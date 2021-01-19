@@ -56,13 +56,10 @@ def B(w, x, y, z, color, text, fontsize = 50, hovercolor = (255, 255, 0), image 
         loadimages(w, x, y, z, image)
     return Button(w, x, y, z, color, text, fontsize, hovercolor)
 
-def B2(button, action, event, actioncommand = None, secondaction = None):
+def B2(button, action, event, *actioncommand):
     if button.is_clicked(event):
         if actioncommand != None:
-            if secondaction != None:
-                action(actioncommand, secondaction)
-            else:
-                action(actioncommand)
+            action(*actioncommand)
         else:
             action()
 
