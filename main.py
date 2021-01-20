@@ -179,6 +179,9 @@ def team(slide):
     openshop = True
     while openshop:
         running = True
+        button_dict = {}
+        XVALUEFORBUTTON = [100, 280, 460, 640, 820]
+        YVALUEFORBUTTON = [215] * 5 + [310] * 5 + [405] * 5
         if slide == 'Team':
             while running:
                 basicheading('Team')
@@ -237,23 +240,10 @@ def team(slide):
                 BWEAPONS = B(540, 125, 150, 50, (0, 242, 255), 'Weapons', 30)
                 BUPGRADES = B(770, 125, 150, 50, (0, 242, 255), 'Upgrades', 30)
 
-                BPLAYER = B(100, 215, 80, 80, (0, 211, 222), 'In shop', 25, image = PLAYER.inventory('self'))
-                BALPIN = B(280, 215, 80, 80, (0, 211, 222), 'In shop', 25, image = ALPIN.inventory('self'))
-                B(460, 215, 80, 80, (0, 211, 222), 'In shop', 25, image = GAR.inventory('self'))
-                B(640, 215, 80, 80, (0, 211, 222), 'In shop', 25, image = MARKSON.inventory('self'))
-                B(820, 215, 80, 80, (0, 211, 222), 'Level 2', 25, image = SWAMP.inventory('self'))
-
-                B(100, 310, 80, 80, (0, 211, 222), 'In shop', 25, image = SISTER.inventory('self'))
-                B(280, 310, 80, 80, (0, 211, 222), 'In shop', 25, image = TORPEDO.inventory('self'))
-                B(460, 310, 80, 80, (0, 211, 222), 'Level 4', 25, image = REAPER.inventory('self'))
-                B(640, 310, 80, 80, (0, 211, 222), 'In shop', 25, image = MINER.inventory('self'))
-                B(820, 310, 80, 80, (0, 211, 222), 'In shop', 25, image = RAZOR.inventory('self'))
-
-                B(100, 405, 80, 80, (0, 211, 222), 'Level 6', 25, image = PHANTASM.inventory('self'))
-                B(280, 405, 80, 80, (0, 211, 222), 'Level 8', 25, image = STALKER.inventory('self'))
-                B(460, 405, 80, 80, (0, 211, 222), 'In shop', 25, image = VIVI.inventory('self'))
-                B(640, 405, 80, 80, (0, 211, 222), 'In shop', 25, image = CLYPEUS.inventory('self'))
-                B(820, 405, 80, 80, (0, 211, 222), 'Level 10', 25, image = EXECUTIONER.inventory('self'))
+                buttonslist = ['BPLAYER', 'BALPIN', 'BGAR', 'BMARKSON', 'BSWAMP', 'BSISTER', 'BTORPEDO', 'BREAPER', 'BMINER', 'BRAZOR', 'BPHANTASM', 'BSTALKER', 'BVIVI', 'BCLYPEUS', 'BEXECUTIONER']
+                heroslist = [PLAYER, ALPIN, GAR, MARKSON, SWAMP, SISTER, TORPEDO, REAPER, MINER, RAZOR, PHANTASM, STALKER, VIVI, CLYPEUS, EXECUTIONER]
+                for button, hero, x, y in zip(buttonslist, heroslist, itertools.cycle(XVALUEFORBUTTON), YVALUEFORBUTTON):
+                    button_dict[button] = B(x, y, 80, 80, (0, 211, 222), requirements(hero), 25, image = hero.inventory('self'))
 
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
@@ -274,10 +264,8 @@ def team(slide):
                     if BUPGRADES.is_clicked(event):
                         slide = 'Upgrades'
                         running = False
-
-                    B2(BPLAYER, selectionbox, event, PLAYER, 'hero', 'team', 'In Shop')
-                    B2(BALPIN, selectionbox, event, ALPIN, 'hero', 'team', 'In Shop')
-
+                    for button, hero in zip(button_dict, heroslist):
+                        B2(button_dict[button], selectionbox, event, hero, 'hero', 'team', requirements(hero))
 
                 pygame.display.update()
                 clock.tick(30)
@@ -292,23 +280,10 @@ def team(slide):
                 B(540, 125, 150, 50, (0, 211, 222), 'Weapons', 55, (0, 211, 222))
                 BUPGRADES = B(770, 125, 150, 50, (0, 242, 255), 'Upgrades', 30)
 
-                BSWORD = B(100, 215, 80, 80, (0, 211, 222), 'Level 1', 25, image = SWORD.inventory('self'))
-                BBOW = B(280, 215, 80, 80, (0, 211, 222), 'In shop', 25, image = BOWANDARROW.inventory('self'))
-                BDUALBLADES = B(460, 215, 80, 80, (0, 211, 222), 'In shop', 25, image = DUALBALDE.inventory('self'))
-                BCHAINKUNAI = B(640, 215, 80, 80, (0, 211, 222), 'In shop', 25, image = CHAINKUNAI.inventory('self'))
-                BSPEAR = B(820, 215, 80, 80, (0, 211, 222), 'In shop', 25, image = SPEAR.inventory('self'))
-
-                BAX = B(100, 310, 80, 80, (0, 211, 222), 'Level 9', 25, image = AX.inventory('self'))
-                BMACE = B(280, 310, 80, 80, (0, 211, 222), 'In shop', 25, image = MACE.inventory('self'))
-                BHAMMER = B(460, 310, 80, 80, (0, 211, 222), 'In shop', 25, image = HAMMER.inventory('self'))
-                BNUNCHUCKS = B(640, 310, 80, 80, (0, 211, 222), 'In shop', 25, image = NUNCHUCKS.inventory('self'))
-                BPICKAXE = B(820, 310, 80, 80, (0, 211, 222), 'In shop', 25, image = PICKAXE.inventory('self'))
-
-                BMAGIC = B(100, 405, 80, 80, (0, 211, 222), 'Level 7', 25, image = MAGIC.inventory('self'))
-                BCLUB = B(280, 405, 80, 80, (0, 211, 222), 'In shop', 25, image = CLUB.inventory('self'))
-                BBLOWGUN = B(460, 405, 80, 80, (0, 211, 222), 'Level 3', 25, image = BLOWGUN.inventory('self'))
-                BSCYTHE = B(640, 405, 80, 80, (0, 211, 222), 'Level 5', 25, image = SCYTHE.inventory('self'))
-                BHEAL = B(820, 405, 80, 80, (0, 211, 222), 'In shop', 25, image = HEAL.inventory('self'))
+                buttonslist = ['BSWORD', 'BBOW', 'BDUALBLADE', 'BCHAINKUNAI', 'BSPEAR', 'BAX', 'BMACE', 'BHAMMER', 'BNUNCHUCKS', 'BPICKAXE', 'BMAGIC', 'BCLUB', 'BBLOWGUN', 'BSCYTHE', 'BHEAL']
+                weaponslist = [SWORD, BOWANDARROW, DUALBALDE, CHAINKUNAI, SPEAR, AX, MACE, HAMMER, NUNCHUCKS, PICKAXE, MAGIC, CLUB, BLOWGUN, SCYTHE, HEAL]
+                for button, weapon, x, y in zip(buttonslist, weaponslist, itertools.cycle(XVALUEFORBUTTON), YVALUEFORBUTTON):
+                    button_dict[button] = B(x, y, 80, 80, (0, 211, 222), requirements(weapon), 25, image = weapon.inventory('self'))
 
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
@@ -329,6 +304,8 @@ def team(slide):
                     if BUPGRADES.is_clicked(event):
                         slide = 'Upgrades'
                         running = False
+                    for button, weapon in zip(button_dict, weaponslist):
+                        B2(button_dict[button], selectionbox, event, weapon, 'weapon', 'team', requirements(weapon))
                 pygame.display.update()
                 clock.tick(30)
         if slide == 'Upgrades':
@@ -757,6 +734,12 @@ STALKER = Character('Stalker', 'Rare', 50, 250, 150, 100, 50, 25, 15, 'GAMEHEROI
 VIVI = Character('Vivi', 'Epic', 50, 250, 150, 100, 50, 25, 15, 'GAMEHEROICONS/game_vivi_icon.png', None)
 CLYPEUS = Character('Clypeus', 'Epic', 50, 250, 150, 100, 50, 25, 15, 'GAMEHEROICONS/game_clypeus_icon.png', None)
 EXECUTIONER = Character('Executioner', 'Epic', 50, 250, 150, 100, 50, 25, 15, 'GAMEHEROICONS/game_executioner_icon.png', None, requiredlevel = 10)
+
+def requirements(item):
+    if item.requiredlevel == 0:
+        return 'In Shop'
+    else:
+        return 'Level ' + str(item.requiredlevel)
 
 '''code testing'''
 
