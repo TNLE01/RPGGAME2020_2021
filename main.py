@@ -56,13 +56,10 @@ def B(w, x, y, z, color, text, fontsize = 50, hovercolor = (255, 255, 0), image 
         loadimages(w, x, y, z, image)
     return Button(w, x, y, z, color, text, fontsize, hovercolor)
 
-def B2(button, action, event, actioncommand = None, secondaction = None):
+def B2(button, action, event, *actioncommand):
     if button.is_clicked(event):
         if actioncommand != None:
-            if secondaction != None:
-                action(actioncommand, secondaction)
-            else:
-                action(actioncommand)
+            action(*actioncommand)
         else:
             action()
 
@@ -240,8 +237,8 @@ def team(slide):
                 BWEAPONS = B(540, 125, 150, 50, (0, 242, 255), 'Weapons', 30)
                 BUPGRADES = B(770, 125, 150, 50, (0, 242, 255), 'Upgrades', 30)
 
-                B(100, 215, 80, 80, (0, 211, 222), 'In shop', 25, image = PLAYER.inventory('self'))
-                B(280, 215, 80, 80, (0, 211, 222), 'In shop', 25, image = ALPIN.inventory('self'))
+                BPLAYER = B(100, 215, 80, 80, (0, 211, 222), 'In shop', 25, image = PLAYER.inventory('self'))
+                BALPIN = B(280, 215, 80, 80, (0, 211, 222), 'In shop', 25, image = ALPIN.inventory('self'))
                 B(460, 215, 80, 80, (0, 211, 222), 'In shop', 25, image = GAR.inventory('self'))
                 B(640, 215, 80, 80, (0, 211, 222), 'In shop', 25, image = MARKSON.inventory('self'))
                 B(820, 215, 80, 80, (0, 211, 222), 'Level 2', 25, image = SWAMP.inventory('self'))
@@ -277,6 +274,11 @@ def team(slide):
                     if BUPGRADES.is_clicked(event):
                         slide = 'Upgrades'
                         running = False
+
+                    B2(BPLAYER, selectionbox, event, PLAYER, 'hero', 'team', 'In Shop')
+                    B2(BALPIN, selectionbox, event, ALPIN, 'hero', 'team', 'In Shop')
+
+
                 pygame.display.update()
                 clock.tick(30)
         if slide == 'Weapons':
@@ -410,14 +412,13 @@ def shop(slide):
                         slide = 'Upgrades'
                         running = False
                     for button, hero in zip(button_dict, heroslist):
-                        B2(button_dict[button], shopbox, event, hero, 'hero')
+                        B2(button_dict[button], selectionbox, event, hero, 'hero', 'buy', 'Recruited')
                 pygame.display.update()
                 clock.tick(30)
         if slide == 'Weapons':
             while running:
                 basicheading('Shop')
                 pygame.draw.rect(screen, (0, 211, 222), pygame.Rect(350, 100, 300, 500 / 5))
-
 
                 BBACK = B(25, 25, 150, 50, (200, 20, 20), 'Back')
                 BHEROS = B(100, 125, 200, 50, (0, 242, 255), 'Heros')
@@ -446,7 +447,7 @@ def shop(slide):
                         slide = 'Upgrades'
                         running = False
                     for button, weapon in zip(button_dict, weaponslist):
-                        B2(button_dict[button], shopbox, event, weapon, 'weapon')
+                        B2(button_dict[button], selectionbox, event, weapon, 'weapon', 'buy', 'Sold Out')
                 pygame.display.update()
                 clock.tick(30)
         if slide == 'Upgrades':
@@ -486,24 +487,36 @@ def shop(slide):
     global SHOPLASTOPEN
     SHOPLASTOPEN = slide
 
-def shopbox(buyitem, type):
+def selectionbox(item, type, use, errormessage):
+    print(item.bought)
+    print(use)
     global GOLD
     running = True
-    DATALIST = [buyitem.cost, buyitem.type, buyitem.damage, buyitem.defense, buyitem.health, buyitem.critrate, buyitem.critdamage, buyitem.speed]
     while running:
+        key = ''
+        DATALIST = [item.cost, item.type, item.damage, item.defense, item.health, item.critrate, item.critdamage, item.speed]
 
         if type == 'hero':
             statslist = ['Cost = ', 'Rarity = ', 'Damage Bonus = ', 'Base Defense = ', 'Base Health = ', 'Crit Rate Bonus = ', 'Base Crit Damage = ', 'Speed = ']
-            boughtmessage = 'Recruited'
         else:
             statslist = ['Cost = ', 'Type = ', 'Base Damage = ', 'Defense Bonus = ', 'Health Bonus = ', 'Base Crit Rate = ', 'Crit Damage Bonus = ', 'Weight = ']
-            boughtmessage = 'Sold Out'
 
-        if buyitem.bought == None:
+        if use == 'buy':
+            question = ['Do you wish to buy: ', '?']
+            if item.bought == None:
+                key = 'shop'
+        else:
+            question = ['Add ', ' to your team?']
+            statslist.remove('Cost = ')
+            DATALIST.remove(item.cost)
+            if item.bought != None:
+                key = 'team'
+
+        if key == 'shop' or key == 'team':
 
             B(275, 25, 450, 450, (0, 242, 255), '', 75, (0, 242, 255))
-            B(275, 25, 450, 50, (0, 242, 255), 'Do you wish to buy: ' + str(buyitem.name) + '?', 30, (0, 242, 255))
-            B(300, 100, 250, 250, (0, 0, 0), '', 0, (0, 0, 0), image = buyitem.icon)
+            B(275, 25, 450, 50, (0, 242, 255), question[0] + str(item.name) + question[1], 30, (0, 242, 255))
+            B(300, 100, 250, 250, (0, 0, 0), '', 0, (0, 0, 0), image = item.icon)
 
             YVALUEFORSTATS = 0
             for stat, statdata in zip(statslist, DATALIST):
@@ -514,7 +527,7 @@ def shopbox(buyitem, type):
             BACCEPT = B(475 + 100/3, 400, 200, 50, (20, 200, 20), 'Accept')
 
         else:
-            B(275, 25, 450, 450, (0, 242, 255), boughtmessage, 75, (0, 242, 255))
+            B(275, 25, 450, 450, (0, 242, 255), errormessage, 75, (0, 242, 255))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -527,18 +540,43 @@ def shopbox(buyitem, type):
                 or B(0, 25, 275, 450, (0, 242, 255), '', invisible = 'on').is_clicked(event)\
                 or B(725, 25, 275, 450, (0, 242, 255), '', invisible = 'on').is_clicked(event):
                 running = False
-            if buyitem.bought == None:
+            if key == 'shop' or key == 'team':
                 if BCANCEL.is_clicked(event):
                     running = False
                 if BACCEPT.is_clicked(event):
-                    if GOLD >= buyitem.cost:
-                        GOLD = GOLD - buyitem.cost
-                        buyitem.bought = 'yes'
-                        running = False
+                    if use == 'buy':
+                        if GOLD >= item.cost:
+                            GOLD = GOLD - item.cost
+                            item.bought = 'yes'
+                            running = False
+                        else:
+                            print('not enough gold')
                     else:
-                        print('no')
+                        teambox('test')
         pygame.display.update()
         clock.tick(30)
+
+def teambox(boughtitem):
+    print('testing team box')
+
+    # running = True
+    # DATALIST = [boughtitem.type, boughtitem.damage, boughtitem.defense, boughtitem.health, boughtitem.critrate, boughtitem.critdamage, boughtitem.speed]
+    # while running:
+    #
+    #
+    #     for event in pygame.event.get():
+    #         if event.type == pygame.QUIT:
+    #             closing()
+    #         if event.type == pygame.KEYDOWN:
+    #             if event.key == pygame.K_ESCAPE:
+    #                 running = False
+    #         if B(0, 0, 1000, 25, (0, 242, 255), '', invisible = 'on').is_clicked(event)\
+    #             or B(0, 475, 1000, 25, (0, 242, 255), '', invisible = 'on').is_clicked(event)\
+    #             or B(0, 25, 275, 450, (0, 242, 255), '', invisible = 'on').is_clicked(event)\
+    #             or B(725, 25, 275, 450, (0, 242, 255), '', invisible = 'on').is_clicked(event):
+    #             running = False
+    #     pygame.display.update()
+    #     clock.tick(30)
 
 def monsters():
     running = True
@@ -617,7 +655,7 @@ def testscreen():
             if BTAKEXP.is_clicked(event):
                 XP = XP - 100
                 print('XP subtracted, now at ' + str(XP))
-            B2(BTEST, shopbox, event, BOWANDARROW)
+            B2(BTEST, selectionbox, event, BOWANDARROW, 'test', 'testing again')
         pygame.display.update()
         clock.tick(30)
 
@@ -743,6 +781,14 @@ EXECUTIONER = Character('Executioner', 'Epic', 50, 250, 150, 100, 50, 25, 15, 'G
 # print(my_dict['hello'])
 #
 # print(my_dict)
+
+# def m(x, y):
+#     print(x+y)
+#
+# def bbb(func, *args):
+#     func(*args)
+#
+# bbb(m, 3, 4)
 
 menu()
 
