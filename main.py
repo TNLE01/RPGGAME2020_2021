@@ -91,6 +91,7 @@ screen = pygame.display.set_mode((1000, 500))
 pygame.display.set_caption('Coliseum')
 icon = pygame.image.load('GAMEICON.png')
 pygame.display.set_icon(icon)
+gridscreen = 'off'
 
 '''Player stats'''
 
@@ -109,7 +110,7 @@ def XPBAR():
     if XP >= currentlevel*100:
         XP = XP - currentlevel*100
         currentlevel = currentlevel + 1
-    draw_text('Level ' + str(currentlevel), fontstuff(20), (50, 100, 150), screen, (650 + (200 / 2)), (5+ (20 / 2)))
+    draw_text('Level ' + str(currentlevel), fontstuff(20), (50, 100, 150), screen, (650 + (200 / 2)), (5 + (20 / 2)))
 
 def basicheading(title, headingcolor = (0, 211, 222), screencolor = (255, 255, 255), size = 500 / 5):
     screen.fill(screencolor)
@@ -117,6 +118,7 @@ def basicheading(title, headingcolor = (0, 211, 222), screencolor = (255, 255, 2
     draw_text(title, fontstuff(100), (0, 0, 0), screen, 500, 50)
     draw_text('$: ' + str(GOLD), fontstuff(25), (0, 0, 0), screen, 900, 15)
     XPBAR()
+    makegrid()
 
 '''Main game loop'''
 
@@ -181,7 +183,7 @@ def team(slide):
         running = True
         button_dict = {}
         XVALUEFORBUTTON = [100, 280, 460, 640, 820]
-        YVALUEFORBUTTON = [215] * 5 + [310] * 5 + [405] * 5
+        YVALUEFORBUTTON = [215]*5 + [310]*5 + [405]*5
         if slide == 'Team':
             while running:
                 basicheading('Team')
@@ -355,8 +357,8 @@ def shop(slide):
     while openshop:
         running = True
         button_dict = {}
-        XVALUEFORBUTTON = [325 / 6, (325 / 6) * 2 + 135, (325 / 6) * 3 + (135) * 2, (325 / 6) * 4 + (135) * 3, (325 / 6) * 5 + (135) * 4]
-        YVALUEFORBUTTON = [210] * 5 + [220 + 135] * 5
+        XVALUEFORBUTTON = [325/6, (325/6)*2 + 135, (325/6)*3 + (135)*2, (325/6)*4 + (135)*3, (325/6)*5 + (135)*4]
+        YVALUEFORBUTTON = [210]*5 + [220 + 135]*5
         if slide == 'Heros':
             while running:
                 basicheading('Shop')
@@ -464,7 +466,7 @@ def shop(slide):
     global SHOPLASTOPEN
     SHOPLASTOPEN = slide
 
-def selectionbox(item, type, use, errormessage):
+def selectionbox(item, type, use, message):
     print(item.bought)
     print(use)
     global GOLD
@@ -491,8 +493,8 @@ def selectionbox(item, type, use, errormessage):
 
         if key == 'shop' or key == 'team':
 
-            B(275, 25, 450, 450, (0, 242, 255), '', 75, (0, 242, 255))
-            B(275, 25, 450, 50, (0, 242, 255), question[0] + str(item.name) + question[1], 30, (0, 242, 255))
+            B(275, 25, 450, 450, (0, 211, 222), '', 75, (0, 211, 222))
+            B(275, 25, 450, 50, (0, 211, 222), question[0] + str(item.name) + question[1], 30, (0, 211, 222))
             B(300, 100, 250, 250, (0, 0, 0), '', 0, (0, 0, 0), image = item.icon)
 
             YVALUEFORSTATS = 0
@@ -504,7 +506,7 @@ def selectionbox(item, type, use, errormessage):
             BACCEPT = B(475 + 100/3, 400, 200, 50, (20, 200, 20), 'Accept')
 
         else:
-            B(275, 25, 450, 450, (0, 242, 255), errormessage, 75, (0, 242, 255))
+            B(275, 25, 450, 450, (0, 242, 255), message, 75, (0, 242, 255))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -529,31 +531,75 @@ def selectionbox(item, type, use, errormessage):
                         else:
                             print('not enough gold')
                     else:
-                        teambox('test')
+                        loadoutbox(item)
+                        running = False
         pygame.display.update()
         clock.tick(30)
 
-def teambox(boughtitem):
-    print('testing team box')
+def loadoutbox(item):
+    running = True
+    while running:
+        button_dict = {}
+        B(25, 25, 950, 450, (0, 211, 222), '', hovercolor = (0, 211, 222))
+        B(25, 25, 950, 25 + (325 - 850/3), (0, 211, 222), 'Pick the slot', hovercolor = (0, 211, 222))
+        BCANCEL = B(400, 400, 200, 50, (200, 20, 20), 'Cancel')
 
-    # running = True
-    # DATALIST = [boughtitem.type, boughtitem.damage, boughtitem.defense, boughtitem.health, boughtitem.critrate, boughtitem.critdamage, boughtitem.speed]
-    # while running:
-    #
-    #
-    #     for event in pygame.event.get():
-    #         if event.type == pygame.QUIT:
-    #             closing()
-    #         if event.type == pygame.KEYDOWN:
-    #             if event.key == pygame.K_ESCAPE:
-    #                 running = False
-    #         if B(0, 0, 1000, 25, (0, 242, 255), '', invisible = 'on').is_clicked(event)\
-    #             or B(0, 475, 1000, 25, (0, 242, 255), '', invisible = 'on').is_clicked(event)\
-    #             or B(0, 25, 275, 450, (0, 242, 255), '', invisible = 'on').is_clicked(event)\
-    #             or B(725, 25, 275, 450, (0, 242, 255), '', invisible = 'on').is_clicked(event):
-    #             running = False
-    #     pygame.display.update()
-    #     clock.tick(30)
+        '''Location markers ↓↓↓, B12 = "Button" team "1" weapons slot "2"'''
+
+        # B(50, 50 + (325 - 850/3), 850/3, 850/3, (0, 0, 0), '')
+        # B(75 + (850/3), 50 + (325 - 850/3), 850/3, 850/3, (0, 0, 0), '')
+        # B(100 + (850/3) * 2, 50 + (325 - 850/3), 850/3, 850/3, (0, 0, 0), '')
+
+        buttonslist = ['B10', 'B11', 'B12', 'B13', 'B20', 'B21', 'B22', 'B23', 'B30', 'B31', 'B32', 'B33']
+        XVALUEFORBUTTONTEAM = [50, 75 + (850/3), 100 + (850/3)*2]
+        XVALUEFORBUTTONWEAPONS = [0, 850/3/3 + 3.75, 2*(850/3/3) + 7.5]
+        buttonmark = 0
+        for teamslot in XVALUEFORBUTTONTEAM:
+            button_dict[buttonslist[buttonmark]] = B(teamslot, 50 + (325 - 850/3), 2*(850/3/3) - 3.75, 2*(850/3/3) - 3.75, (0, 242, 255), '')
+            buttonmark += 1
+            for weaponslot in XVALUEFORBUTTONWEAPONS:
+                button_dict[buttonslist[buttonmark]] = B(teamslot + weaponslot, 50 + (325 - 850 / 3) + 850 / 3 - 850 / 3 / 3 + 7.5, 850 / 3 / 3 - 7.5, 850 / 3 / 3 - 7.5, (0, 242, 255), '')
+                buttonmark += 1
+
+        B(50, 50 + (325 - 850/3), 2*(850/3/3) - 3.75, 2*(850/3/3) - 3.75, (0, 242, 255), '')
+        B(50, 50 + (325 - 850/3) + 850/3 - 850/3/3 + 7.5, 850/3/3 - 7.5, 850/3/3 - 7.5, (0, 242, 255), '')
+        B(50 + 850/3/3 + 3.75, 50 + (325 - 850/3) + 850/3 - 850/3/3 + 7.5, 850/3/3 - 7.5, 850/3/3 - 7.5, (0, 242, 255), '')
+        B(50 + 2*(850/3/3) + 7.5, 50 + (325 - 850/3) + 2*(850/3/3) + 7.5, 850/3/3 - 7.5, 850/3/3 - 7.5, (0, 242, 255), '')
+        # B(50 + 2*(850/3/3) + 7.5, 50 + (325 - 850/3) + 850/3/3 + 3.75, 850/3/3 - 7.5, 850/3/3 - 7.5, (0, 242, 255), '')
+        # B(50 + 2*(850/3/3) + 7.5, 50 + (325 - 850/3), 850/3/3 - 7.5, 850/3/3 - 7.5, (0, 242, 255), '')
+
+        B(75 + (850/3), 50 + (325 - 850/3), 2*(850/3/3) - 3.75, 2*(850/3/3) - 3.75, (0, 242, 255), '')
+        B(75 + (850/3), 50 + (325 - 850/3) + 850/3 - 850/3/3 + 7.5, 850/3/3 - 7.5, 850/3/3 - 7.5, (0, 242, 255), '')
+        B(75 + (850/3) + 850/3/3 + 3.75, 50 + (325 - 850/3) + 850/3 - 850/3/3 + 7.5, 850/3/3 - 7.5, 850/3/3 - 7.5, (0, 242, 255), '')
+        B(75 + (850/3) + 2*(850/3/3) + 7.5, 50 + (325 - 850/3) + 2*(850 / 3 / 3) + 7.5, 850/3/3 - 7.5, 850/3/3 - 7.5, (0, 242, 255), '')
+        # B(75 + (850/3) + 2*(850/3/3) + 7.5, 50 + (325 - 850/3) + 850/3/3 + 3.75, 850/3/3 - 7.5, 850/3/3 - 7.5, (0, 242, 255), '')
+        # B(75 + (850/3) + 2*(850/3/3) + 7.5, 50 + (325 - 850/3), 850/3/3 - 7.5, 850/3/3 - 7.5, (0, 242, 255), '')
+
+        B(100 + (850/3)*2, 50 + (325 - 850/3), 2*(850/3/3) - 3.75, 2*(850/3/3) - 3.75, (0, 242, 255), '')
+        B(100 + (850/3)*2, 50 + (325 - 850/3) + 850/3 - 850/3/3 + 7.5, 850/3/3 - 7.5, 850/3/3 - 7.5, (0, 242, 255), '')
+        B(100 + (850/3)*2 + 850/3/3 + 3.75, 50 + (325 - 850/3) + 850/3 - 850/3/3 + 7.5, 850/3/3 - 7.5, 850/3/3 - 7.5, (0, 242, 255), '')
+        B(100 + (850/3)*2 + 2*(850/3/3) + 7.5, 50 + (325 - 850/3) + 2*(850/3/3) + 7.5, 850/3/3 - 7.5, 850/3/3 - 7.5, (0, 242, 255), '')
+        # B(100 + (850/3)*2 + 2*(850/3/3) + 7.5, 50 + (325 - 850/3) + 850/3/3 + 3.75, 850/3/3 - 7.5, 850/3/3 - 7.5, (0, 242, 255), '')
+        # B(100 + (850/3)*2 + 2*(850/3/3) + 7.5, 50 + (325 - 850/3), 850/3/3 - 7.5, 850/3/3 - 7.5, (0, 242, 255), '')
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                closing()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    running = False
+            if B(0, 0, 1000, 25, (0, 242, 255), '', invisible = 'on').is_clicked(event)\
+                or B(0, 475, 1000, 25, (0, 242, 255), '', invisible = 'on').is_clicked(event)\
+                or B(0, 25, 25, 450, (0, 242, 255), '', invisible = 'on').is_clicked(event)\
+                or B(975, 25, 25, 450, (0, 242, 255), '', invisible = 'on').is_clicked(event)\
+                or BCANCEL.is_clicked(event):
+                    running = False
+
+            for button in button_dict:
+                if button_dict[button].is_clicked(event):
+                    print(button)
+        pygame.display.update()
+        clock.tick(30)
 
 def monsters():
     running = True
@@ -606,9 +652,9 @@ def testscreen():
         BTAKEGOLD = B(100, 500 / 2 + 150, 200, 50, (0, 242, 255), 'Minus Gold')
         BTAKEXP = B(400, 500 / 2 + 150, 200, 50, (0, 242, 255), 'Minus XP')
         BTEST = B(700, 500 / 2 + 50, 200, 50, (0, 242, 255), 'TEST BUTTON')
+        BGRID = B(700, 500 / 2 + 150, 200, 50, (0, 242, 255), 'Grid')
 
-
-
+        global gridscreen
         global GOLD
         global XP
 
@@ -632,9 +678,28 @@ def testscreen():
             if BTAKEXP.is_clicked(event):
                 XP = XP - 100
                 print('XP subtracted, now at ' + str(XP))
-            B2(BTEST, selectionbox, event, BOWANDARROW, 'test', 'testing again')
+            B2(BTEST, selectionbox, event, BOWANDARROW, 'test', 'testing again', 'testing once again')
+            if BGRID.is_clicked(event):
+                if gridscreen == 'off':
+                    gridscreen = 'on'
+                else:
+                    gridscreen = 'off'
+                makegrid()
         pygame.display.update()
         clock.tick(30)
+
+def makegrid():
+    if gridscreen == 'on':
+        XVALUEFORLINE = 0
+        YVALUEFORLINE = 0
+        for x in range(21):
+            pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(XVALUEFORLINE, 0, 1, 500))
+            XVALUEFORLINE += 50
+        for y in range(11):
+            pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(0, YVALUEFORLINE, 1000, 1))
+            YVALUEFORLINE += 50
+    else:
+        pass
 
 '''Weapons for player, place holder stats'''
 
@@ -670,10 +735,10 @@ class Weapon():
                 return None
 
 SWORD = Weapon('Sword', 'Damage', 50, 250, 150, 100, 50, 25, 15, 'GAMEWEAPONS/game_sword_icon.png', requiredlevel = 1)
-BOWANDARROW = Weapon('Bow and Arrows', 'Damage', 50, 250, 150, 100, 50, 25, 15, 'GAMEWEAPONS/game_bow_icon.png')
-DUALBALDE = Weapon('Dual Blades', 'Damage', 50, 250, 150, 100, 50, 25, 15, 'GAMEWEAPONS/game_dualblade_icon.png')
-CHAINKUNAI = Weapon('Chained Kunai', 'Damage', 50, 250, 150, 100, 50, 25, 15, 'GAMEWEAPONS/game_chainkunai_icon.png')
-SPEAR = Weapon('Spear', 'Damage', 50, 250, 150, 100, 50, 25, 15, 'GAMEWEAPONS/game_spear_icon.png')
+BOWANDARROW = Weapon('Bow and Arrows', 'Damage', 0, 250, 150, 100, 50, 25, 15, 'GAMEWEAPONS/game_bow_icon.png')
+DUALBALDE = Weapon('Dual Blades', 'Damage', 0, 250, 150, 100, 50, 25, 15, 'GAMEWEAPONS/game_dualblade_icon.png')
+CHAINKUNAI = Weapon('Chained Kunai', 'Damage', 0, 250, 150, 100, 50, 25, 15, 'GAMEWEAPONS/game_chainkunai_icon.png')
+SPEAR = Weapon('Spear', 'Damage', 0, 250, 150, 100, 50, 25, 15, 'GAMEWEAPONS/game_spear_icon.png')
 AX = Weapon('Ax', 'Damage', 50, 250, 150, 100, 50, 25, 15, 'GAMEWEAPONS/game_ax_icon.png', requiredlevel = 9)
 MACE = Weapon('Mace', 'Breaker', 50, 250, 150, 100, 50, 25, 15, 'GAMEWEAPONS/game_mace_icon.png')
 HAMMER = Weapon('Hammer', 'Breaker', 50, 250, 150, 100, 50, 25, 15, 'GAMEWEAPONS/game_hammer_icon.png')
@@ -719,10 +784,10 @@ class Character():
             else:
                 return None
 
-PLAYER = Character('Player', 'Common', 50, 250, 150, 100, 50, 25, 15, 'GAMEHEROICONS/game_player_icon.png', None)
-ALPIN = Character('Alpin', 'Common', 50, 250, 150, 100, 50, 25, 15, 'GAMEHEROICONS/game_alpin_icon.png', None)
-GAR = Character('Gar', 'Common', 50, 250, 150, 100, 50, 25, 15, 'GAMEHEROICONS/game_gar_icon.png', None)
-MARKSON = Character('Markson', 'Common', 50, 250, 150, 100, 50, 25, 15, 'GAMEHEROICONS/game_markson_icon.png', None)
+PLAYER = Character('Player', 'Common', 0, 250, 150, 100, 50, 25, 15, 'GAMEHEROICONS/game_player_icon.png', None)
+ALPIN = Character('Alpin', 'Common', 0, 250, 150, 100, 50, 25, 15, 'GAMEHEROICONS/game_alpin_icon.png', None)
+GAR = Character('Gar', 'Common', 0, 250, 150, 100, 50, 25, 15, 'GAMEHEROICONS/game_gar_icon.png', None)
+MARKSON = Character('Markson', 'Common', 0, 250, 150, 100, 50, 25, 15, 'GAMEHEROICONS/game_markson_icon.png', None)
 SWAMP = Character('Swamp', 'Rare', 50, 250, 150, 100, 50, 25, 15, 'GAMEHEROICONS/game_swamp_icon.png', None, requiredlevel = 2)
 SISTER = Character('Sister', 'Rare', 50, 250, 150, 100, 50, 25, 15, 'GAMEHEROICONS/game_sister_icon.png', None)
 TORPEDO = Character('Torpedo', 'Rare', 50, 250, 150, 100, 50, 25, 15, 'GAMEHEROICONS/game_torpedo_icon.png', None)
