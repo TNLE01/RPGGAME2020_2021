@@ -64,7 +64,7 @@ def B2(button, action, event, *actioncommand):
             action()
 
 def loadimages(w, x, y, z, image):
-    screen.blit(pygame.transform.scale(pygame.image.load(image), (y - 10, z - 10)), (w + 5,x +5))
+    screen.blit(pygame.transform.scale(pygame.image.load(image), (int(y) - 10, int(z) - 10)), (int(w) + 5,int(x) +5))
 
 def closing():
     pygame.quit()
@@ -195,20 +195,27 @@ def team(slide):
                 BWEAPONS = B(540, 125, 150, 50, (0, 242, 255), 'Weapons', 30)
                 BUPGRADES = B(770, 125, 150, 50, (0, 242, 255), 'Upgrades', 30)
 
-                B(47.5, 215, 175, 270, (0, 211, 222), '')
-                B(237.5, 215, 80, 80, (0, 211, 222), '')
-                B(237.5, 310, 80, 80, (0, 211, 222), '')
-                B(237.5, 405, 80, 80, (0, 211, 222), '')
+                buttonslist = ['B10', 'B11', 'B12', 'B13', 'B20', 'B21', 'B22', 'B23', 'B30', 'B31', 'B32', 'B33']
+                XVALUEFORBUTTONTEAM = [47.5, 365, 682.5]
+                XVALUEFORBUTTONWEAPONS = [237.5, 555, 872.5]
+                YVALUEFORBUTTONWEAPONS = [215, 310, 405]
 
-                B(365, 215, 175, 270, (0, 211, 222), '')
-                B(555, 215, 80, 80, (0, 211, 222), '')
-                B(555, 310, 80, 80, (0, 211, 222), '')
-                B(555, 405, 80, 80, (0, 211, 222), '')
+                onteamimages = [None, None, None, None, None, None, None, None, None, None, None, None]
+                for weapon, hero in zip(fullweaponslist, fullheroslist):
+                    if weapon.onteam != None:
+                        onteamimages.pop(weapon.teamcode)
+                        onteamimages.insert(weapon.teamcode, weapon.icon)
+                    if hero.onteam != None:
+                        onteamimages.pop(hero.teamcode)
+                        onteamimages.insert(hero.teamcode, hero.icon)
 
-                B(682.5, 215, 175, 270, (0, 211, 222), '')
-                B(872.5, 215, 80, 80, (0, 211, 222), '')
-                B(872.5, 310, 80, 80, (0, 211, 222), '')
-                B(872.5, 405, 80, 80, (0, 211, 222), '')
+                buttonmark = 0
+                for teamslot, Xweaponslot in zip(XVALUEFORBUTTONTEAM, XVALUEFORBUTTONWEAPONS):
+                    button_dict[buttonslist[buttonmark]] = B(teamslot, 215, 175, 270, (0, 211, 222), '')
+                    buttonmark += 1
+                    for Yweaponslot in YVALUEFORBUTTONWEAPONS:
+                        button_dict[buttonslist[buttonmark]] = B(Xweaponslot, Yweaponslot,80, 80, (0, 211, 222), '', image = onteamimages[buttonmark])
+                        buttonmark += 1
 
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
@@ -229,6 +236,9 @@ def team(slide):
                     if BUPGRADES.is_clicked(event):
                         slide = 'Upgrades'
                         running = False
+                    for button, index in zip(button_dict, range(0, 12)):
+                        if button_dict[button].is_clicked(event):
+                            print(button, index)
                 pygame.display.update()
                 clock.tick(30)
         if slide == 'Heros':
@@ -243,8 +253,7 @@ def team(slide):
                 BUPGRADES = B(770, 125, 150, 50, (0, 242, 255), 'Upgrades', 30)
 
                 buttonslist = ['BPLAYER', 'BALPIN', 'BGAR', 'BMARKSON', 'BSWAMP', 'BSISTER', 'BTORPEDO', 'BREAPER', 'BMINER', 'BRAZOR', 'BPHANTASM', 'BSTALKER', 'BVIVI', 'BCLYPEUS', 'BEXECUTIONER']
-                heroslist = [PLAYER, ALPIN, GAR, MARKSON, SWAMP, SISTER, TORPEDO, REAPER, MINER, RAZOR, PHANTASM, STALKER, VIVI, CLYPEUS, EXECUTIONER]
-                for button, hero, x, y in zip(buttonslist, heroslist, itertools.cycle(XVALUEFORBUTTON), YVALUEFORBUTTON):
+                for button, hero, x, y in zip(buttonslist, fullheroslist, itertools.cycle(XVALUEFORBUTTON), YVALUEFORBUTTON):
                     button_dict[button] = B(x, y, 80, 80, (0, 211, 222), requirements(hero), 25, image = hero.inventory('self'))
 
                 for event in pygame.event.get():
@@ -266,7 +275,7 @@ def team(slide):
                     if BUPGRADES.is_clicked(event):
                         slide = 'Upgrades'
                         running = False
-                    for button, hero in zip(button_dict, heroslist):
+                    for button, hero in zip(button_dict, fullheroslist):
                         B2(button_dict[button], selectionbox, event, hero, 'hero', 'team', requirements(hero))
 
                 pygame.display.update()
@@ -283,8 +292,7 @@ def team(slide):
                 BUPGRADES = B(770, 125, 150, 50, (0, 242, 255), 'Upgrades', 30)
 
                 buttonslist = ['BSWORD', 'BBOW', 'BDUALBLADE', 'BCHAINKUNAI', 'BSPEAR', 'BAX', 'BMACE', 'BHAMMER', 'BNUNCHUCKS', 'BPICKAXE', 'BMAGIC', 'BCLUB', 'BBLOWGUN', 'BSCYTHE', 'BHEAL']
-                weaponslist = [SWORD, BOWANDARROW, DUALBALDE, CHAINKUNAI, SPEAR, AX, MACE, HAMMER, NUNCHUCKS, PICKAXE, MAGIC, CLUB, BLOWGUN, SCYTHE, HEAL]
-                for button, weapon, x, y in zip(buttonslist, weaponslist, itertools.cycle(XVALUEFORBUTTON), YVALUEFORBUTTON):
+                for button, weapon, x, y in zip(buttonslist, fullweaponslist, itertools.cycle(XVALUEFORBUTTON), YVALUEFORBUTTON):
                     button_dict[button] = B(x, y, 80, 80, (0, 211, 222), requirements(weapon), 25, image = weapon.inventory('self'))
 
                 for event in pygame.event.get():
@@ -306,7 +314,7 @@ def team(slide):
                     if BUPGRADES.is_clicked(event):
                         slide = 'Upgrades'
                         running = False
-                    for button, weapon in zip(button_dict, weaponslist):
+                    for button, weapon in zip(button_dict, fullweaponslist):
                         B2(button_dict[button], selectionbox, event, weapon, 'weapon', 'team', requirements(weapon))
                 pygame.display.update()
                 clock.tick(30)
@@ -531,15 +539,22 @@ def selectionbox(item, type, use, message):
                         else:
                             print('not enough gold')
                     else:
-                        loadoutbox(item)
+                        loadoutbox(item, type)
                         running = False
         pygame.display.update()
         clock.tick(30)
 
-def loadoutbox(item):
+def loadoutbox(item, type):
     running = True
     while running:
+
         button_dict = {}
+        if type == 'hero':
+            actioncolorhero = (255, 255, 0)
+            actioncolorweapon = (0, 242, 255)
+        else:
+            actioncolorhero = (0, 242, 255)
+            actioncolorweapon = (255, 255, 0)
         B(25, 25, 950, 450, (0, 211, 222), '', hovercolor = (0, 211, 222))
         B(25, 25, 950, 25 + (325 - 850/3), (0, 211, 222), 'Pick the slot', hovercolor = (0, 211, 222))
         BCANCEL = B(400, 400, 200, 50, (200, 20, 20), 'Cancel')
@@ -553,34 +568,23 @@ def loadoutbox(item):
         buttonslist = ['B10', 'B11', 'B12', 'B13', 'B20', 'B21', 'B22', 'B23', 'B30', 'B31', 'B32', 'B33']
         XVALUEFORBUTTONTEAM = [50, 75 + (850/3), 100 + (850/3)*2]
         XVALUEFORBUTTONWEAPONS = [0, 850/3/3 + 3.75, 2*(850/3/3) + 7.5]
+
+        onteamimages = [None, None, None, None, None, None, None, None, None, None, None, None]
+        for weapon, hero in zip(fullweaponslist, fullheroslist):
+            if weapon.onteam != None:
+                onteamimages.pop(weapon.teamcode)
+                onteamimages.insert(weapon.teamcode, weapon.icon)
+            if hero.onteam != None:
+                onteamimages.pop(hero.teamcode)
+                onteamimages.insert(hero.teamcode, hero.icon)
+
         buttonmark = 0
         for teamslot in XVALUEFORBUTTONTEAM:
-            button_dict[buttonslist[buttonmark]] = B(teamslot, 50 + (325 - 850/3), 2*(850/3/3) - 3.75, 2*(850/3/3) - 3.75, (0, 242, 255), '')
+            button_dict[buttonslist[buttonmark]] = B(teamslot, 50 + (325 - 850/3), 2*(850/3/3) - 3.75, 2*(850/3/3) - 3.75, (0, 242, 255), 'Hero', hovercolor = actioncolorhero, image = onteamimages[buttonmark])
             buttonmark += 1
             for weaponslot in XVALUEFORBUTTONWEAPONS:
-                button_dict[buttonslist[buttonmark]] = B(teamslot + weaponslot, 50 + (325 - 850 / 3) + 850 / 3 - 850 / 3 / 3 + 7.5, 850 / 3 / 3 - 7.5, 850 / 3 / 3 - 7.5, (0, 242, 255), '')
+                button_dict[buttonslist[buttonmark]] = B(teamslot + weaponslot, 50 + (325 - 850/3) + 850/3 - 850/3/3 + 7.5, 850/3/3 - 7.5, 850/3/3 - 7.5, (0, 242, 255), 'Weapon', 20, actioncolorweapon, image = onteamimages[buttonmark])
                 buttonmark += 1
-
-        B(50, 50 + (325 - 850/3), 2*(850/3/3) - 3.75, 2*(850/3/3) - 3.75, (0, 242, 255), '')
-        B(50, 50 + (325 - 850/3) + 850/3 - 850/3/3 + 7.5, 850/3/3 - 7.5, 850/3/3 - 7.5, (0, 242, 255), '')
-        B(50 + 850/3/3 + 3.75, 50 + (325 - 850/3) + 850/3 - 850/3/3 + 7.5, 850/3/3 - 7.5, 850/3/3 - 7.5, (0, 242, 255), '')
-        B(50 + 2*(850/3/3) + 7.5, 50 + (325 - 850/3) + 2*(850/3/3) + 7.5, 850/3/3 - 7.5, 850/3/3 - 7.5, (0, 242, 255), '')
-        # B(50 + 2*(850/3/3) + 7.5, 50 + (325 - 850/3) + 850/3/3 + 3.75, 850/3/3 - 7.5, 850/3/3 - 7.5, (0, 242, 255), '')
-        # B(50 + 2*(850/3/3) + 7.5, 50 + (325 - 850/3), 850/3/3 - 7.5, 850/3/3 - 7.5, (0, 242, 255), '')
-
-        B(75 + (850/3), 50 + (325 - 850/3), 2*(850/3/3) - 3.75, 2*(850/3/3) - 3.75, (0, 242, 255), '')
-        B(75 + (850/3), 50 + (325 - 850/3) + 850/3 - 850/3/3 + 7.5, 850/3/3 - 7.5, 850/3/3 - 7.5, (0, 242, 255), '')
-        B(75 + (850/3) + 850/3/3 + 3.75, 50 + (325 - 850/3) + 850/3 - 850/3/3 + 7.5, 850/3/3 - 7.5, 850/3/3 - 7.5, (0, 242, 255), '')
-        B(75 + (850/3) + 2*(850/3/3) + 7.5, 50 + (325 - 850/3) + 2*(850 / 3 / 3) + 7.5, 850/3/3 - 7.5, 850/3/3 - 7.5, (0, 242, 255), '')
-        # B(75 + (850/3) + 2*(850/3/3) + 7.5, 50 + (325 - 850/3) + 850/3/3 + 3.75, 850/3/3 - 7.5, 850/3/3 - 7.5, (0, 242, 255), '')
-        # B(75 + (850/3) + 2*(850/3/3) + 7.5, 50 + (325 - 850/3), 850/3/3 - 7.5, 850/3/3 - 7.5, (0, 242, 255), '')
-
-        B(100 + (850/3)*2, 50 + (325 - 850/3), 2*(850/3/3) - 3.75, 2*(850/3/3) - 3.75, (0, 242, 255), '')
-        B(100 + (850/3)*2, 50 + (325 - 850/3) + 850/3 - 850/3/3 + 7.5, 850/3/3 - 7.5, 850/3/3 - 7.5, (0, 242, 255), '')
-        B(100 + (850/3)*2 + 850/3/3 + 3.75, 50 + (325 - 850/3) + 850/3 - 850/3/3 + 7.5, 850/3/3 - 7.5, 850/3/3 - 7.5, (0, 242, 255), '')
-        B(100 + (850/3)*2 + 2*(850/3/3) + 7.5, 50 + (325 - 850/3) + 2*(850/3/3) + 7.5, 850/3/3 - 7.5, 850/3/3 - 7.5, (0, 242, 255), '')
-        # B(100 + (850/3)*2 + 2*(850/3/3) + 7.5, 50 + (325 - 850/3) + 850/3/3 + 3.75, 850/3/3 - 7.5, 850/3/3 - 7.5, (0, 242, 255), '')
-        # B(100 + (850/3)*2 + 2*(850/3/3) + 7.5, 50 + (325 - 850/3), 850/3/3 - 7.5, 850/3/3 - 7.5, (0, 242, 255), '')
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -595,9 +599,10 @@ def loadoutbox(item):
                 or BCANCEL.is_clicked(event):
                     running = False
 
-            for button in button_dict:
+            for button, index in zip(button_dict, range(0, 12)):
                 if button_dict[button].is_clicked(event):
-                    print(button)
+                    item.putinloadout(button, index)
+
         pygame.display.update()
         clock.tick(30)
 
@@ -718,6 +723,7 @@ class Weapon():
         self.bought = bought
         self.onteam = onteam
         self.requiredlevel = requiredlevel
+        self.teamcode = None
 
     def inventory(self, location):
         if self.requiredlevel != 0:
@@ -733,6 +739,18 @@ class Weapon():
                 return self.icon
             else:
                 return None
+
+    def putinloadout(self, place, placeindex):
+        if place[-1] == '0':
+            print('zero')
+        else:
+            for weapon in fullweaponslist:
+                if weapon.onteam == place:
+                    weapon.onteam = None
+                    weapon.teamcode = None
+            self.onteam = place
+            self.teamcode = placeindex
+            print(self.onteam, placeindex)
 
 SWORD = Weapon('Sword', 'Damage', 50, 250, 150, 100, 50, 25, 15, 'GAMEWEAPONS/game_sword_icon.png', requiredlevel = 1)
 BOWANDARROW = Weapon('Bow and Arrows', 'Damage', 0, 250, 150, 100, 50, 25, 15, 'GAMEWEAPONS/game_bow_icon.png')
@@ -768,6 +786,7 @@ class Character():
         self.bought = bought
         self.onteam = onteam
         self.requiredlevel = requiredlevel
+        self.teamcode = None
 
     def inventory(self, location):
         if self.requiredlevel != 0:
@@ -783,6 +802,18 @@ class Character():
                 return self.icon
             else:
                 return None
+
+    def putinloadout(self, place, placeindex):
+        if place[-1] != '0':
+            print('zero')
+        else:
+            for hero in fullheroslist:
+                if hero.onteam == place:
+                    hero.onteam = None
+                    hero.teamcode = None
+            self.onteam = place
+            self.teamcode = placeindex
+            print(self.onteam, placeindex)
 
 PLAYER = Character('Player', 'Common', 0, 250, 150, 100, 50, 25, 15, 'GAMEHEROICONS/game_player_icon.png', None)
 ALPIN = Character('Alpin', 'Common', 0, 250, 150, 100, 50, 25, 15, 'GAMEHEROICONS/game_alpin_icon.png', None)
@@ -805,6 +836,9 @@ def requirements(item):
         return 'In Shop'
     else:
         return 'Level ' + str(item.requiredlevel)
+
+fullweaponslist = [SWORD, BOWANDARROW, DUALBALDE, CHAINKUNAI, SPEAR, AX, MACE, HAMMER, NUNCHUCKS, PICKAXE, MAGIC, CLUB, BLOWGUN, SCYTHE, HEAL]
+fullheroslist = [PLAYER, ALPIN, GAR, MARKSON, SWAMP, SISTER, TORPEDO, REAPER, MINER, RAZOR, PHANTASM, STALKER, VIVI, CLYPEUS, EXECUTIONER]
 
 '''code testing'''
 
@@ -837,6 +871,19 @@ def requirements(item):
 #     func(*args)
 #
 # bbb(m, 3, 4)
+
+herotest = ['B30', None, 'B20']
+onteamzzz = []
+for h in herotest:
+    if h != None:
+        onteamzzz.append(h)
+    else:
+        onteamzzz.append(None)
+
+print(onteamzzz)
+
+for num in range(0, 5):
+    print(num)
 
 menu()
 
