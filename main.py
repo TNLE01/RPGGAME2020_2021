@@ -251,6 +251,7 @@ def team(slide):
                     for button, index in zip(button_dict, range(0, 12)):
                         if button_dict[button].is_clicked(event):
                             print(button, index)
+                            onteamimages[index].onteam = None
                 pygame.display.update()
                 clock.tick(30)
         if slide == 'Heros':
