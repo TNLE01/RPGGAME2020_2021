@@ -211,22 +211,22 @@ def team(slide):
                 XVALUEFORBUTTONWEAPONS = [237.5, 555, 872.5]
                 YVALUEFORBUTTONWEAPONS = [215, 310, 405]
 
-                onteamimages = [None, None, None, None, None, None, None, None, None, None, None, None]
+                onteamimages = ([PHC] + [PHW]*3)*3
                 for weapon, hero in zip(fullweaponslist, fullheroslist):
                     if weapon.onteam != None:
                         onteamimages.pop(weapon.teamcode)
-                        onteamimages.insert(weapon.teamcode, weapon.icon)
+                        onteamimages.insert(weapon.teamcode, weapon)
                     if hero.onteam != None:
                         onteamimages.pop(hero.teamcode)
-                        onteamimages.insert(hero.teamcode, hero.icon)
+                        onteamimages.insert(hero.teamcode, hero)
 
                 buttonmark = 0
                 for teamslot, Xweaponslot in zip(XVALUEFORBUTTONTEAM, XVALUEFORBUTTONWEAPONS):
                     button_dict[buttonslist[buttonmark]] = B(teamslot, 215, 175, 270, (0, 211, 222), '')
-                    characteronteam(teamslot + 5, 220, onteamimages[buttonmark])
+                    characteronteam(teamslot + 5, 220, onteamimages[buttonmark].icon)
                     buttonmark += 1
                     for Yweaponslot in YVALUEFORBUTTONWEAPONS:
-                        button_dict[buttonslist[buttonmark]] = B(Xweaponslot, Yweaponslot,80, 80, (0, 211, 222), '', image = onteamimages[buttonmark])
+                        button_dict[buttonslist[buttonmark]] = B(Xweaponslot, Yweaponslot,80, 80, (0, 211, 222), '', image = onteamimages[buttonmark].icon)
                         buttonmark += 1
 
                 for event in pygame.event.get():
@@ -556,6 +556,10 @@ def selectionbox(item, type, use, message):
         pygame.display.update()
         clock.tick(30)
 
+def couldntthinkofanythingelse(item, index):
+    DATALIST = [item.damage, item.defense, item.health, item.critrate, item.critdamage, item.speed]
+    return DATALIST[index]
+
 def loadoutbox(item, type):
     running = True
     while running:
@@ -568,7 +572,7 @@ def loadoutbox(item, type):
             actioncolorhero = (0, 242, 255)
             actioncolorweapon = (255, 255, 0)
         B(25, 25, 950, 450, (0, 211, 222), '', hovercolor = (0, 211, 222))
-        B(25, 25, 950, 25 + (325 - 850/3), (0, 211, 222), 'Pick the slot', hovercolor = (0, 211, 222))
+        B(25, 25, 950, 25 + (325 - 850/3), (0, 211, 222), 'Pick the slot', invisible = 'on')
         BCANCEL = B(400, 400, 200, 50, (200, 20, 20), 'Cancel')
 
         '''Location markers ↓↓↓, B12 = "Button" team "1" weapons slot "2"'''
@@ -580,23 +584,35 @@ def loadoutbox(item, type):
         buttonslist = ['B10', 'B11', 'B12', 'B13', 'B20', 'B21', 'B22', 'B23', 'B30', 'B31', 'B32', 'B33']
         XVALUEFORBUTTONTEAM = [50, 75 + (850/3), 100 + (850/3)*2]
         XVALUEFORBUTTONWEAPONS = [0, 850/3/3 + 3.75, 2*(850/3/3) + 7.5]
+        statslist = ['Speed = ', 'Crit Damage = ', 'Crit Rate = ', 'Health = ', 'Defense = ', 'Damage = ']
 
-        onteamimages = [None, None, None, None, None, None, None, None, None, None, None, None]
+        onteamimages = ([PHC] + [PHW]*3)*3
         for weapon, hero in zip(fullweaponslist, fullheroslist):
             if weapon.onteam != None:
                 onteamimages.pop(weapon.teamcode)
-                onteamimages.insert(weapon.teamcode, weapon.icon)
+                onteamimages.insert(weapon.teamcode, weapon)
             if hero.onteam != None:
                 onteamimages.pop(hero.teamcode)
-                onteamimages.insert(hero.teamcode, hero.icon)
+                onteamimages.insert(hero.teamcode, hero)
 
         buttonmark = 0
+        totalcounter = 0
+        totalstat = 0
         for teamslot in XVALUEFORBUTTONTEAM:
-            button_dict[buttonslist[buttonmark]] = B(teamslot, 50 + (325 - 850/3), 2*(850/3/3) - 3.75, 2*(850/3/3) - 3.75, (0, 242, 255), 'Hero', hovercolor = actioncolorhero, image = onteamimages[buttonmark])
+            button_dict[buttonslist[buttonmark]] = B(teamslot, 50 + (325 - 850/3), 2*(850/3/3) - 3.75, 2*(850/3/3) - 3.75, (0, 242, 255), 'Hero', hovercolor = actioncolorhero, image = onteamimages[buttonmark].icon)
             buttonmark += 1
+            totalcounter += 4
             for weaponslot in XVALUEFORBUTTONWEAPONS:
-                button_dict[buttonslist[buttonmark]] = B(teamslot + weaponslot, 50 + (325 - 850/3) + 850/3 - 850/3/3 + 7.5, 850/3/3 - 7.5, 850/3/3 - 7.5, (0, 242, 255), 'Weapon', 20, actioncolorweapon, image = onteamimages[buttonmark])
+                button_dict[buttonslist[buttonmark]] = B(teamslot + weaponslot, 50 + (325 - 850/3) + 850/3 - 850/3/3 + 7.5, 850/3/3 - 7.5, 850/3/3 - 7.5, (0, 242, 255), 'Weapon', 20, actioncolorweapon, image = onteamimages[buttonmark].icon)
                 buttonmark += 1
+                statindex = 5
+                for num, stats in zip(range(1, 7), statslist):
+                    for total in range(totalcounter - 4, totalcounter):
+                        totalstat += couldntthinkofanythingelse(onteamimages[total], statindex)
+                    B(teamslot + 2*(850/3/3) + 7.5, (50 + (325 - 850/3) + 850/3 - 850/3/3) - (2*(850/3/3))*(num/6), 850/3/3 - 7.5, (2*(850/3/3) - 3.75)/6, (0, 242, 255), stats + str(totalstat), 15, invisible = 'on')
+                    statindex -= 1
+                    totalstat = 0
+
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -730,7 +746,7 @@ class Weapon():
         self.health = healthbonus
         self.critrate = basecritrate
         self.critdamage = critdamagebonus
-        self.speed = speedreduction
+        self.speed = -speedreduction
         self.icon = icon
         self.bought = bought
         self.onteam = onteam
@@ -851,6 +867,11 @@ def requirements(item):
 
 fullweaponslist = [SWORD, BOWANDARROW, DUALBALDE, CHAINKUNAI, SPEAR, AX, MACE, HAMMER, NUNCHUCKS, PICKAXE, MAGIC, CLUB, BLOWGUN, SCYTHE, HEAL]
 fullheroslist = [PLAYER, ALPIN, GAR, MARKSON, SWAMP, SISTER, TORPEDO, REAPER, MINER, RAZOR, PHANTASM, STALKER, VIVI, CLYPEUS, EXECUTIONER]
+
+'''PLace Holders for Weapons and Characters'''
+
+PHW = Weapon('', '', 0, 0, 0, 0, 0, 0, 0, None)
+PHC = Character('', '', 0, 0, 0, 0, 0, 0, 0, None, None)
 
 '''code testing'''
 
