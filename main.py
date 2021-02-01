@@ -135,11 +135,20 @@ def menu():
         BCREDITS = B(400, 500/2 + 150, 200, 50, (0, 242, 255), 'Credits')
         BEXIT = B(700, 500/2 + 150, 200, 50, (0, 242, 255), 'Exit')
 
+        '''test code in a loop'''
         # img_path = os.path.join("Game Stuff - Python", "game_ax_icon.png")
         # image = pygame.image.load(img_path).convert()
         # pygame.image.load('Game Stuff - Python/game_ax_icon.png').convert()
         # loadimages(105, 305, 190, 40, 'Game Stuff - Python/game_ax_icon.png')
+        # cropped_image = pygame.transform.chop(pygame.image.load(ALPIN.icon), (150, 100, 200, 200))
+        # cropped_image22 = pygame.image.load(ALPIN.icon).subsurface(((2375/26), 0, (4125/13), 500))
+        # loadimages(100, 100, 300, 100, ALPIN.icon)
+        # screen.blit(pygame.transform.scale(pygame.image.load(SWAMP.icon), (int(300) - 10, int(100) - 10)), (int(100) + 5, int(100) + 5))
+        # screen.blit(pygame.transform.scale(pygame.image.load(ALPIN.icon).subsurface(((2375/26), 0, (4125/13), 500)), (200, 100)), (500, 200))
+        # screen.blit(cropped_image22, (600,100))
 
+
+        makegrid()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 closing()
@@ -152,8 +161,6 @@ def menu():
             B2(BMONSTERS, monsters, event)
             B2(BCREDITS, c, event)
             B2(BEXIT, closing, event)
-
-
         pygame.display.flip()
         clock.tick(30)
 
@@ -176,6 +183,10 @@ def map():
 
         pygame.display.update()
         clock.tick(30)
+
+def characteronteam(x, y, image = None):
+    if image != None:
+        screen.blit(pygame.transform.scale(pygame.image.load(image).subsurface(((2375 / 26), 0, (4125 / 13), 500)), (165, 260)), (x, y))
 
 def team(slide):
     openshop = True
@@ -212,6 +223,7 @@ def team(slide):
                 buttonmark = 0
                 for teamslot, Xweaponslot in zip(XVALUEFORBUTTONTEAM, XVALUEFORBUTTONWEAPONS):
                     button_dict[buttonslist[buttonmark]] = B(teamslot, 215, 175, 270, (0, 211, 222), '')
+                    characteronteam(teamslot + 5, 220, onteamimages[buttonmark])
                     buttonmark += 1
                     for Yweaponslot in YVALUEFORBUTTONWEAPONS:
                         button_dict[buttonslist[buttonmark]] = B(Xweaponslot, Yweaponslot,80, 80, (0, 211, 222), '', image = onteamimages[buttonmark])
@@ -872,18 +884,18 @@ fullheroslist = [PLAYER, ALPIN, GAR, MARKSON, SWAMP, SISTER, TORPEDO, REAPER, MI
 #
 # bbb(m, 3, 4)
 
-herotest = ['B30', None, 'B20']
-onteamzzz = []
-for h in herotest:
-    if h != None:
-        onteamzzz.append(h)
-    else:
-        onteamzzz.append(None)
-
-print(onteamzzz)
-
-for num in range(0, 5):
-    print(num)
+# herotest = ['B30', None, 'B20']
+# onteamzzz = []
+# for h in herotest:
+#     if h != None:
+#         onteamzzz.append(h)
+#     else:
+#         onteamzzz.append(None)
+#
+# print(onteamzzz)
+#
+# for num in range(0, 5):
+#     print(num)
 
 menu()
 
