@@ -4,87 +4,6 @@ pygame.init()
 
 clock = pygame.time.Clock()
 
-'''Stuff for text'''
-
-def draw_text(text, font, color, surface, x, y):
-    textobj = font.render(text, 1, color)
-    textrect = textobj.get_rect()
-    textrect.center = (x, y)
-    surface.blit(textobj, textrect)
-
-def fontstuff(size):
-    return pygame.font.SysFont(None, size)
-
-'''Stuff to make buttons and images work'''
-
-class Button(object):
-
-    def __init__(self, w, x, y, z, color, text, fontsize, hovercolor, invisible = None):
-        self.text = text
-        self.fontsize = fontsize
-        self.w = w
-        self.x = x
-        self.y = y
-        self.z = z
-        self.color = color
-        self.hovercolor = hovercolor
-        self.invisible = invisible
-        self.rect = pygame.Rect((0,0), (y, z))
-        self.rect.topleft = (w, x)
-
-    def draw(self):
-        b = pygame.Rect(self.w, self.x, self.y, self.z)
-        mouse = pygame.mouse.get_pos()
-        if self.invisible != None:
-            draw_text(self.text, fontstuff(self.fontsize), (50, 100, 150), screen, (self.w + (self.y / 2)), (self.x + (self.z / 2)))
-        else:
-            if self.w + self.y > mouse[0] > self.w and self.x + self.z > mouse[1] > self.x:
-                pygame.draw.rect(screen, self.hovercolor, b)
-            else:
-                pass
-                pygame.draw.rect(screen, self.color, b)
-            draw_text(self.text, fontstuff(self.fontsize), (50, 100, 150), screen, (self.w + (self.y / 2)), (self.x + (self.z / 2)))
-
-    def is_clicked(self, event):
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if event.button == 1:
-                return self.rect.collidepoint(event.pos)
-
-def B(w, x, y, z, color, text, fontsize = 50, hovercolor = (255, 255, 0), image = None, invisible = None):
-    Button(w, x, y, z, color, text, fontsize, hovercolor, invisible).draw()
-    if image != None:
-        loadimages(w, x, y, z, image)
-    return Button(w, x, y, z, color, text, fontsize, hovercolor)
-
-def B2(button, action, event, *actioncommand):
-    if button.is_clicked(event):
-        if actioncommand != None:
-            action(*actioncommand)
-        else:
-            action()
-
-def loadimages(w, x, y, z, image):
-    screen.blit(pygame.transform.scale(pygame.image.load(image), (int(y) - 10, int(z) - 10)), (int(w) + 5,int(x) +5))
-
-def closing():
-    pygame.quit()
-    sys.exit()
-
-# def bv(w, x, y, z, text, color): #, action=None):
-#     b = pygame.Rect(w, x, y, z)
-#     mouse = pygame.mouse.get_pos()
-#     if w + y > mouse[0] > w and x + z > mouse[1] > x:
-#         pygame.draw.rect(screen, (255, 255, 0), b)
-#         # if click[0] == 1 and action != None:
-#         #     print('work')
-#         #     action()
-#     else:
-#         pygame.draw.rect(screen, color, b)
-#     draw_text(text, fontstuff(50), (50, 100, 150), screen, (w + (y / 2)), (x + (z / 2)))
-
-
-#screen
-
 '''Stuff for pygame window'''
 
 screen = pygame.display.set_mode((1000, 500))
@@ -93,651 +12,925 @@ icon = pygame.image.load('GAMEICON.png')
 pygame.display.set_icon(icon)
 gridscreen = 'off'
 
+'''Stuff for text / Images'''
+
+class BasicWorkings:
+
+    def closing(self):
+        pygame.quit()
+        sys.exit()
+
+    def loadimages(self, w, x, y, z, image):
+        screen.blit(pygame.transform.scale(pygame.image.load(image), (int(y) - 10, int(z) - 10)), (int(w) + 5, int(x) + 5))
+
+    def draw_text(self, text, font, color, surface, x, y):
+        textobj = font.render(text, 1, color)
+        textrect = textobj.get_rect()
+        textrect.center = (x, y)
+        surface.blit(textobj, textrect)
+
+    def fontstuff(self, size):
+        return pygame.font.SysFont(None, size)
+
+    def makegrid(self):
+        if gridscreen == 'on':
+            XVALUEFORLINE = 0
+            YVALUEFORLINE = 0
+            for x in range(21):
+                pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(XVALUEFORLINE, 0, 1, 500))
+                XVALUEFORLINE += 50
+            for y in range(11):
+                pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(0, YVALUEFORLINE, 1000, 1))
+                YVALUEFORLINE += 50
+        else:
+            pass
+
+    def basicheading(self, title, headingcolor = (0, 211, 222), screencolor = (255, 255, 255), size = 500/5):
+        screen.fill(screencolor)
+        pygame.draw.rect(screen, headingcolor, pygame.Rect(0, 0, 1000, size))
+        BasicWorkings().draw_text(title, BasicWorkings().fontstuff(100), (0, 0, 0), screen, 500, 50)
+        BasicWorkings().draw_text('$: ' + str(FILE_1.Gold), BasicWorkings().fontstuff(25), (0, 0, 0), screen, 900, 15)
+        FILE_1.XPBAR()
+        BasicWorkings().makegrid()
+
+'''Stuff to make buttons work / exiting game'''
+
+class Button(object):
+
+    def __init__(self, w, x, y, z, color, text, fontsize = 50, hovercolor = (255, 255, 0), image = None, invisible = None):
+        self.text = text
+        self.fontsize = fontsize
+        self.w = w
+        self.x = x
+        self.y = y
+        self.z = z
+        self.color = color
+        self.hovercolor = hovercolor
+        self.image = image
+        self.invisible = invisible
+        self.rect = pygame.Rect((0,0), (y, z))
+        self.rect.topleft = (w, x)
+
+    def draw(self):
+        b = pygame.Rect(self.w, self.x, self.y, self.z)
+        mouse = pygame.mouse.get_pos()
+        if self.invisible != None:
+            BasicWorkings().draw_text(self.text, BasicWorkings().fontstuff(self.fontsize), (50, 100, 150), screen, (self.w + (self.y / 2)), (self.x + (self.z / 2)))
+        else:
+            if self.w + self.y > mouse[0] > self.w and self.x + self.z > mouse[1] > self.x:
+                pygame.draw.rect(screen, self.hovercolor, b)
+            else:
+                pass
+                pygame.draw.rect(screen, self.color, b)
+            BasicWorkings().draw_text(self.text, BasicWorkings().fontstuff(self.fontsize), (50, 100, 150), screen, (self.w + (self.y / 2)), (self.x + (self.z / 2)))
+        if self.image != None:
+            BasicWorkings().loadimages(self.w, self.x, self.y, self.z, self.image)
+        return Button(self.w, self.x, self.y, self.z, self.color, self.text, self.fontsize, self.hovercolor)
+
+    def is_clicked(self, event):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:
+                return self.rect.collidepoint(event.pos)
+
+    def clicked_action(self, event, action, *actioncommand):
+        if self.is_clicked(event):
+            if actioncommand != None:
+                action(*actioncommand)
+            else:
+                action()
+
 '''Player stats'''
 
-SHOPLASTOPEN = 'Heros'
-TEAMLASTOPEN = 'Team'
-GOLD = 0
-XP = 0
-currentlevel = 1
+class Profile:
 
-def XPBAR():
-    global currentlevel
-    global XP
-    XPTOBAR = (currentlevel*100)/200
-    B(650, 5, 200, 20, (200, 200, 200), 'Level ' + str(currentlevel), 20, (200, 200, 200))
-    B(650, 5, XP/XPTOBAR, 20, (55, 200, 55), '', 20, (55, 200, 55))
-    if XP >= currentlevel*100:
-        XP = XP - currentlevel*100
-        currentlevel = currentlevel + 1
-    draw_text('Level ' + str(currentlevel), fontstuff(20), (50, 100, 150), screen, (650 + (200 / 2)), (5 + (20 / 2)))
+    def __init__(self, ShopLastOpen, TeamLastOpen, Gold, XP, CurrentLevel):
+        self.ShopLastOpen = ShopLastOpen
+        self.TeamLastOpen = TeamLastOpen
+        self.Gold = Gold
+        self.XP = XP
+        self.CurrentLevel = CurrentLevel
+        self.ontheteam = None
+        self.currentlevel = None
 
-def basicheading(title, headingcolor = (0, 211, 222), screencolor = (255, 255, 255), size = 500 / 5):
-    screen.fill(screencolor)
-    pygame.draw.rect(screen, headingcolor, pygame.Rect(0, 0, 1000, size))
-    draw_text(title, fontstuff(100), (0, 0, 0), screen, 500, 50)
-    draw_text('$: ' + str(GOLD), fontstuff(25), (0, 0, 0), screen, 900, 15)
-    XPBAR()
-    makegrid()
+    def change(self, what, value):
+        if what == 'XP':
+            self.XP += value
+        else:
+            self.Gold += value
+
+    def XPBAR(self):
+        XPTOBAR = (self.CurrentLevel * 100) / 200
+        Button(650, 5, 200, 20, (200, 200, 200), 'Level ' + str(self.CurrentLevel), 20, (200, 200, 200)).draw()
+        Button(650, 5, self.XP / XPTOBAR, 20, (55, 200, 55), '', 20, (55, 200, 55)).draw()
+        if self.XP >= self.CurrentLevel * 100:
+            self.XP = self.XP - self.CurrentLevel * 100
+            self.CurrentLevel = self.CurrentLevel + 1
+        BasicWorkings().draw_text('Level ' + str(self.CurrentLevel), BasicWorkings().fontstuff(20), (50, 100, 150), screen, (650 + (200 / 2)), (5 + (20 / 2)))
+
+FILE_1 = Profile('Heros', 'Team', 0, 0, 1)
+#FILE_2 = Profile()
+#FILE_3 = Profile()
 
 '''Main game loop'''
 
-def menu():
-    while True:
+class MainRun:
 
-        basicheading('', size = 250)
-        draw_text('Coliseum', fontstuff(300), (0, 0, 0), screen, 500, 125)
+    def __init__(self):
+        self.dw = 1000
+        self.dh = 500
+        self.main()
 
-        BMAP = B(100, 500/2 + 50, 200, 50, (0, 242, 255), 'Map')
-        BTEAM = B(400, 500/2 + 50, 200, 50, (0, 242, 255), 'Team')
-        BSHOP = B(700, 500/2 + 50, 200, 50, (0, 242, 255), 'Shop')
-        BMONSTERS = B(100, 500/2 + 150, 200, 50, (0, 242, 255), 'Monsters')
-        BCREDITS = B(400, 500/2 + 150, 200, 50, (0, 242, 255), 'Credits')
-        BEXIT = B(700, 500/2 + 150, 200, 50, (0, 242, 255), 'Exit')
+    def main(self):
 
-        '''test code in a loop'''
-        # img_path = os.path.join("Game Stuff - Python", "game_ax_icon.png")
-        # image = pygame.image.load(img_path).convert()
-        # pygame.image.load('Game Stuff - Python/game_ax_icon.png').convert()
-        # loadimages(105, 305, 190, 40, 'Game Stuff - Python/game_ax_icon.png')
-        # cropped_image = pygame.transform.chop(pygame.image.load(ALPIN.icon), (150, 100, 200, 200))
-        # cropped_image22 = pygame.image.load(ALPIN.icon).subsurface(((2375/26), 0, (4125/13), 500))
-        # loadimages(100, 100, 300, 100, ALPIN.icon)
-        # screen.blit(pygame.transform.scale(pygame.image.load(SWAMP.icon), (int(300) - 10, int(100) - 10)), (int(100) + 5, int(100) + 5))
-        # screen.blit(pygame.transform.scale(pygame.image.load(ALPIN.icon).subsurface(((2375/26), 0, (4125/13), 500)), (200, 100)), (500, 200))
-        # screen.blit(cropped_image22, (600,100))
+        while True:
+            BasicWorkings().basicheading('', size=250)
+            BasicWorkings().draw_text('Coliseum', BasicWorkings().fontstuff(300), (0, 0, 0), screen, 500, 125)
 
+            BMAP = Button(100, 500 / 2 + 50, 200, 50, (0, 242, 255), 'Map').draw()
+            BTEAM = Button(400, 500 / 2 + 50, 200, 50, (0, 242, 255), 'Team').draw()
+            BSHOP = Button(700, 500 / 2 + 50, 200, 50, (0, 242, 255), 'Shop').draw()
+            BMONSTERS = Button(100, 500 / 2 + 150, 200, 50, (0, 242, 255), 'Monsters').draw()
+            BCREDITS = Button(400, 500 / 2 + 150, 200, 50, (0, 242, 255), 'Credits').draw()
+            BEXIT = Button(700, 500 / 2 + 150, 200, 50, (0, 242, 255), 'Exit').draw()
 
-        makegrid()
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                closing()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    closing()
-            B2(BMAP, map, event)
-            B2(BTEAM, team, event, TEAMLASTOPEN)
-            B2(BSHOP, shop, event, SHOPLASTOPEN)
-            B2(BMONSTERS, monsters, event)
-            B2(BCREDITS, c, event)
-            B2(BEXIT, closing, event)
-        pygame.display.flip()
-        clock.tick(30)
+            '''test code in a loop'''
+            #img_path = os.path.join("Game Stuff - Python", "game_ax_icon.png")
+            #image = pygame.image.load(img_path).convert()
+            #pygame.image.load('Game Stuff - Python/game_ax_icon.png').convert()
+            #BasicWorkings().loadimages(105, 305, 190, 40, 'Game Stuff - Python/game_ax_icon.png')
+            #cropped_image = pygame.transform.chop(pygame.image.load(ALPIN.icon), (150, 100, 200, 200))
+            #cropped_image22 = pygame.image.load(ALPIN.icon).subsurface(((2375/26), 0, (4125/13), 500))
+            #BasicWorkings().loadimages(100, 100, 300, 100, ALPIN.icon)
+            #screen.blit(pygame.transform.scale(pygame.image.load(SWAMP.icon), (int(300) - 10, int(100) - 10)), (int(100) + 5, int(100) + 5))
+            #screen.blit(pygame.transform.scale(pygame.image.load(ALPIN.icon).subsurface(((2375/26), 0, (4125/13), 500)), (200, 100)), (500, 200))
+            #screen.blit(cropped_image22, (600,100))
 
-def map():
-    running = True
-    while running:
-        basicheading('Map')
+            #Event Tasking
+            #Add all your event tasking things here
+            BasicWorkings().makegrid()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    BasicWorkings().closing()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        BasicWorkings().closing()
 
-        BBACK = B(25, 25, 150, 50, (200, 20, 20), 'Back')
+                BMAP.clicked_action(event, Combat().combatwindow) #self.map)
+                BTEAM.clicked_action(event, self.team, FILE_1.TeamLastOpen)
+                BSHOP.clicked_action(event, self.shop, FILE_1.ShopLastOpen)
+                BMONSTERS.clicked_action(event, self.monsters)
+                BCREDITS.clicked_action(event, self.c)
+                BEXIT.clicked_action(event, BasicWorkings().closing)
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                closing()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
+            pygame.display.flip()
+            clock.tick(30)
+            #Add things like player updates here
+            #Also things like score updates or drawing additional items
+            # Remember things on top get done first so they will update in the order yours is set at
+
+            # Remember to update your clock and display at the end
+            pygame.display.update()
+            clock.tick(30)
+
+        # If you need to reset variables here
+        # This includes things like score resets
+
+    def map(self):
+        running = True
+        while running:
+            BasicWorkings().basicheading('Map')
+
+            BBACK = Button(25, 25, 150, 50, (200, 20, 20), 'Back').draw()
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    BasicWorkings().closing()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        running = False
+                if BBACK.is_clicked(event):
                     running = False
-            if BBACK.is_clicked(event):
-                running = False
 
+            pygame.display.update()
+            clock.tick(30)
 
-        pygame.display.update()
-        clock.tick(30)
+    def team(self, slide):
+        openshop = True
+        while openshop:
+            running = True
+            button_dict = {}
+            XVALUEFORBUTTON = [100, 280, 460, 640, 820]
+            YVALUEFORBUTTON = [215] * 5 + [310] * 5 + [405] * 5
+            if slide == 'Team':
+                while running:
+                    BasicWorkings().basicheading('Team')
+                    pygame.draw.rect(screen, (0, 211, 222), pygame.Rect(40, 100, 230, 500 / 5))
+
+                    BBACK = Button(25, 25, 150, 50, (200, 20, 20), 'Back').draw()
+                    Button(80, 125, 150, 50, (0, 211, 222), 'Team', 55, (0, 211, 222)).draw()
+                    BHEROS = Button(310, 125, 150, 50, (0, 242, 255), 'Heros', 30).draw()
+                    BWEAPONS = Button(540, 125, 150, 50, (0, 242, 255), 'Weapons', 30).draw()
+                    BUPGRADES = Button(770, 125, 150, 50, (0, 242, 255), 'Upgrades', 30).draw()
+
+                    buttonslist = ['B10', 'B11', 'B12', 'B13', 'B20', 'B21', 'B22', 'B23', 'B30', 'B31', 'B32', 'B33']
+                    XVALUEFORBUTTONTEAM = [47.5, 365, 682.5]
+                    XVALUEFORBUTTONWEAPONS = [237.5, 555, 872.5]
+                    YVALUEFORBUTTONWEAPONS = [215, 310, 405]
+
+                    FILE_1.ontheteam = ([PHC] + [PHW] * 3) * 3
+                    for weapon, hero in zip(fullweaponslist, fullheroslist):
+                        if weapon.onteam != None:
+                            FILE_1.ontheteam.pop(weapon.teamcode)
+                            FILE_1.ontheteam.insert(weapon.teamcode, weapon)
+                        if hero.onteam != None:
+                            FILE_1.ontheteam.pop(hero.teamcode)
+                            FILE_1.ontheteam.insert(hero.teamcode, hero)
+
+                    buttonmark = 0
+                    for teamslot, Xweaponslot in zip(XVALUEFORBUTTONTEAM, XVALUEFORBUTTONWEAPONS):
+                        button_dict[buttonslist[buttonmark]] = Button(teamslot, 215, 175, 270, (0, 211, 222), '').draw()
+                        characteronteam(teamslot + 5, 220, FILE_1.ontheteam[buttonmark].icon)
+                        buttonmark += 1
+                        for Yweaponslot in YVALUEFORBUTTONWEAPONS:
+                            button_dict[buttonslist[buttonmark]] = Button(Xweaponslot, Yweaponslot, 80, 80, (0, 211, 222), '', image = FILE_1.ontheteam[buttonmark].icon).draw()
+                            buttonmark += 1
+
+                    for event in pygame.event.get():
+                        if event.type == pygame.QUIT:
+                            BasicWorkings().closing()
+                        if event.type == pygame.KEYDOWN:
+                            if event.key == pygame.K_ESCAPE:
+                                openshop = False
+                                running = False
+                        if BBACK.is_clicked(event):
+                            openshop = False
+                            running = False
+                        if BHEROS.is_clicked(event):
+                            slide = 'Heros'
+                            running = False
+                        if BWEAPONS.is_clicked(event):
+                            slide = 'Weapons'
+                            running = False
+                        if BUPGRADES.is_clicked(event):
+                            slide = 'Upgrades'
+                            running = False
+                        for button, index in zip(button_dict, range(0, 12)):
+                            button_dict[button].clicked_action(event, Popup(FILE_1.ontheteam[index], 'all', 'remove', donothing = 'on').selectionbox)
+
+                    pygame.display.update()
+                    clock.tick(30)
+            if slide == 'Heros':
+                while running:
+                    BasicWorkings().basicheading('Team')
+                    pygame.draw.rect(screen, (0, 211, 222), pygame.Rect(270, 100, 230, 500 / 5))
+
+                    BBACK = Button(25, 25, 150, 50, (200, 20, 20), 'Back').draw()
+                    BTEAM = Button(80, 125, 150, 50, (0, 242, 255), 'Team', 30).draw()
+                    Button(310, 125, 150, 50, (0, 211, 222), 'Heros', 55, (0, 211, 222)).draw()
+                    BWEAPONS = Button(540, 125, 150, 50, (0, 242, 255), 'Weapons', 30).draw()
+                    BUPGRADES = Button(770, 125, 150, 50, (0, 242, 255), 'Upgrades', 30).draw()
+
+                    buttonslist = ['BPLAYER', 'BALPIN', 'BGAR', 'BMARKSON', 'BSWAMP', 'BSISTER', 'BTORPEDO', 'BREAPER', 'BMINER', 'BRAZOR', 'BPHANTASM', 'BSTALKER', 'BVIVI', 'BCLYPEUS', 'BEXECUTIONER']
+                    for button, hero, x, y in zip(buttonslist, fullheroslist, itertools.cycle(XVALUEFORBUTTON), YVALUEFORBUTTON):
+                        button_dict[button] = Button(x, y, 80, 80, (0, 211, 222), requirements(hero), 25, image=hero.inventory('self')).draw()
+
+                    for event in pygame.event.get():
+                        if event.type == pygame.QUIT:
+                            BasicWorkings().closing()
+                        if event.type == pygame.KEYDOWN:
+                            if event.key == pygame.K_ESCAPE:
+                                openshop = False
+                                running = False
+                        if BBACK.is_clicked(event):
+                            openshop = False
+                            running = False
+                        if BTEAM.is_clicked(event):
+                            slide = 'Team'
+                            running = False
+                        if BWEAPONS.is_clicked(event):
+                            slide = 'Weapons'
+                            running = False
+                        if BUPGRADES.is_clicked(event):
+                            slide = 'Upgrades'
+                            running = False
+                        for button, hero in zip(button_dict, fullheroslist):
+                            button_dict[button].clicked_action(event, Popup(hero, 'hero', 'team', requirements(hero)).selectionbox)
+                    pygame.display.update()
+                    clock.tick(30)
+            if slide == 'Weapons':
+                while running:
+                    BasicWorkings().basicheading('Team')
+                    pygame.draw.rect(screen, (0, 211, 222), pygame.Rect(500, 100, 230, 500 / 5))
+
+                    BBACK = Button(25, 25, 150, 50, (200, 20, 20), 'Back').draw()
+                    BTEAM = Button(80, 125, 150, 50, (0, 242, 255), 'Team', 30).draw()
+                    BHEROS = Button(310, 125, 150, 50, (0, 242, 255), 'Heros', 30).draw()
+                    Button(540, 125, 150, 50, (0, 211, 222), 'Weapons', 55, (0, 211, 222)).draw()
+                    BUPGRADES = Button(770, 125, 150, 50, (0, 242, 255), 'Upgrades', 30).draw()
+
+                    buttonslist = ['BSWORD', 'BBOW', 'BDUALBLADE', 'BCHAINKUNAI', 'BSPEAR', 'BAX', 'BMACE', 'BHAMMER', 'BNUNCHUCKS', 'BPICKAXE', 'BMAGIC', 'BCLUB', 'BBLOWGUN', 'BSCYTHE', 'BHEAL']
+                    for button, weapon, x, y in zip(buttonslist, fullweaponslist, itertools.cycle(XVALUEFORBUTTON), YVALUEFORBUTTON):
+                        button_dict[button] = Button(x, y, 80, 80, (0, 211, 222), requirements(weapon), 25, image=weapon.inventory('self')).draw()
+
+                    for event in pygame.event.get():
+                        if event.type == pygame.QUIT:
+                            BasicWorkings().closing()
+                        if event.type == pygame.KEYDOWN:
+                            if event.key == pygame.K_ESCAPE:
+                                openshop = False
+                                running = False
+                        if BBACK.is_clicked(event):
+                            openshop = False
+                            running = False
+                        if BTEAM.is_clicked(event):
+                            slide = 'Team'
+                            running = False
+                        if BHEROS.is_clicked(event):
+                            slide = 'Heros'
+                            running = False
+                        if BUPGRADES.is_clicked(event):
+                            slide = 'Upgrades'
+                            running = False
+                        for button, weapon in zip(button_dict, fullweaponslist):
+                            button_dict[button].clicked_action(event, Popup(weapon, 'weapon', 'team', requirements(weapon)).selectionbox)
+                    pygame.display.update()
+                    clock.tick(30)
+            if slide == 'Upgrades':
+                while running:
+                    BasicWorkings().basicheading('Team')
+                    pygame.draw.rect(screen, (0, 211, 222), pygame.Rect(730, 100, 230, 500 / 5))
+
+                    BBACK = Button(25, 25, 150, 50, (200, 20, 20), 'Back').draw()
+                    BTEAM = Button(80, 125, 150, 50, (0, 242, 255), 'Team', 30).draw()
+                    BHEROS = Button(310, 125, 150, 50, (0, 242, 255), 'Heros', 30).draw()
+                    BWEAPONS = Button(540, 125, 150, 50, (0, 242, 255), 'Weapons', 30).draw()
+                    Button(770, 125, 150, 50, (0, 211, 222), 'Upgrades', 55, (0, 211, 222)).draw()
+
+                    Button(25, 265, 170, 170, (0, 242, 255), '', image='GAMEUPGRADES/game_upgrades_attack.png').draw()
+                    Button(220, 265, 170, 170, (0, 242, 255), '', image='GAMEUPGRADES/game_upgrades_defense.png').draw()
+                    Button(415, 265, 170, 170, (0, 242, 255), '', image='GAMEUPGRADES/game_upgrades_health.png').draw()
+                    Button(610, 265, 170, 170, (0, 242, 255), '', image='GAMEUPGRADES/game_upgrades_crit_rate.png').draw()
+                    Button(805, 265, 170, 170, (0, 242, 255), '', image='GAMEUPGRADES/game_upgrades_crit_damage.png').draw()
+
+                    for event in pygame.event.get():
+                        if event.type == pygame.QUIT:
+                            BasicWorkings().closing()
+                        if event.type == pygame.KEYDOWN:
+                            if event.key == pygame.K_ESCAPE:
+                                openshop = False
+                                running = False
+                        if BBACK.is_clicked(event):
+                            openshop = False
+                            running = False
+                        if BTEAM.is_clicked(event):
+                            slide = 'Team'
+                            running = False
+                        if BHEROS.is_clicked(event):
+                            slide = 'Heros'
+                            running = False
+                        if BWEAPONS.is_clicked(event):
+                            slide = 'Weapons'
+                            running = False
+                    pygame.display.update()
+                    clock.tick(30)
+
+        FILE_1.TeamLastOpen = slide
+
+    def shop(self, slide):
+        openshop = True
+        while openshop:
+            running = True
+            button_dict = {}
+            XVALUEFORBUTTON = [325 / 6, (325 / 6) * 2 + 135, (325 / 6) * 3 + (135) * 2, (325 / 6) * 4 + (135) * 3, (325 / 6) * 5 + (135) * 4]
+            YVALUEFORBUTTON = [210] * 5 + [220 + 135] * 5
+            if slide == 'Heros':
+                while running:
+                    BasicWorkings().basicheading('Shop')
+                    pygame.draw.rect(screen, (0, 211, 222), pygame.Rect(50, 100, 300, 500 / 5))
+
+                    BBACK = Button(25, 25, 150, 50, (200, 20, 20), 'Back').draw()
+                    Button(100, 125, 200, 50, (0, 211, 222), 'Heros', 75, (0, 211, 222)).draw()
+                    BWEAPONS = Button(400, 125, 200, 50, (0, 242, 255), 'Weapons').draw()
+                    BUPGRADES = Button(700, 125, 200, 50, (0, 242, 255), 'Upgrades').draw()
+
+                    buttonslist = ['BPLAYER', 'BALPIN', 'BGAR', 'BMARKSON', 'BSISTER', 'BTORPEDO', 'BMINER', 'BRAZOR', 'BVIVI', 'BCLYPEUS']
+                    heroslist = [PLAYER, ALPIN, GAR, MARKSON, SISTER, TORPEDO, MINER, RAZOR, VIVI, CLYPEUS]
+                    for button, hero, x, y in zip(buttonslist, heroslist, itertools.cycle(XVALUEFORBUTTON), YVALUEFORBUTTON):
+                        button_dict[button] = Button(x, y, 135, 135, (0, 211, 222), 'Recruited', 35, image=hero.inventory('shop')).draw()
+
+                    for event in pygame.event.get():
+                        if event.type == pygame.QUIT:
+                            BasicWorkings().closing()
+                        if event.type == pygame.KEYDOWN:
+                            if event.key == pygame.K_ESCAPE:
+                                openshop = False
+                                running = False
+                        if BBACK.is_clicked(event):
+                            openshop = False
+                            running = False
+                        if BWEAPONS.is_clicked(event):
+                            slide = 'Weapons'
+                            running = False
+                        if BUPGRADES.is_clicked(event):
+                            slide = 'Upgrades'
+                            running = False
+                        for button, hero in zip(button_dict, heroslist):
+                            button_dict[button].clicked_action(event, Popup(hero, 'hero', 'buy', 'Recruited').selectionbox)
+                    pygame.display.update()
+                    clock.tick(30)
+            if slide == 'Weapons':
+                while running:
+                    BasicWorkings().basicheading('Shop')
+                    pygame.draw.rect(screen, (0, 211, 222), pygame.Rect(350, 100, 300, 500 / 5))
+
+                    BBACK = Button(25, 25, 150, 50, (200, 20, 20), 'Back').draw()
+                    BHEROS = Button(100, 125, 200, 50, (0, 242, 255), 'Heros').draw()
+                    Button(400, 125, 200, 50, (0, 211, 222), 'Weapons', 75, (0, 211, 222)).draw()
+                    BUPGRADES = Button(700, 125, 200, 50, (0, 242, 255), 'Upgrades').draw()
+
+                    buttonslist = ['BBOW', 'BDUALBLADE', 'BCHAINKUNAI', 'BSPEAR', 'BMACE', 'BHAMMER', 'BNUNCHUCKS', 'BPICKAXE', 'BCLUB', 'BHEAL']
+                    weaponslist = [BOWANDARROW, DUALBALDE, CHAINKUNAI, SPEAR, MACE, HAMMER, NUNCHUCKS, PICKAXE, CLUB, HEAL]
+                    for button, weapon, x, y in zip(buttonslist, weaponslist, itertools.cycle(XVALUEFORBUTTON), YVALUEFORBUTTON):
+                        button_dict[button] = Button(x, y, 135, 135, (0, 211, 222), 'Sold Out', 35, image=weapon.inventory('shop')).draw()
+
+                    for event in pygame.event.get():
+                        if event.type == pygame.QUIT:
+                            BasicWorkings().closing()
+                        if event.type == pygame.KEYDOWN:
+                            if event.key == pygame.K_ESCAPE:
+                                openshop = False
+                                running = False
+                        if BBACK.is_clicked(event):
+                            openshop = False
+                            running = False
+                        if BHEROS.is_clicked(event):
+                            slide = 'Heros'
+                            running = False
+                        if BUPGRADES.is_clicked(event):
+                            slide = 'Upgrades'
+                            running = False
+                        for button, weapon in zip(button_dict, weaponslist):
+                            button_dict[button].clicked_action(event, Popup(weapon, 'weapon', 'buy', 'Sold Out').selectionbox)
+                    pygame.display.update()
+                    clock.tick(30)
+            if slide == 'Upgrades':
+                while running:
+                    BasicWorkings().basicheading('Shop')
+                    pygame.draw.rect(screen, (0, 211, 222), pygame.Rect(650, 100, 300, 500 / 5))
+
+                    BBACK = Button(25, 25, 150, 50, (200, 20, 20), 'Back').draw()
+                    BHEROS = Button(100, 125, 200, 50, (0, 242, 255), 'Heros').draw()
+                    BWEAPONS = Button(400, 125, 200, 50, (0, 242, 255), 'Weapons').draw()
+                    Button(700, 125, 200, 50, (0, 211, 222), 'Upgrades', 75, (0, 211, 222)).draw()
+
+                    Button(25, 265, 170, 170, (0, 242, 255), '', image='GAMEUPGRADES/game_upgrades_attack.png').draw()
+                    Button(220, 265, 170, 170, (0, 242, 255), '', image='GAMEUPGRADES/game_upgrades_defense.png').draw()
+                    Button(415, 265, 170, 170, (0, 242, 255), '', image='GAMEUPGRADES/game_upgrades_health.png').draw()
+                    Button(610, 265, 170, 170, (0, 242, 255), '', image='GAMEUPGRADES/game_upgrades_crit_rate.png').draw()
+                    Button(805, 265, 170, 170, (0, 242, 255), '', image='GAMEUPGRADES/game_upgrades_crit_damage.png').draw()
+
+                    for event in pygame.event.get():
+                        if event.type == pygame.QUIT:
+                            BasicWorkings().closing()
+                        if event.type == pygame.KEYDOWN:
+                            if event.key == pygame.K_ESCAPE:
+                                openshop = False
+                                running = False
+                        if BBACK.is_clicked(event):
+                            openshop = False
+                            running = False
+                        if BHEROS.is_clicked(event):
+                            slide = 'Heros'
+                            running = False
+                        if BWEAPONS.is_clicked(event):
+                            slide = 'Weapons'
+                            running = False
+                    pygame.display.update()
+                    clock.tick(30)
+
+        FILE_1.ShopLastOpen = slide
+
+    def monsters(self):
+        running = True
+        while running:
+            BasicWorkings().basicheading('Monsters')
+
+            BBACK = Button(25, 25, 150, 50, (200, 20, 20), 'Back').draw()
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    BasicWorkings().closing()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        running = False
+                if BBACK.is_clicked(event):
+                    running = False
+            pygame.display.update()
+            clock.tick(30)
+
+    '''Extra stuff for testing the game'''
+
+    def c(self):
+        running = True
+        while running:
+            BasicWorkings().basicheading('Credits')
+
+            BBACK = Button(25, 25, 150, 50, (200, 20, 20), 'Back').draw()
+            BTESTSCREEN = Button(400, 500 / 2 + 150, 200, 50, (0, 242, 255), 'Testscreen').draw()
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    BasicWorkings().closing()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        running = False
+                if BBACK.is_clicked(event):
+                    running = False
+                BTESTSCREEN.clicked_action(event, self.testscreen)
+            pygame.display.update()
+            clock.tick(30)
+
+    def testscreen(self):
+        running = True
+        while running:
+            BasicWorkings().basicheading('Testscreen')
+
+            BBACK = Button(25, 25, 150, 50, (200, 20, 20), 'Back').draw()
+            BGIVEGOLD = Button(100, 500 / 2 + 50, 200, 50, (0, 242, 255), 'Add Gold').draw()
+            BGIVEXP = Button(400, 500 / 2 + 50, 200, 50, (0, 242, 255), 'Add XP').draw()
+            BTAKEGOLD = Button(100, 500 / 2 + 150, 200, 50, (0, 242, 255), 'Minus Gold').draw()
+            BTAKEXP = Button(400, 500 / 2 + 150, 200, 50, (0, 242, 255), 'Minus XP').draw()
+            BTEST = Button(700, 500 / 2 + 50, 200, 50, (0, 242, 255), 'TEST BUTTON').draw()
+            BGRID = Button(700, 500 / 2 + 150, 200, 50, (0, 242, 255), 'Grid').draw()
+
+            global gridscreen
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    BasicWorkings().closing()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        running = False
+                if BBACK.is_clicked(event):
+                    running = False
+                if BGIVEGOLD.is_clicked(event):
+                    FILE_1.change('gold', 100)
+                    print('Gold added, now at ' + str(FILE_1.Gold))
+                if BGIVEXP.is_clicked(event):
+                    FILE_1.change('XP', 500)
+                    print('XP added, now at ' + str(FILE_1.XP))
+                if BTAKEGOLD.is_clicked(event):
+                    FILE_1.change('gold', -100)
+                    print('Gold subtracted, now at ' + str(FILE_1.Gold))
+                if BTAKEXP.is_clicked(event):
+                    FILE_1.change('XP', -100)
+                    print('XP subtracted, now at ' + str(FILE_1.XP))
+                BTEST.clicked_action(event, Popup(BOWANDARROW, 'test', 'testing again', 'testing once again').selectionbox)
+                if BGRID.is_clicked(event):
+                    if gridscreen == 'off':
+                        gridscreen = 'on'
+                    else:
+                        gridscreen = 'off'
+                    BasicWorkings().makegrid()
+            pygame.display.update()
+            clock.tick(30)
 
 def characteronteam(x, y, image = None):
     if image != None:
         screen.blit(pygame.transform.scale(pygame.image.load(image).subsurface(((2375 / 26), 0, (4125 / 13), 500)), (165, 260)), (x, y))
 
-def team(slide):
-    openshop = True
-    while openshop:
+class Popup:
+
+    def __init__(self, item, type, use, message = None, donothing = None):
+        self.item = item
+        self.type = type
+        self.message = message
+        self.use = use
+        self.donothing = donothing
+
+    def TEXT(self, size):
+        Button(275, 25, 450, 450, (0, 242, 255), self.message, size, (0, 242, 255)).draw()
+
+    def selectionbox(self, size = 75):
         running = True
-        button_dict = {}
-        XVALUEFORBUTTON = [100, 280, 460, 640, 820]
-        YVALUEFORBUTTON = [215]*5 + [310]*5 + [405]*5
-        if slide == 'Team':
-            while running:
-                basicheading('Team')
-                pygame.draw.rect(screen, (0, 211, 222), pygame.Rect(40, 100, 230, 500 / 5))
+        while running:
+            if self.use == 'buy':
+                key = self.buying()
+            if self.use == 'team':
+                key = self.addtoloadout()
+            if self.use == 'remove':
+                key = self.removefromteam()
 
-                BBACK = B(25, 25, 150, 50, (200, 20, 20), 'Back')
-                B(80, 125, 150, 50, (0, 211, 222), 'Team', 55, (0, 211, 222))
-                BHEROS = B(310, 125, 150, 50, (0, 242, 255), 'Heros', 30)
-                BWEAPONS = B(540, 125, 150, 50, (0, 242, 255), 'Weapons', 30)
-                BUPGRADES = B(770, 125, 150, 50, (0, 242, 255), 'Upgrades', 30)
+            if key == True:
+                BCANCEL = Button(275 + 50 / 3, 400, 200, 50, (200, 20, 20), 'Cancel').draw()
+                BACCEPT = Button(475 + 100 / 3, 400, 200, 50, (20, 200, 20), 'Accept').draw()
 
-                buttonslist = ['B10', 'B11', 'B12', 'B13', 'B20', 'B21', 'B22', 'B23', 'B30', 'B31', 'B32', 'B33']
-                XVALUEFORBUTTONTEAM = [47.5, 365, 682.5]
-                XVALUEFORBUTTONWEAPONS = [237.5, 555, 872.5]
-                YVALUEFORBUTTONWEAPONS = [215, 310, 405]
+            else:
+                if self.donothing != None:
+                    return
+                self.TEXT(size)
 
-                onteamimages = ([PHC] + [PHW]*3)*3
-                for weapon, hero in zip(fullweaponslist, fullheroslist):
-                    if weapon.onteam != None:
-                        onteamimages.pop(weapon.teamcode)
-                        onteamimages.insert(weapon.teamcode, weapon)
-                    if hero.onteam != None:
-                        onteamimages.pop(hero.teamcode)
-                        onteamimages.insert(hero.teamcode, hero)
-
-                buttonmark = 0
-                for teamslot, Xweaponslot in zip(XVALUEFORBUTTONTEAM, XVALUEFORBUTTONWEAPONS):
-                    button_dict[buttonslist[buttonmark]] = B(teamslot, 215, 175, 270, (0, 211, 222), '')
-                    characteronteam(teamslot + 5, 220, onteamimages[buttonmark].icon)
-                    buttonmark += 1
-                    for Yweaponslot in YVALUEFORBUTTONWEAPONS:
-                        button_dict[buttonslist[buttonmark]] = B(Xweaponslot, Yweaponslot,80, 80, (0, 211, 222), '', image = onteamimages[buttonmark].icon)
-                        buttonmark += 1
-
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        closing()
-                    if event.type == pygame.KEYDOWN:
-                        if event.key == pygame.K_ESCAPE:
-                            openshop = False
-                            running = False
-                    if BBACK.is_clicked(event):
-                        openshop = False
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    BasicWorkings().closing()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
                         running = False
-                    if BHEROS.is_clicked(event):
-                        slide = 'Heros'
+                if Button(0, 0, 1000, 25, (0, 242, 255), '', invisible='on').is_clicked(event) \
+                        or Button(0, 475, 1000, 25, (0, 242, 255), '', invisible='on').is_clicked(event) \
+                        or Button(0, 25, 275, 450, (0, 242, 255), '', invisible='on').is_clicked(event) \
+                        or Button(725, 25, 275, 450, (0, 242, 255), '', invisible='on').is_clicked(event):
+                    running = False
+                if key == True:
+                    if BCANCEL.is_clicked(event):
                         running = False
-                    if BWEAPONS.is_clicked(event):
-                        slide = 'Weapons'
+                    if BACCEPT.is_clicked(event):
+                        self.ACTION()
                         running = False
-                    if BUPGRADES.is_clicked(event):
-                        slide = 'Upgrades'
-                        running = False
-                    for button, index in zip(button_dict, range(0, 12)):
-                        if button_dict[button].is_clicked(event):
-                            print(button, index)
-                            onteamimages[index].onteam = None
-                pygame.display.update()
-                clock.tick(30)
-        if slide == 'Heros':
-            while running:
-                basicheading('Team')
-                pygame.draw.rect(screen, (0, 211, 222), pygame.Rect(270, 100, 230, 500 / 5))
 
-                BBACK = B(25, 25, 150, 50, (200, 20, 20), 'Back')
-                BTEAM = B(80, 125, 150, 50, (0, 242, 255), 'Team', 30)
-                B(310, 125, 150, 50, (0, 211, 222), 'Heros', 55, (0, 211, 222))
-                BWEAPONS = B(540, 125, 150, 50, (0, 242, 255), 'Weapons', 30)
-                BUPGRADES = B(770, 125, 150, 50, (0, 242, 255), 'Upgrades', 30)
+            pygame.display.update()
+            clock.tick(30)
 
-                buttonslist = ['BPLAYER', 'BALPIN', 'BGAR', 'BMARKSON', 'BSWAMP', 'BSISTER', 'BTORPEDO', 'BREAPER', 'BMINER', 'BRAZOR', 'BPHANTASM', 'BSTALKER', 'BVIVI', 'BCLYPEUS', 'BEXECUTIONER']
-                for button, hero, x, y in zip(buttonslist, fullheroslist, itertools.cycle(XVALUEFORBUTTON), YVALUEFORBUTTON):
-                    button_dict[button] = B(x, y, 80, 80, (0, 211, 222), requirements(hero), 25, image = hero.inventory('self'))
+    def ACTION(self):
+        if self.use == 'buy':
+            self.buying(action = 'on')
+        if self.use == 'team':
+            self.addtoloadout(action = 'on')
+        if self.use == 'remove':
+            self.removefromteam(action = 'on')
 
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        closing()
-                    if event.type == pygame.KEYDOWN:
-                        if event.key == pygame.K_ESCAPE:
-                            openshop = False
-                            running = False
-                    if BBACK.is_clicked(event):
-                        openshop = False
-                        running = False
-                    if BTEAM.is_clicked(event):
-                        slide = 'Team'
-                        running = False
-                    if BWEAPONS.is_clicked(event):
-                        slide = 'Weapons'
-                        running = False
-                    if BUPGRADES.is_clicked(event):
-                        slide = 'Upgrades'
-                        running = False
-                    for button, hero in zip(button_dict, fullheroslist):
-                        B2(button_dict[button], selectionbox, event, hero, 'hero', 'team', requirements(hero))
-
-                pygame.display.update()
-                clock.tick(30)
-        if slide == 'Weapons':
-            while running:
-                basicheading('Team')
-                pygame.draw.rect(screen, (0, 211, 222), pygame.Rect(500, 100, 230, 500 / 5))
-
-                BBACK = B(25, 25, 150, 50, (200, 20, 20), 'Back')
-                BTEAM = B(80, 125, 150, 50, (0, 242, 255), 'Team', 30)
-                BHEROS = B(310, 125, 150, 50, (0, 242, 255), 'Heros', 30)
-                B(540, 125, 150, 50, (0, 211, 222), 'Weapons', 55, (0, 211, 222))
-                BUPGRADES = B(770, 125, 150, 50, (0, 242, 255), 'Upgrades', 30)
-
-                buttonslist = ['BSWORD', 'BBOW', 'BDUALBLADE', 'BCHAINKUNAI', 'BSPEAR', 'BAX', 'BMACE', 'BHAMMER', 'BNUNCHUCKS', 'BPICKAXE', 'BMAGIC', 'BCLUB', 'BBLOWGUN', 'BSCYTHE', 'BHEAL']
-                for button, weapon, x, y in zip(buttonslist, fullweaponslist, itertools.cycle(XVALUEFORBUTTON), YVALUEFORBUTTON):
-                    button_dict[button] = B(x, y, 80, 80, (0, 211, 222), requirements(weapon), 25, image = weapon.inventory('self'))
-
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        closing()
-                    if event.type == pygame.KEYDOWN:
-                        if event.key == pygame.K_ESCAPE:
-                            openshop = False
-                            running = False
-                    if BBACK.is_clicked(event):
-                        openshop = False
-                        running = False
-                    if BTEAM.is_clicked(event):
-                        slide = 'Team'
-                        running = False
-                    if BHEROS.is_clicked(event):
-                        slide = 'Heros'
-                        running = False
-                    if BUPGRADES.is_clicked(event):
-                        slide = 'Upgrades'
-                        running = False
-                    for button, weapon in zip(button_dict, fullweaponslist):
-                        B2(button_dict[button], selectionbox, event, weapon, 'weapon', 'team', requirements(weapon))
-                pygame.display.update()
-                clock.tick(30)
-        if slide == 'Upgrades':
-            while running:
-                basicheading('Team')
-                pygame.draw.rect(screen, (0, 211, 222), pygame.Rect(730, 100, 230, 500 / 5))
-
-                BBACK = B(25, 25, 150, 50, (200, 20, 20), 'Back')
-                BTEAM = B(80, 125, 150, 50, (0, 242, 255), 'Team', 30)
-                BHEROS = B(310, 125, 150, 50, (0, 242, 255), 'Heros', 30)
-                BWEAPONS = B(540, 125, 150, 50, (0, 242, 255), 'Weapons', 30)
-                B(770, 125, 150, 50, (0, 211, 222), 'Upgrades', 55, (0, 211, 222))
-
-                B(25, 265, 170, 170, (0, 242, 255), '', image = 'GAMEUPGRADES/game_upgrades_attack.png')
-                B(220, 265, 170, 170, (0, 242, 255), '', image = 'GAMEUPGRADES/game_upgrades_defense.png')
-                B(415, 265, 170, 170, (0, 242, 255), '', image = 'GAMEUPGRADES/game_upgrades_health.png')
-                B(610, 265, 170, 170, (0, 242, 255), '', image = 'GAMEUPGRADES/game_upgrades_crit_rate.png')
-                B(805, 265, 170, 170, (0, 242, 255), '', image = 'GAMEUPGRADES/game_upgrades_crit_damage.png')
-
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        closing()
-                    if event.type == pygame.KEYDOWN:
-                        if event.key == pygame.K_ESCAPE:
-                            openshop = False
-                            running = False
-                    if BBACK.is_clicked(event):
-                        openshop = False
-                        running = False
-                    if BTEAM.is_clicked(event):
-                        slide = 'Team'
-                        running = False
-                    if BHEROS.is_clicked(event):
-                        slide = 'Heros'
-                        running = False
-                    if BWEAPONS.is_clicked(event):
-                        slide = 'Weapons'
-                        running = False
-                pygame.display.update()
-                clock.tick(30)
-
-    global TEAMLASTOPEN
-    TEAMLASTOPEN = slide
-
-def shop(slide):
-    openshop = True
-    while openshop:
-        running = True
-        button_dict = {}
-        XVALUEFORBUTTON = [325/6, (325/6)*2 + 135, (325/6)*3 + (135)*2, (325/6)*4 + (135)*3, (325/6)*5 + (135)*4]
-        YVALUEFORBUTTON = [210]*5 + [220 + 135]*5
-        if slide == 'Heros':
-            while running:
-                basicheading('Shop')
-                pygame.draw.rect(screen, (0, 211, 222), pygame.Rect(50, 100, 300, 500 / 5))
-
-                BBACK = B(25, 25, 150, 50, (200, 20, 20), 'Back')
-                B(100, 125, 200, 50, (0, 211, 222), 'Heros', 75,(0, 211, 222))
-                BWEAPONS = B(400, 125, 200, 50, (0, 242, 255), 'Weapons')
-                BUPGRADES = B(700, 125, 200, 50, (0, 242, 255), 'Upgrades')
-
-                buttonslist = ['BPLAYER', 'BALPIN', 'BGAR', 'BMARKSON', 'BSISTER', 'BTORPEDO', 'BMINER', 'BRAZOR', 'BVIVI', 'BCLYPEUS']
-                heroslist = [PLAYER, ALPIN, GAR, MARKSON, SISTER, TORPEDO, MINER, RAZOR, VIVI, CLYPEUS]
-                for button, hero, x, y in zip(buttonslist, heroslist, itertools.cycle(XVALUEFORBUTTON), YVALUEFORBUTTON):
-                    button_dict[button] = B(x, y, 135, 135, (0, 211, 222), 'Recruited', 35, image = hero.inventory('shop'))
-
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        closing()
-                    if event.type == pygame.KEYDOWN:
-                        if event.key == pygame.K_ESCAPE:
-                            openshop = False
-                            running = False
-                    if BBACK.is_clicked(event):
-                        openshop = False
-                        running = False
-                    if BWEAPONS.is_clicked(event):
-                        slide = 'Weapons'
-                        running = False
-                    if BUPGRADES.is_clicked(event):
-                        slide = 'Upgrades'
-                        running = False
-                    for button, hero in zip(button_dict, heroslist):
-                        B2(button_dict[button], selectionbox, event, hero, 'hero', 'buy', 'Recruited')
-                pygame.display.update()
-                clock.tick(30)
-        if slide == 'Weapons':
-            while running:
-                basicheading('Shop')
-                pygame.draw.rect(screen, (0, 211, 222), pygame.Rect(350, 100, 300, 500 / 5))
-
-                BBACK = B(25, 25, 150, 50, (200, 20, 20), 'Back')
-                BHEROS = B(100, 125, 200, 50, (0, 242, 255), 'Heros')
-                B(400, 125, 200, 50, (0, 211, 222), 'Weapons', 75,(0, 211, 222))
-                BUPGRADES = B(700, 125, 200, 50, (0, 242, 255), 'Upgrades')
-
-                buttonslist = ['BBOW', 'BDUALBLADE', 'BCHAINKUNAI', 'BSPEAR', 'BMACE', 'BHAMMER', 'BNUNCHUCKS', 'BPICKAXE', 'BCLUB', 'BHEAL']
-                weaponslist = [BOWANDARROW, DUALBALDE, CHAINKUNAI, SPEAR, MACE, HAMMER, NUNCHUCKS, PICKAXE, CLUB, HEAL]
-                for button, weapon, x, y in zip(buttonslist, weaponslist, itertools.cycle(XVALUEFORBUTTON), YVALUEFORBUTTON):
-                    button_dict[button] = B(x, y, 135, 135, (0, 211, 222), 'Sold Out', 35, image = weapon.inventory('shop'))
-
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        closing()
-                    if event.type == pygame.KEYDOWN:
-                        if event.key == pygame.K_ESCAPE:
-                            openshop = False
-                            running = False
-                    if BBACK.is_clicked(event):
-                        openshop = False
-                        running = False
-                    if BHEROS.is_clicked(event):
-                        slide = 'Heros'
-                        running = False
-                    if BUPGRADES.is_clicked(event):
-                        slide = 'Upgrades'
-                        running = False
-                    for button, weapon in zip(button_dict, weaponslist):
-                        B2(button_dict[button], selectionbox, event, weapon, 'weapon', 'buy', 'Sold Out')
-                pygame.display.update()
-                clock.tick(30)
-        if slide == 'Upgrades':
-            while running:
-                basicheading('Shop')
-                pygame.draw.rect(screen, (0, 211, 222), pygame.Rect(650, 100, 300, 500 / 5))
-
-                BBACK = B(25, 25, 150, 50, (200, 20, 20), 'Back')
-                BHEROS = B(100, 125, 200, 50, (0, 242, 255), 'Heros')
-                BWEAPONS = B(400, 125, 200, 50, (0, 242, 255), 'Weapons')
-                B(700, 125, 200, 50, (0, 211, 222), 'Upgrades', 75,(0, 211, 222))
-
-                B(25, 265, 170, 170, (0, 242, 255), '', image = 'GAMEUPGRADES/game_upgrades_attack.png')
-                B(220, 265, 170, 170, (0, 242, 255), '', image = 'GAMEUPGRADES/game_upgrades_defense.png')
-                B(415, 265, 170, 170, (0, 242, 255), '', image = 'GAMEUPGRADES/game_upgrades_health.png')
-                B(610, 265, 170, 170, (0, 242, 255), '', image = 'GAMEUPGRADES/game_upgrades_crit_rate.png')
-                B(805, 265, 170, 170, (0, 242, 255), '', image = 'GAMEUPGRADES/game_upgrades_crit_damage.png')
-
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        closing()
-                    if event.type == pygame.KEYDOWN:
-                        if event.key == pygame.K_ESCAPE:
-                            openshop = False
-                            running = False
-                    if BBACK.is_clicked(event):
-                        openshop = False
-                        running = False
-                    if BHEROS.is_clicked(event):
-                        slide = 'Heros'
-                        running = False
-                    if BWEAPONS.is_clicked(event):
-                        slide = 'Weapons'
-                        running = False
-                pygame.display.update()
-                clock.tick(30)
-    global SHOPLASTOPEN
-    SHOPLASTOPEN = slide
-
-def selectionbox(item, type, use, message):
-    print(item.bought)
-    print(use)
-    global GOLD
-    running = True
-    while running:
-        key = ''
-        DATALIST = [item.cost, item.type, item.damage, item.defense, item.health, item.critrate, item.critdamage, item.speed]
-
-        if type == 'hero':
-            statslist = ['Cost = ', 'Rarity = ', 'Damage Bonus = ', 'Base Defense = ', 'Base Health = ', 'Crit Rate Bonus = ', 'Base Crit Damage = ', 'Speed = ']
-        else:
-            statslist = ['Cost = ', 'Type = ', 'Base Damage = ', 'Defense Bonus = ', 'Health Bonus = ', 'Base Crit Rate = ', 'Crit Damage Bonus = ', 'Weight = ']
-
-        if use == 'buy':
-            question = ['Do you wish to buy: ', '?']
-            if item.bought == None:
-                key = 'shop'
-        else:
-            question = ['Add ', ' to your team?']
-            statslist.remove('Cost = ')
-            DATALIST.remove(item.cost)
-            if item.bought != None:
-                key = 'team'
-
-        if key == 'shop' or key == 'team':
-
-            B(275, 25, 450, 450, (0, 211, 222), '', 75, (0, 211, 222))
-            B(275, 25, 450, 50, (0, 211, 222), question[0] + str(item.name) + question[1], 30, (0, 211, 222))
-            B(300, 100, 250, 250, (0, 0, 0), '', 0, (0, 0, 0), image = item.icon)
-
+    def buying(self, action = None):
+        if self.item.bought == None and action == None:
+            Button(275, 25, 450, 450, (0, 211, 222), '', 75, (0, 211, 222)).draw()
+            Button(275, 25, 450, 50, (0, 211, 222), 'Do you wish to buy: ' + str(self.item.name) + '?', 30, (0, 211, 222)).draw()
+            Button(300, 100, 250, 250, (0, 0, 0), '', 0, (0, 0, 0), image = self.item.icon).draw()
             YVALUEFORSTATS = 0
-            for stat, statdata in zip(statslist, DATALIST):
-                B(575, 100 + (YVALUEFORSTATS*(250/8)), 125, 250 / 8, (0, 0, 0), stat + str(statdata), 20, invisible='on')
+            for num in range(0, 8):
+                Button(575, 100 + (YVALUEFORSTATS * (250 / 8)), 125, 250 / 8, (0, 0, 0),
+                       self.item.statslist[num] + str(self.item.DATALIST[num]), 20, invisible='on').draw()
                 YVALUEFORSTATS += 1
+            return True
+        if action != None:
+            if FILE_1.Gold >= self.item.cost:
+                FILE_1.change('gold', -self.item.cost)
+                self.item.bought = 'yes'
+            else:
+                print('not enough gold')
 
-            BCANCEL = B(275 + 50/3, 400, 200, 50, (200, 20, 20), 'Cancel')
-            BACCEPT = B(475 + 100/3, 400, 200, 50, (20, 200, 20), 'Accept')
+    def addtoloadout(self, action = None):
+        if self.item.bought != None and action == None:
+            Button(275, 25, 450, 450, (0, 211, 222), '', 75, (0, 211, 222)).draw()
+            Button(275, 25, 450, 50, (0, 211, 222), 'Add ' + str(self.item.name) + ' to your team?', 30, (0, 211, 222)).draw()
+            Button(300, 100, 250, 250, (0, 0, 0), '', 0, (0, 0, 0), image = self.item.icon).draw()
+            YVALUEFORSTATS = 0
+            for num in range(1, 8):
+                Button(575, 100 + (YVALUEFORSTATS * (250 / 8)), 125, 250 / 8, (0, 0, 0), self.item.statslist[num] + str(self.item.DATALIST[num]), 20, invisible = 'on').draw()
+                YVALUEFORSTATS += 1
+            return True
+        if action != None:
+            self.loadoutbox()
 
-        else:
-            B(275, 25, 450, 450, (0, 242, 255), message, 75, (0, 242, 255))
+    def loadoutbox(self):
+        running = True
+        while running:
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                closing()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    running = False
-            if B(0, 0, 1000, 25, (0, 242, 255), '', invisible = 'on').is_clicked(event)\
-                or B(0, 475, 1000, 25, (0, 242, 255), '', invisible = 'on').is_clicked(event)\
-                or B(0, 25, 275, 450, (0, 242, 255), '', invisible = 'on').is_clicked(event)\
-                or B(725, 25, 275, 450, (0, 242, 255), '', invisible = 'on').is_clicked(event):
-                running = False
-            if key == 'shop' or key == 'team':
-                if BCANCEL.is_clicked(event):
-                    running = False
-                if BACCEPT.is_clicked(event):
-                    if use == 'buy':
-                        if GOLD >= item.cost:
-                            GOLD = GOLD - item.cost
-                            item.bought = 'yes'
-                            running = False
-                        else:
-                            print('not enough gold')
-                    else:
-                        loadoutbox(item, type)
-                        running = False
-        pygame.display.update()
-        clock.tick(30)
+            button_dict = {}
+            if self.type == 'hero':
+                actioncolorhero = (255, 255, 0)
+                actioncolorweapon = (0, 242, 255)
+            else:
+                actioncolorhero = (0, 242, 255)
+                actioncolorweapon = (255, 255, 0)
+            Button(25, 25, 950, 450, (0, 211, 222), '', hovercolor = (0, 211, 222)).draw()
+            Button(25, 25, 950, 25 + (325 - 850 / 3), (0, 211, 222), 'Pick the slot', invisible = 'on').draw()
+            BCANCEL = Button(400, 400, 200, 50, (200, 20, 20), 'Cancel').draw()
 
-def couldntthinkofanythingelse(item, index):
-    DATALIST = [item.damage, item.defense, item.health, item.critrate, item.critdamage, item.speed]
-    return DATALIST[index]
+            '''Location markers ↓↓↓, B12 = "Button" team "1" weapons slot "2"'''
 
-def loadoutbox(item, type):
-    running = True
-    while running:
+            # Button(50, 50 + (325 - 850/3), 850/3, 850/3, (0, 0, 0), '').draw()
+            # Button(75 + (850/3), 50 + (325 - 850/3), 850/3, 850/3, (0, 0, 0), '').draw()
+            # Button(100 + (850/3) * 2, 50 + (325 - 850/3), 850/3, 850/3, (0, 0, 0), '').draw()
 
-        button_dict = {}
-        if type == 'hero':
-            actioncolorhero = (255, 255, 0)
-            actioncolorweapon = (0, 242, 255)
-        else:
-            actioncolorhero = (0, 242, 255)
-            actioncolorweapon = (255, 255, 0)
-        B(25, 25, 950, 450, (0, 211, 222), '', hovercolor = (0, 211, 222))
-        B(25, 25, 950, 25 + (325 - 850/3), (0, 211, 222), 'Pick the slot', invisible = 'on')
-        BCANCEL = B(400, 400, 200, 50, (200, 20, 20), 'Cancel')
+            buttonslist = ['B10', 'B11', 'B12', 'B13', 'B20', 'B21', 'B22', 'B23', 'B30', 'B31', 'B32', 'B33']
+            XVALUEFORBUTTONTEAM = [50, 75 + (850 / 3), 100 + (850 / 3) * 2]
+            XVALUEFORBUTTONWEAPONS = [0, 850 / 3 / 3 + 3.75, 2 * (850 / 3 / 3) + 7.5]
+            statslist = ['Speed = ', 'Crit Damage = ', 'Crit Rate = ', 'Health = ', 'Defense = ', 'Damage = ']
 
-        '''Location markers ↓↓↓, B12 = "Button" team "1" weapons slot "2"'''
+            FILE_1.ontheteam = ([PHC] + [PHW] * 3) * 3
 
-        # B(50, 50 + (325 - 850/3), 850/3, 850/3, (0, 0, 0), '')
-        # B(75 + (850/3), 50 + (325 - 850/3), 850/3, 850/3, (0, 0, 0), '')
-        # B(100 + (850/3) * 2, 50 + (325 - 850/3), 850/3, 850/3, (0, 0, 0), '')
+            for weapon, hero in zip(fullweaponslist, fullheroslist):
+                if weapon.onteam != None:
+                    FILE_1.ontheteam.pop(weapon.teamcode)
+                    FILE_1.ontheteam.insert(weapon.teamcode, weapon)
+                if hero.onteam != None:
+                    FILE_1.ontheteam.pop(hero.teamcode)
+                    FILE_1.ontheteam.insert(hero.teamcode, hero)
 
-        buttonslist = ['B10', 'B11', 'B12', 'B13', 'B20', 'B21', 'B22', 'B23', 'B30', 'B31', 'B32', 'B33']
-        XVALUEFORBUTTONTEAM = [50, 75 + (850/3), 100 + (850/3)*2]
-        XVALUEFORBUTTONWEAPONS = [0, 850/3/3 + 3.75, 2*(850/3/3) + 7.5]
-        statslist = ['Speed = ', 'Crit Damage = ', 'Crit Rate = ', 'Health = ', 'Defense = ', 'Damage = ']
-
-        onteamimages = ([PHC] + [PHW]*3)*3
-        for weapon, hero in zip(fullweaponslist, fullheroslist):
-            if weapon.onteam != None:
-                onteamimages.pop(weapon.teamcode)
-                onteamimages.insert(weapon.teamcode, weapon)
-            if hero.onteam != None:
-                onteamimages.pop(hero.teamcode)
-                onteamimages.insert(hero.teamcode, hero)
-
-        buttonmark = 0
-        totalcounter = 0
-        totalstat = 0
-        for teamslot in XVALUEFORBUTTONTEAM:
-            button_dict[buttonslist[buttonmark]] = B(teamslot, 50 + (325 - 850/3), 2*(850/3/3) - 3.75, 2*(850/3/3) - 3.75, (0, 242, 255), 'Hero', hovercolor = actioncolorhero, image = onteamimages[buttonmark].icon)
-            buttonmark += 1
-            totalcounter += 4
-            for weaponslot in XVALUEFORBUTTONWEAPONS:
-                button_dict[buttonslist[buttonmark]] = B(teamslot + weaponslot, 50 + (325 - 850/3) + 850/3 - 850/3/3 + 7.5, 850/3/3 - 7.5, 850/3/3 - 7.5, (0, 242, 255), 'Weapon', 20, actioncolorweapon, image = onteamimages[buttonmark].icon)
+            buttonmark = 0
+            totalcounter = 0
+            totalstat = 0
+            for teamslot in XVALUEFORBUTTONTEAM:
+                button_dict[buttonslist[buttonmark]] = Button(teamslot, 50 + (325 - 850 / 3), 2 * (850 / 3 / 3) - 3.75, 2 * (850 / 3 / 3) - 3.75, (0, 242, 255), 'Hero', hovercolor = actioncolorhero, image = FILE_1.ontheteam[buttonmark].icon).draw()
                 buttonmark += 1
-                statindex = 5
-                for num, stats in zip(range(1, 7), statslist):
-                    for total in range(totalcounter - 4, totalcounter):
-                        totalstat += couldntthinkofanythingelse(onteamimages[total], statindex)
-                    B(teamslot + 2*(850/3/3) + 7.5, (50 + (325 - 850/3) + 850/3 - 850/3/3) - (2*(850/3/3))*(num/6), 850/3/3 - 7.5, (2*(850/3/3) - 3.75)/6, (0, 242, 255), stats + str(totalstat), 15, invisible = 'on')
-                    statindex -= 1
-                    totalstat = 0
+                totalcounter += 4
+                for weaponslot in XVALUEFORBUTTONWEAPONS:
+                    button_dict[buttonslist[buttonmark]] = Button(teamslot + weaponslot, 50 + (325 - 850 / 3) + 850 / 3 - 850 / 3 / 3 + 7.5, 850 / 3 / 3 - 7.5, 850 / 3 / 3 - 7.5, (0, 242, 255), 'Weapon', 20, actioncolorweapon, image = FILE_1.ontheteam[buttonmark].icon).draw()
+                    buttonmark += 1
+                    statindex = 7
+                    for num, stats in zip(range(1, 7), statslist):
+                        for total in range(totalcounter - 4, totalcounter):
+                            totalstat += FILE_1.ontheteam[total].DATALIST[statindex]
+                        Button(teamslot + 2 * (850 / 3 / 3) + 7.5, (50 + (325 - 850 / 3) + 850 / 3 - 850 / 3 / 3) - (2 * (850 / 3 / 3)) * (num / 6), 850 / 3 / 3 - 7.5, (2 * (850 / 3 / 3) - 3.75) / 6, (0, 242, 255), stats + str(totalstat), 15, invisible='on').draw()
+                        statindex -= 1
+                        totalstat = 0
 
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                closing()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    BasicWorkings().closing()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        running = False
+                if Button(0, 0, 1000, 25, (0, 242, 255), '', invisible='on').is_clicked(event) \
+                        or Button(0, 475, 1000, 25, (0, 242, 255), '', invisible='on').is_clicked(event) \
+                        or Button(0, 25, 25, 450, (0, 242, 255), '', invisible='on').is_clicked(event) \
+                        or Button(975, 25, 25, 450, (0, 242, 255), '', invisible='on').is_clicked(event) \
+                        or BCANCEL.is_clicked(event):
                     running = False
-            if B(0, 0, 1000, 25, (0, 242, 255), '', invisible = 'on').is_clicked(event)\
-                or B(0, 475, 1000, 25, (0, 242, 255), '', invisible = 'on').is_clicked(event)\
-                or B(0, 25, 25, 450, (0, 242, 255), '', invisible = 'on').is_clicked(event)\
-                or B(975, 25, 25, 450, (0, 242, 255), '', invisible = 'on').is_clicked(event)\
-                or BCANCEL.is_clicked(event):
-                    running = False
 
-            for button, index in zip(button_dict, range(0, 12)):
-                if button_dict[button].is_clicked(event):
-                    item.putinloadout(button, index)
+                for button, index in zip(button_dict, range(0, 12)):
+                    if button_dict[button].is_clicked(event):
+                        self.item.putinloadout(button, index)
+            pygame.display.update()
+            clock.tick(30)
 
-        pygame.display.update()
-        clock.tick(30)
+    def removefromteam(self, action = None):
+        if self.item.bought != None and action == None:
+            Button(275, 25, 450, 450, (0, 211, 222), '', 75, (0, 211, 222)).draw()
+            Button(275, 25, 450, 50, (0, 211, 222), 'Remove ' + str(self.item.name) + ' from your team?', 30, (0, 211, 222)).draw()
+            Button(300, 100, 250, 250, (0, 0, 0), '', 0, (0, 0, 0), image = self.item.icon).draw()
+            YVALUEFORSTATS = 0
+            for num in range(1, 8):
+                Button(575, 100 + (YVALUEFORSTATS * (250 / 8)), 125, 250 / 8, (0, 0, 0), self.item.statslist[num] + str(self.item.DATALIST[num]), 20, invisible = 'on').draw()
+                YVALUEFORSTATS += 1
+            return True
+        if action != None:
+            if self.item in FILE_1.ontheteam:
+                self.item.onteam = None
 
-def monsters():
-    running = True
-    while running:
-        basicheading('Monsters')
+class Combat:
 
-        BBACK = B(25, 25, 150, 50, (200, 20, 20), 'Back')
+    def __init__(self):
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                closing()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    running = False
-            if BBACK.is_clicked(event):
-                running = False
-        pygame.display.update()
-        clock.tick(30)
+        self.player1 = FILE_1.ontheteam[0]
+        self.item11 = FILE_1.ontheteam[1]
+        self.item12 = FILE_1.ontheteam[2]
+        self.item13 = FILE_1.ontheteam[3]
+        self.player2 = FILE_1.ontheteam[4]
+        self.item21 = FILE_1.ontheteam[5]
+        self.item22 = FILE_1.ontheteam[6]
+        self.item23 = FILE_1.ontheteam[7]
+        self.player3 = FILE_1.ontheteam[8]
+        self.item31 = FILE_1.ontheteam[9]
+        self.item32 = FILE_1.ontheteam[10]
+        self.item33 = FILE_1.ontheteam[11]
 
-'''Extra stuff for testing the game'''
+        self.enemy1 = FILE_1.currentlevel[0]
+        self.enemyitem11 = FILE_1.currentlevel[1]
+        self.enemyitem12 = FILE_1.currentlevel[2]
+        self.enemyitem13 = FILE_1.currentlevel[3]
+        self.enemy2 = FILE_1.currentlevel[4]
+        self.enemyitem21 = FILE_1.currentlevel[5]
+        self.enemyitem22 = FILE_1.currentlevel[6]
+        self.enemyitem23 = FILE_1.currentlevel[7]
+        self.enemy3 = FILE_1.currentlevel[8]
+        self.enemyitem31 = FILE_1.currentlevel[9]
+        self.enemyitem32 = FILE_1.currentlevel[10]
+        self.enemyitem33 = FILE_1.currentlevel[11]
 
-def c():
-    running = True
-    while running:
-        basicheading('Credits')
+        self.currentplayer = 1
+        self.currentenemy = 1
 
-        BBACK = B(25, 25, 150, 50, (200, 20, 20), 'Back')
-        BTESTSCREEN = B(400, 500/2 + 150, 200, 50, (0, 242, 255), 'Testscreen')
+    def combatwindow(self):
+        running = True
+        while running:
+            BasicWorkings().basicheading('', size=30)
+            Button(0, 470, 1000, 30, (0, 211, 222), '', 75, (0, 211, 222)).draw()
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                closing()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    running = False
-            if BBACK.is_clicked(event):
-                running = False
-            B2(BTESTSCREEN, testscreen, event)
-        pygame.display.update()
-        clock.tick(30)
+            # Button(499, 0, 2, 500, (255, 0, 0), '', 75, (255, 0, 0)).draw()
+            global gridscreen
+            # gridscreen = 'on'
 
-def testscreen():
-    running = True
-    while running:
-        basicheading('Testscreen')
+            bplayer1 = Button(10, 110, 80, 80, (0, 211, 222), '', 75, (0, 211, 222),
+                              image=self.player1.icon).draw()  # team 1
+            bplayer2 = Button(10, 210, 80, 80, (0, 211, 222), '', 75, (0, 211, 222),
+                              image=self.player2.icon).draw()  # team 2
+            bplayer3 = Button(10, 310, 80, 80, (0, 211, 222), '', 75, (0, 211, 222),
+                              image=self.player3.icon).draw()  # team 3
 
-        BBACK = B(25, 25, 150, 50, (200, 20, 20), 'Back')
-        BGIVEGOLD = B(100, 500 / 2 + 50, 200, 50, (0, 242, 255), 'Add Gold')
-        BGIVEXP = B(400, 500 / 2 + 50, 200, 50, (0, 242, 255), 'Add XP')
-        BTAKEGOLD = B(100, 500 / 2 + 150, 200, 50, (0, 242, 255), 'Minus Gold')
-        BTAKEXP = B(400, 500 / 2 + 150, 200, 50, (0, 242, 255), 'Minus XP')
-        BTEST = B(700, 500 / 2 + 50, 200, 50, (0, 242, 255), 'TEST BUTTON')
-        BGRID = B(700, 500 / 2 + 150, 200, 50, (0, 242, 255), 'Grid')
 
-        global gridscreen
-        global GOLD
-        global XP
+            if self.currentplayer == 1:
+                Button(100, 100, 300, 300, (0, 211, 222), '', 75, (0, 211, 222), image = self.player1.icon).draw()  # player
+                Button(100, 50, 300, 30, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # health
+                Button(110, 410, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.item11.icon).draw()  # weapon 1
+                Button(210, 410, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.item12.icon).draw()  # weapon 2
+                Button(310, 410, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.item13.icon).draw()  # weapon 3
+            if self.currentplayer == 2:
+                Button(100, 100, 300, 300, (0, 211, 222), '', 75, (0, 211, 222), image = self.player2.icon).draw()  # player
+                Button(100, 50, 300, 30, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # health
+                Button(10, 110, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.player1.icon).draw()  # team 1
+                Button(10, 210, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.player2.icon).draw()  # team 2
+                Button(10, 310, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.player3.icon).draw()  # team 3
+                Button(110, 410, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.item21.icon).draw()  # weapon 1
+                Button(210, 410, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.item22.icon).draw()  # weapon 2
+                Button(310, 410, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.item23.icon).draw()  # weapon 3
+            if self.currentplayer == 3:
+                Button(100, 100, 300, 300, (0, 211, 222), '', 75, (0, 211, 222), image = self.player3.icon).draw()  # player
+                Button(100, 50, 300, 30, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # health
+                Button(10, 110, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.player1.icon).draw()  # team 1
+                Button(10, 210, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.player2.icon).draw()  # team 2
+                Button(10, 310, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.player3.icon).draw()  # team 3
+                Button(110, 410, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.item31.icon).draw()  # weapon 1
+                Button(210, 410, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.item32.icon).draw()  # weapon 2
+                Button(310, 410, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.item33.icon).draw()  # weapon 3
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                closing()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    running = False
-            if BBACK.is_clicked(event):
-                running = False
-            if BGIVEGOLD.is_clicked(event):
-                GOLD = GOLD + 100
-                print('Gold added, now at ' + str(GOLD))
-            if BGIVEXP.is_clicked(event):
-                XP = XP + 500
-                print('XP added, now at ' + str(XP))
-            if BTAKEGOLD.is_clicked(event):
-                GOLD = GOLD - 100
-                print('Gold subtracted, now at ' + str(GOLD))
-            if BTAKEXP.is_clicked(event):
-                XP = XP - 100
-                print('XP subtracted, now at ' + str(XP))
-            B2(BTEST, selectionbox, event, BOWANDARROW, 'test', 'testing again', 'testing once again')
-            if BGRID.is_clicked(event):
-                if gridscreen == 'off':
-                    gridscreen = 'on'
-                else:
-                    gridscreen = 'off'
-                makegrid()
-        pygame.display.update()
-        clock.tick(30)
+            if self.currentenemy == 1:
+                Button(600, 100, 300, 300, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemy1.icon).draw()  # player
+                Button(600, 50, 300, 30, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # health
+                Button(910, 110, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemy1.icon).draw()  # team 1
+                Button(910, 210, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemy2.icon).draw()  # team 2
+                Button(910, 310, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemy3.icon).draw()  # team 3
+                Button(610, 410, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemyitem11.icon).draw()  # weapon 1
+                Button(710, 410, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemyitem12.icon).draw()  # weapon 2
+                Button(810, 410, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemyitem13.icon).draw()  # weapon 3
+            if self.currentenemy == 2:
+                Button(600, 100, 300, 300, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemy2.icon).draw()  # player
+                Button(600, 50, 300, 30, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # health
+                Button(910, 110, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemy1.icon).draw()  # team 1
+                Button(910, 210, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemy2.icon).draw()  # team 2
+                Button(910, 310, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemy3.icon).draw()  # team 3
+                Button(610, 410, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemyitem21.icon).draw()  # weapon 1
+                Button(710, 410, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemyitem22.icon).draw()  # weapon 2
+                Button(810, 410, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemyitem23.icon).draw()  # weapon 3
+            if self.currentenemy == 3:
+                Button(600, 100, 300, 300, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemy3.icon).draw()  # player
+                Button(600, 50, 300, 30, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # health
+                Button(910, 110, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemy1.icon).draw()  # team 1
+                Button(910, 210, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemy2.icon).draw()  # team 2
+                Button(910, 310, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemy3.icon).draw()  # team 3
+                Button(610, 410, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemyitem31.icon).draw()  # weapon 1
+                Button(710, 410, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemyitem32.icon).draw()  # weapon 2
+                Button(810, 410, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemyitem33.icon).draw()  # weapon 3
 
-def makegrid():
-    if gridscreen == 'on':
-        XVALUEFORLINE = 0
-        YVALUEFORLINE = 0
-        for x in range(21):
-            pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(XVALUEFORLINE, 0, 1, 500))
-            XVALUEFORLINE += 50
-        for y in range(11):
-            pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(0, YVALUEFORLINE, 1000, 1))
-            YVALUEFORLINE += 50
-    else:
-        pass
+
+
+            '''Mapping out Buttons'''
+
+            Button(430, 130, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 1
+            Button(430, 180, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 2
+            Button(430, 230, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 3
+            Button(430, 280, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 4
+            Button(430, 330, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 5
+
+            Button(530, 130, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 1
+            Button(530, 180, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 2
+            Button(530, 230, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 3
+            Button(530, 280, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 4
+            Button(530, 330, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 5
+
+            # BBACK = Button(25, 25, 150, 50, (200, 20, 20), 'Back').draw()
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    BasicWorkings().closing()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        running = False
+                if self.currentplayer == 1:
+                    if bplayer2.is_clicked(event):
+                        self.currentplayer = 2
+                    if bplayer3.is_clicked(event):
+                        self.currentplayer = 3
+                if self.currentplayer == 2:
+                    if bplayer1.is_clicked(event):
+                        self.currentplayer = 1
+                    if bplayer3.is_clicked(event):
+                        self.currentplayer = 3
+                if self.currentplayer == 3:
+                    if bplayer1.is_clicked(event):
+                        self.currentplayer = 1
+                    if bplayer2.is_clicked(event):
+                        self.currentplayer = 2
+
+                # if BBACK.is_clicked(event):
+                #     running = False
+
+            pygame.display.update()
+            clock.tick(30)
+
 
 '''Weapons for player, place holder stats'''
 
-class Weapon():
+class Weapon:
     def __init__(self, name, type, cost, basedamage, defensebonus, healthbonus, basecritrate, critdamagebonus, speedreduction, icon, bought = None, onteam = None, requiredlevel = 0):
         self.name = name
         self.type = type
@@ -753,10 +946,12 @@ class Weapon():
         self.onteam = onteam
         self.requiredlevel = requiredlevel
         self.teamcode = None
+        self.statslist = ['Cost = ', 'Type = ', 'Base Damage = ', 'Defense Bonus = ', 'Health Bonus = ', 'Base Crit Rate = ', 'Crit Damage Bonus = ', 'Weight = ']
+        self.DATALIST = [self.cost, self.type, self.damage, self.defense, self.health, self.critrate, self.critdamage, self.speed]
 
     def inventory(self, location):
         if self.requiredlevel != 0:
-            if self.requiredlevel <= currentlevel:
+            if self.requiredlevel <= FILE_1.CurrentLevel:
                 self.bought = 'yes'
         if location == 'shop':
             if self.bought != None:
@@ -799,7 +994,7 @@ HEAL = Weapon('Heal', 'Heal', 50, 250, 150, 100, 50, 25, 15, 'GAMEWEAPONS/game_h
 
 '''Player and enemies, place holder stats'''
 
-class Character():
+class Character:
     def __init__(self, name, rarity, cost, basedamage, basedefense, basehealth, critratebonus, basecritdamage, speed, icon, profile, bought = None, onteam = None, requiredlevel = 0):
         self.name = name
         self.type = rarity
@@ -816,10 +1011,12 @@ class Character():
         self.onteam = onteam
         self.requiredlevel = requiredlevel
         self.teamcode = None
+        self.statslist = ['Cost = ', 'Rarity = ', 'Damage Bonus = ', 'Base Defense = ', 'Base Health = ', 'Crit Rate Bonus = ', 'Base Crit Damage = ', 'Speed = ']
+        self.DATALIST = [self.cost, self.type, self.damage, self.defense, self.health, self.critrate, self.critdamage, self.speed]
 
     def inventory(self, location):
         if self.requiredlevel != 0:
-            if self.requiredlevel <= currentlevel:
+            if self.requiredlevel <= FILE_1.CurrentLevel:
                 self.bought = 'yes'
         if location == 'shop':
             if self.bought != None:
@@ -919,5 +1116,16 @@ PHC = Character('', '', 0, 0, 0, 0, 0, 0, 0, None, None)
 # for num in range(0, 5):
 #     print(num)
 
-menu()
+# bobbob = ['q', 'w', 'e', 'r']
+# print(bobbob)
+# print(bobbob[1])
+# print(bobbob)
 
+FILE_1.ontheteam = ([PHC] + [PHW] * 3) * 3
+FILE_1.currentlevel = (PLAYER, SWORD, PICKAXE, SPEAR, SWAMP, SCYTHE, BLOWGUN, HEAL, EXECUTIONER, MAGIC, CLUB, AX)
+
+
+# menu()
+
+if __name__ == '__main__':
+    MainRun()
