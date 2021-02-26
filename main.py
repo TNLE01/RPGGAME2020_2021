@@ -868,6 +868,9 @@ class Combat:
         self.playerteam, self.enemyteam = [1, self.player1, self.item11, self.item12, self.item13, self.stats1], [1, self.enemy1, self.enemyitem11, self.enemyitem12, self.enemyitem13, self.estats1]
 
     def s(self, new):
+        playerlistdata = ['p1', 'p2', 'p3']
+        enemylistdata = ['e1', 'e2', 'e3']
+
         if new == 'p1':
             self.playerteam = [1, self.player1, self.item11, self.item12, self.item13, self.stats1]
         elif new == 'p2':
@@ -880,6 +883,11 @@ class Combat:
             self.enemyteam = [2, self.enemy2, self.enemyitem21, self.enemyitem22, self.enemyitem23, self.estats2]
         elif new == 'e3':
             self.enemyteam = [3, self.enemy3, self.enemyitem31, self.enemyitem32, self.enemyitem33, self.estats3]
+
+        elif new == 'rp':
+            self.s(random.choice(playerlistdata))
+        elif new == 're':
+            self.s(random.choice(enemylistdata))
 
     def combatwindow(self):
         running = True
@@ -970,9 +978,11 @@ class Combat:
                     if bplayer2.is_clicked(event):
                         self.s('p2')
 
-                bplayeritem1.clicked_action(event, self.dealdamage, 'toenemy', 2)
-                bplayeritem2.clicked_action(event, self.dealdamage, 'toenemy', 3)
-                bplayeritem3.clicked_action(event, self.dealdamage, 'toenemy', 4)
+
+
+                bplayeritem1.clicked_action(event, self.speedfactor, 'toenemy', 2)
+                bplayeritem2.clicked_action(event, self.speedfactor, 'toenemy', 3)
+                bplayeritem3.clicked_action(event, self.speedfactor, 'toenemy', 4)
 
                         # if BBACK.is_clicked(event):
                 #     running = False
@@ -992,20 +1002,49 @@ class Combat:
             Button(600, 50, 300 * (currenthealth/Totalstats(team, self.enemyteam[0]).totalhealth()), 30, (100, 255, 0), '', 20, (100, 255, 0)).draw()
             Button(600, 50, 300, 30, (200, 200, 200), 'Health ' + str(currenthealth) + '/' + str(Totalstats(team, self.enemyteam[0]).totalhealth()), 20, (200, 200, 200), invisible='on').draw()
 
+    def speedfactor(self, who, weapon):
+
+        self.s('re')
+
+        if self.playerteam[5][5] > self.enemyteam[5][5]:
+            print('player first')
+            self.dealdamage(who, weapon)
+            self.dealdamage('toplayer', random.randint(2, 5))
+        elif self.playerteam[5][5] < self.enemyteam[5][5]:
+            print('enemy first')
+            self.dealdamage('toplayer', random.randint(2, 5))
+            self.dealdamage(who, weapon)
+
+        #if speed is the same do a coin flip'''
+
+        else:
+            coin = 0
+            for side in range(1):
+                coin = random.randint(1, 2)
+            if coin == 1:
+                print('coin flip, player first')
+                self.dealdamage(who, weapon)
+                self.dealdamage('toplayer', random.randint(2, 4))
+            elif coin == 2:
+                print('coin flip, enemy first')
+                self.dealdamage('toplayer', random.randint(2, 4))
+                self.dealdamage(who, weapon)
+
     def dealdamage(self, who, weapon):
         if who == 'toenemy':
-            damagedeal = self.playerteam[5][0] * self.playerteam[weapon].power
+            damagedeal = ((self.playerteam[5][0] * self.playerteam[5][0])/(self.playerteam[5][0] + self.enemyteam[5][1])) * self.playerteam[weapon].power
             for x in range(1):
-                t = random.randint(1, 101)
+                t = random.randint(1, 100)
                 print(t)
                 if t <= self.playerteam[5][3]:
                     damagedeal *= (1+self.playerteam[5][4])
+            print(damagedeal)
             self.enemyteam[5][2] -= int(damagedeal)
 
         elif who == 'toplayer':
-            damagedeal = self.enemyteam[5][0] * self.enemyteam[weapon].power
+            damagedeal = ((self.enemyteam[5][0] * self.enemyteam[5][0])/(self.enemyteam[5][0] + self.playerteam[5][1])) * self.enemyteam[weapon].power
             for x in range(1):
-                if random.randint(1, 101) <= self.enemyteam[5][3]:
+                if random.randint(1, 100) <= self.enemyteam[5][3]:
                     damagedeal *= (1+self.enemyteam[5][4])
             self.playerteam[5][2] -= int(damagedeal)
 
@@ -1013,7 +1052,7 @@ class Combat:
 
 class Weapon:
 
-    def __init__(self, name, type, cost, basedamage, defensebonus, healthbonus, basecritrate, critdamagebonus, speedreduction, power, icon, bought = None, onteam = None, requiredlevel = 0):
+    def __init__(self, name, type, cost, basedamage, defensebonus, healthbonus, basecritrate, critdamagebonus, speedreduction, takeupspace, power, icon, bought = None, onteam = None, requiredlevel = 0):
         self.name = name
         self.type = type
         self.cost = cost
@@ -1023,6 +1062,7 @@ class Weapon:
         self.critrate = basecritrate
         self.critdamage = critdamagebonus
         self.speed = -speedreduction
+        self.space = takeupspace
         self.power = power
         self.icon = icon
         self.bought = bought
@@ -1059,27 +1099,27 @@ class Weapon:
             self.teamcode = placeindex
             print(self.onteam, placeindex)
 
-SWORD = Weapon('Sword', 'Damage', 50, 250, 150, 100, 5, .1, 15, .20, 'GAMEWEAPONS/game_sword_icon.png', requiredlevel = 1)
-BOWANDARROW = Weapon('Bow and Arrows', 'Damage', 0, 250, 150, 100, 5, .1, 15, .20, 'GAMEWEAPONS/game_bow_icon.png')
-DUALBALDE = Weapon('Dual Blades', 'Damage', 0, 250, 150, 100, 5, .1, 15, .20, 'GAMEWEAPONS/game_dualblade_icon.png')
-CHAINKUNAI = Weapon('Chained Kunai', 'Damage', 0, 250, 150, 100, 5, .1, 15, .20, 'GAMEWEAPONS/game_chainkunai_icon.png')
-SPEAR = Weapon('Spear', 'Damage', 0, 250, 150, 100, 5, .1, 15, .20, 'GAMEWEAPONS/game_spear_icon.png')
-AX = Weapon('Ax', 'Damage', 50, 250, 150, 100, 5, .1, 15, .20, 'GAMEWEAPONS/game_ax_icon.png', requiredlevel = 9)
-MACE = Weapon('Mace', 'Breaker', 50, 250, 150, 100, 5, .1, 15, .20, 'GAMEWEAPONS/game_mace_icon.png')
-HAMMER = Weapon('Hammer', 'Breaker', 50, 250, 150, 100, 5, .1, 15, .20, 'GAMEWEAPONS/game_hammer_icon.png')
-NUNCHUCKS = Weapon('Nunchucks', 'Breaker', 50, 250, 150, 100, 5, .1, 15, .20, 'GAMEWEAPONS/game_nunchucks_icon.png')
-PICKAXE = Weapon('Pickaxe', 'Breaker', 50, 250, 150, 100, 5, .1, 15, .20, 'GAMEWEAPONS/game_pickaxe_icon.png')
-MAGIC = Weapon('Magic', 'Breaker', 50, 250, 150, 100, 5, .1, 15, .20, 'GAMEWEAPONS/game_magic_icon.png', requiredlevel = 7)
-CLUB = Weapon('Club', 'Stack', 50, 250, 150, 100, 5, .1, 15, .20, 'GAMEWEAPONS/game_club_icon.png')
-BLOWGUN = Weapon('Blowgun', 'Stack', 50, 250, 150, 100, 5, .1, 15, .20, 'GAMEWEAPONS/game_blowgun_icon.png', requiredlevel = 3)
-SCYTHE = Weapon('Scythe', 'Stack', 50, 250, 150, 100, 5, .1, 15, .20, 'GAMEWEAPONS/game_scythe_icon.png', requiredlevel = 5)
-HEAL = Weapon('Heal', 'Heal', 50, 250, 150, 100, 5, .1, 15, .20, 'GAMEWEAPONS/game_heal_icon.png')
+SWORD = Weapon('Sword', 'Damage', 50, 250, 150, 100, 5, .1, 15, 1,.20, 'GAMEWEAPONS/game_sword_icon.png', requiredlevel = 1)
+BOWANDARROW = Weapon('Bow and Arrows', 'Damage', 0, 250, 150, 100, 5, .1, 15, 1, .20, 'GAMEWEAPONS/game_bow_icon.png')
+DUALBALDE = Weapon('Dual Blades', 'Damage', 0, 250, 150, 100, 5, .1, 15, 1, .20, 'GAMEWEAPONS/game_dualblade_icon.png')
+CHAINKUNAI = Weapon('Chained Kunai', 'Damage', 0, 250, 150, 100, 5, .1, 15, 1, .20, 'GAMEWEAPONS/game_chainkunai_icon.png')
+SPEAR = Weapon('Spear', 'Damage', 0, 250, 150, 100, 5, .1, 15, 1, .20, 'GAMEWEAPONS/game_spear_icon.png')
+AX = Weapon('Ax', 'Damage', 50, 250, 150, 100, 5, .1, 15, 1, .20, 'GAMEWEAPONS/game_ax_icon.png', requiredlevel = 9)
+MACE = Weapon('Mace', 'Breaker', 50, 250, 150, 100, 5, .1, 15, 1, .20, 'GAMEWEAPONS/game_mace_icon.png')
+HAMMER = Weapon('Hammer', 'Breaker', 50, 250, 150, 100, 5, .1, 15, 1, .20, 'GAMEWEAPONS/game_hammer_icon.png')
+NUNCHUCKS = Weapon('Nunchucks', 'Breaker', 50, 250, 150, 100, 5, .1, 15, 1, .20, 'GAMEWEAPONS/game_nunchucks_icon.png')
+PICKAXE = Weapon('Pickaxe', 'Breaker', 50, 250, 150, 100, 5, .1, 15, 1, .20, 'GAMEWEAPONS/game_pickaxe_icon.png')
+MAGIC = Weapon('Magic', 'Breaker', 50, 250, 150, 100, 5, .1, 15, 1, .20, 'GAMEWEAPONS/game_magic_icon.png', requiredlevel = 7)
+CLUB = Weapon('Club', 'Stack', 50, 250, 150, 100, 5, .1, 15, 1, .20, 'GAMEWEAPONS/game_club_icon.png')
+BLOWGUN = Weapon('Blowgun', 'Stack', 50, 250, 150, 100, 5, .1, 15, 1, .20, 'GAMEWEAPONS/game_blowgun_icon.png', requiredlevel = 3)
+SCYTHE = Weapon('Scythe', 'Stack', 50, 250, 150, 100, 5, .1, 15, 1, .20, 'GAMEWEAPONS/game_scythe_icon.png', requiredlevel = 5)
+HEAL = Weapon('Heal', 'Heal', 50, 250, 150, 100, 5, .1, 15, 1, .20, 'GAMEWEAPONS/game_heal_icon.png')
 
 '''Player and enemies, place holder stats'''
 
 class Character:
 
-    def __init__(self, name, rarity, cost, basedamage, basedefense, basehealth, critratebonus, basecritdamage, speed, icon, profile, bought = None, onteam = None, requiredlevel = 0):
+    def __init__(self, name, rarity, cost, basedamage, basedefense, basehealth, critratebonus, basecritdamage, speed, availablespace, icon, profile, bought = None, onteam = None, requiredlevel = 0):
         self.name = name
         self.type = rarity
         self.cost = cost
@@ -1089,6 +1129,7 @@ class Character:
         self.critrate = critratebonus
         self.critdamage = basecritdamage
         self.speed = speed
+        self.space = availablespace
         self.icon = icon
         self.profile = profile
         self.bought = bought
@@ -1125,21 +1166,21 @@ class Character:
             self.teamcode = placeindex
             print(self.onteam, placeindex)
 
-PLAYER = Character('Player', 'Common', 0, 250, 150, 100, 5, .1, 15, 'GAMEHEROICONS/game_player_icon.png', None)
-ALPIN = Character('Alpin', 'Common', 0, 250, 150, 100, 5, .1, 15, 'GAMEHEROICONS/game_alpin_icon.png', None)
-GAR = Character('Gar', 'Common', 0, 250, 150, 100, 5, .1, 15, 'GAMEHEROICONS/game_gar_icon.png', None)
-MARKSON = Character('Markson', 'Common', 0, 250, 150, 100, 5, .1, 15, 'GAMEHEROICONS/game_markson_icon.png', None)
-SWAMP = Character('Swamp', 'Rare', 50, 250, 150, 10000, 5, .1, 15, 'GAMEHEROICONS/game_swamp_icon.png', None, requiredlevel = 2)
-SISTER = Character('Sister', 'Rare', 50, 250, 150, 100, 5, .1, 15, 'GAMEHEROICONS/game_sister_icon.png', None)
-TORPEDO = Character('Torpedo', 'Rare', 50, 250, 150, 100, 5, .1, 15, 'GAMEHEROICONS/game_torpedo_icon.png', None)
-REAPER = Character('Reaper', 'Rare', 50, 250, 150, 100, 5, .1, 15, 'GAMEHEROICONS/game_reaper_icon.png', None, requiredlevel = 4)
-MINER = Character('Miner', 'Rare', 50, 250, 150, 100, 5, .1, 15, 'GAMEHEROICONS/game_miner_icon.png', None)
-RAZOR = Character('Razor', 'Rare', 50, 250, 150, 100, 5, .1, 15, 'GAMEHEROICONS/game_razor_icon.png', None)
-PHANTASM = Character('Phantasm', 'Rare', 50, 250, 150, 100, 5, .1, 15, 'GAMEHEROICONS/game_phantasm_icon.png',None, requiredlevel = 6)
-STALKER = Character('Stalker', 'Rare', 50, 250, 150, 100, 5, .1, 15, 'GAMEHEROICONS/game_stalker_icon.png', None, requiredlevel = 8)
-VIVI = Character('Vivi', 'Epic', 50, 250, 150, 100, 5, .1, 15, 'GAMEHEROICONS/game_vivi_icon.png', None)
-CLYPEUS = Character('Clypeus', 'Epic', 50, 250, 150, 100, 5, .1, 15, 'GAMEHEROICONS/game_clypeus_icon.png', None)
-EXECUTIONER = Character('Executioner', 'Epic', 50, 250, 150, 1, 5, .1, 15, 'GAMEHEROICONS/game_executioner_icon.png', None, requiredlevel = 10)
+PLAYER = Character('Player', 'Common', 0, 250, 150, 100, 5, .1, 15, 3, 'GAMEHEROICONS/game_player_icon.png', None)
+ALPIN = Character('Alpin', 'Common', 0, 250, 150, 100, 5, .1, 15, 3, 'GAMEHEROICONS/game_alpin_icon.png', None)
+GAR = Character('Gar', 'Common', 0, 250, 150, 100, 5, .1, 15, 3, 'GAMEHEROICONS/game_gar_icon.png', None)
+MARKSON = Character('Markson', 'Common', 0, 250, 150, 100, 5, .1, 15, 3, 'GAMEHEROICONS/game_markson_icon.png', None)
+SWAMP = Character('Swamp', 'Rare', 50, 250, 150, 10000, 5, .1, 15, 3, 'GAMEHEROICONS/game_swamp_icon.png', None, requiredlevel = 2)
+SISTER = Character('Sister', 'Rare', 50, 250, 150, 100, 5, .1, 15, 3, 'GAMEHEROICONS/game_sister_icon.png', None)
+TORPEDO = Character('Torpedo', 'Rare', 50, 250, 150, 100, 5, .1, 15, 3, 'GAMEHEROICONS/game_torpedo_icon.png', None)
+REAPER = Character('Reaper', 'Rare', 50, 250, 150, 100, 5, .1, 15, 3, 'GAMEHEROICONS/game_reaper_icon.png', None, requiredlevel = 4)
+MINER = Character('Miner', 'Rare', 50, 250, 150, 100, 5, .1, 15, 3, 'GAMEHEROICONS/game_miner_icon.png', None)
+RAZOR = Character('Razor', 'Rare', 50, 250, 150, 100, 5, .1, 15, 3, 'GAMEHEROICONS/game_razor_icon.png', None)
+PHANTASM = Character('Phantasm', 'Rare', 50, 250, 150, 100, 5, .1, 15, 3, 'GAMEHEROICONS/game_phantasm_icon.png',None, requiredlevel = 6)
+STALKER = Character('Stalker', 'Rare', 50, 250, 150, 100, 5, .1, 15, 3, 'GAMEHEROICONS/game_stalker_icon.png', None, requiredlevel = 8)
+VIVI = Character('Vivi', 'Epic', 50, 250, 150, 100, 5, .1, 15, 3, 'GAMEHEROICONS/game_vivi_icon.png', None)
+CLYPEUS = Character('Clypeus', 'Epic', 50, 250, 150, 100, 5, .1, 15, 3, 'GAMEHEROICONS/game_clypeus_icon.png', None)
+EXECUTIONER = Character('Executioner', 'Epic', 50, 250, 150, 1, 5, .1, 15, 3, 'GAMEHEROICONS/game_executioner_icon.png', None, requiredlevel = 10)
 
 def requirements(item):
     if item.requiredlevel == 0:
@@ -1152,8 +1193,8 @@ fullheroslist = [PLAYER, ALPIN, GAR, MARKSON, SWAMP, SISTER, TORPEDO, REAPER, MI
 
 '''PLace Holders for Weapons and Characters'''
 
-PHW = Weapon('', '', 0, 0, 0, 0, 0, 0, 0, 0, None)
-PHC = Character('', '', 0, 0, 0, 0, 0, 0, 0, None, None)
+PHW = Weapon('', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, None)
+PHC = Character('', '', 0, 0, 0, 0, 0, 0, 0, 0, None, None)
 
 '''code testing'''
 
@@ -1218,6 +1259,12 @@ print(totalpower)
 print(Combat().stats1)
 print(Combat().stats2)
 print(Combat().stats3)
+
+deff = 900
+
+print((1000) * (((deff)/(deff + 100))))
+
+print((1000*1000)/(1000 + deff))
 
 if __name__ == '__main__':
     MainRun()
