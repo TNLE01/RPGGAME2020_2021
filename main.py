@@ -852,34 +852,37 @@ class Combat:
         self.stats1, self.stats2, self.stats3 = Totalstats(FILE_1.ontheteam, 1).totallsit(), Totalstats(FILE_1.ontheteam, 2).totallsit(), Totalstats(FILE_1.ontheteam, 3).totallsit()
         self.estats1, self.estats2, self.estats3 = Totalstats(FILE_1.currentlevel, 1).totallsit(), Totalstats(FILE_1.currentlevel, 2).totallsit(), Totalstats(FILE_1.currentlevel, 3).totallsit()
 
-        self.playerteam, self.enemyteam = [1, self.player1, self.item11, self.item12, self.item13, self.stats1], [1, self.enemy1, self.enemyitem11, self.enemyitem12, self.enemyitem13, self.estats1]
+        self.playerteam, self.enemyteam = [1, self.player1, self.item11, self.item12, self.item13, self.stats1, 'p1'], [1, self.enemy1, self.enemyitem11, self.enemyitem12, self.enemyitem13, self.estats1, 'e1']
 
         self.round = 1
 
-        self.playerstatus, self.enemystatus = ['a', 'a', 'a'], ['a', 'a', 'a']
+        self.playerstatus, self.enemystatus, self.playerlistdata, self.enemylistdata = ['a'] * 3, ['a'] * 3, ['p1', 'p2', 'p3'], ['e1', 'e2', 'e3']
 
     def s(self, new):
 
-        playerlistdata = ['p1', 'p2', 'p3']
-        enemylistdata = ['e1', 'e2', 'e3']
-
         if new == 'p1':
-            self.playerteam = [1, self.player1, self.item11, self.item12, self.item13, self.stats1]
+            self.playerteam = [1, self.player1, self.item11, self.item12, self.item13, self.stats1, 'p1']
         elif new == 'p2':
-            self.playerteam = [2, self.player2, self.item21, self.item22, self.item23, self.stats2]
+            self.playerteam = [2, self.player2, self.item21, self.item22, self.item23, self.stats2, 'p2']
         elif new == 'p3':
-            self.playerteam = [3, self.player3, self.item31, self.item32, self.item33, self.stats3]
+            self.playerteam = [3, self.player3, self.item31, self.item32, self.item33, self.stats3, 'p3']
         elif new == 'e1':
-            self.enemyteam = [1, self.enemy1, self.enemyitem11, self.enemyitem12, self.enemyitem13, self.estats1]
+            self.enemyteam = [1, self.enemy1, self.enemyitem11, self.enemyitem12, self.enemyitem13, self.estats1, 'e1']
         elif new == 'e2':
-            self.enemyteam = [2, self.enemy2, self.enemyitem21, self.enemyitem22, self.enemyitem23, self.estats2]
+            self.enemyteam = [2, self.enemy2, self.enemyitem21, self.enemyitem22, self.enemyitem23, self.estats2, 'e2']
         elif new == 'e3':
-            self.enemyteam = [3, self.enemy3, self.enemyitem31, self.enemyitem32, self.enemyitem33, self.estats3]
+            self.enemyteam = [3, self.enemy3, self.enemyitem31, self.enemyitem32, self.enemyitem33, self.estats3, 'e3']
 
         elif new == 'rp':
-            self.s(random.choice(playerlistdata))
+            if self.playerstatus != ['d'] * 3:
+                self.s(random.choice(self.playerlistdata))
+            else:
+                pass
         elif new == 're':
-            self.s(random.choice(enemylistdata))
+            if self.enemystatus != ['d'] * 3:
+                self.s(random.choice(self.enemylistdata))
+            else:
+                pass
 
     def combatwindow(self):
         running = True
@@ -958,26 +961,36 @@ class Combat:
                         running = False
 
                 if self.playerteam[0] == 1:
-                    if bplayer2.is_clicked(event):
+                    if bplayer2.is_clicked(event) and self.playerstatus[1] == 'a':
                         self.s('p2')
-                    if bplayer3.is_clicked(event):
+                    if bplayer3.is_clicked(event) and self.playerstatus[2] == 'a':
                         self.s('p3')
                 if self.playerteam[0] == 2:
-                    if bplayer1.is_clicked(event):
+                    if bplayer1.is_clicked(event) and self.playerstatus[0] == 'a':
                         self.s('p1')
-                    if bplayer3.is_clicked(event):
+                    if bplayer3.is_clicked(event) and self.playerstatus[2] == 'a':
                         self.s('p3')
                 if self.playerteam[0] == 3:
-                    if bplayer1.is_clicked(event):
+                    if bplayer1.is_clicked(event) and self.playerstatus[0] == 'a':
                         self.s('p1')
-                    if bplayer2.is_clicked(event):
+                    if bplayer2.is_clicked(event) and self.playerstatus[1] == 'a':
                         self.s('p2')
 
-
+                if self.playerstatus[self.playerteam[0] - 1] == 'd':
+                    self.s('rp')
+                elif self.enemystatus[self.enemyteam[0] - 1] == 'd':
+                    self.s('re')
 
                 bplayeritem1.clicked_action(event, self.speedfactor, 'toenemy', 2)
                 bplayeritem2.clicked_action(event, self.speedfactor, 'toenemy', 3)
                 bplayeritem3.clicked_action(event, self.speedfactor, 'toenemy', 4)
+
+                if self.playerstatus == ['d'] * 3:
+                    running = False
+                    print('You lose')
+                elif self.enemystatus == ['d'] * 3:
+                    running = False
+                    print('You win')
 
                         # if BBACK.is_clicked(event):
                 #     running = False
@@ -1045,6 +1058,7 @@ class Combat:
 
             if self.enemyteam[5][2] <= 0:
                 self.enemystatus[(self.enemyteam[0] - 1)] = 'd'
+                self.enemylistdata.remove(self.enemyteam[6])
                 print("Enemy's " + self.enemyteam[1].name + ' died')
 
         elif who == 'toplayer':
@@ -1056,6 +1070,7 @@ class Combat:
 
             if self.playerteam[5][2] <= 0:
                 self.playerstatus[(self.playerteam[0] - 1)] = 'd'
+                self.playerlistdata.remove(self.playerteam[6])
                 print("PLayer's " + self.playerteam[1].name + ' died')
 
         print(self.playerstatus)
@@ -1260,8 +1275,8 @@ PHC = Character('', '', 0, 0, 0, 0, 0, 0, 0, 0, None, None)
 # print(bobbob)
 
 FILE_1.ontheteam = ([PHC] + [PHW] * 3) * 3
-FILE_1.currentlevel = (PLAYER, SWORD, PICKAXE, SPEAR, SWAMP, SCYTHE, BLOWGUN, HEAL, EXECUTIONER, MAGIC, CLUB, AX)
-FILE_1.ontheteam = FILE_1.currentlevel
+FILE_1.currentlevel = (TORPEDO, SWORD, PICKAXE, SPEAR, PLAYER, SCYTHE, BLOWGUN, HEAL, EXECUTIONER, MAGIC, CLUB, AX)
+FILE_1.ontheteam = (TORPEDO, SWORD, PICKAXE, SPEAR, SWAMP, SCYTHE, BLOWGUN, HEAL, EXECUTIONER, MAGIC, CLUB, AX)
 # menu()
 
 # print(Combat().player1.damage)
