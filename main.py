@@ -836,38 +836,30 @@ class Combat:
 
     def __init__(self):
 
-        self.player1 = FILE_1.ontheteam[0]
-        self.item11 = FILE_1.ontheteam[1]
-        self.item12 = FILE_1.ontheteam[2]
-        self.item13 = FILE_1.ontheteam[3]
-        self.player2 = FILE_1.ontheteam[4]
-        self.item21 = FILE_1.ontheteam[5]
-        self.item22 = FILE_1.ontheteam[6]
-        self.item23 = FILE_1.ontheteam[7]
-        self.player3 = FILE_1.ontheteam[8]
-        self.item31 = FILE_1.ontheteam[9]
-        self.item32 = FILE_1.ontheteam[10]
-        self.item33 = FILE_1.ontheteam[11]
+        self.player1, self.enemy1 = FILE_1.ontheteam[0], FILE_1.currentlevel[0]
+        self.item11, self.item12, self.item13 = FILE_1.ontheteam[1], FILE_1.ontheteam[2], FILE_1.ontheteam[3]
+        self.enemyitem11, self.enemyitem12, self.enemyitem13 = FILE_1.currentlevel[1], FILE_1.currentlevel[2], FILE_1.currentlevel[3]
 
-        self.enemy1 = FILE_1.currentlevel[0]
-        self.enemyitem11 = FILE_1.currentlevel[1]
-        self.enemyitem12 = FILE_1.currentlevel[2]
-        self.enemyitem13 = FILE_1.currentlevel[3]
-        self.enemy2 = FILE_1.currentlevel[4]
-        self.enemyitem21 = FILE_1.currentlevel[5]
-        self.enemyitem22 = FILE_1.currentlevel[6]
-        self.enemyitem23 = FILE_1.currentlevel[7]
-        self.enemy3 = FILE_1.currentlevel[8]
-        self.enemyitem31 = FILE_1.currentlevel[9]
-        self.enemyitem32 = FILE_1.currentlevel[10]
-        self.enemyitem33 = FILE_1.currentlevel[11]
+        self.player2, self.enemy2 = FILE_1.ontheteam[4], FILE_1.currentlevel[4]
+        self.item21, self.item22, self.item23 = FILE_1.ontheteam[5], FILE_1.ontheteam[6], FILE_1.ontheteam[7]
+        self.enemyitem21, self.enemyitem22, self.enemyitem23 = FILE_1.currentlevel[5], FILE_1.currentlevel[6], FILE_1.currentlevel[7]
+
+        self.player3, self.enemy3 = FILE_1.ontheteam[8], FILE_1.currentlevel[8]
+        self.item31, self.item32, self.item33 = FILE_1.ontheteam[9], FILE_1.ontheteam[10], FILE_1.ontheteam[11]
+        self.enemyitem31, self.enemyitem32, self.enemyitem33= FILE_1.currentlevel[9], FILE_1.currentlevel[10], FILE_1.currentlevel[11]
+
         # damage 0 defense 1 health 2 critrate 3 critdamage 4 speed 5
         self.stats1, self.stats2, self.stats3 = Totalstats(FILE_1.ontheteam, 1).totallsit(), Totalstats(FILE_1.ontheteam, 2).totallsit(), Totalstats(FILE_1.ontheteam, 3).totallsit()
         self.estats1, self.estats2, self.estats3 = Totalstats(FILE_1.currentlevel, 1).totallsit(), Totalstats(FILE_1.currentlevel, 2).totallsit(), Totalstats(FILE_1.currentlevel, 3).totallsit()
 
         self.playerteam, self.enemyteam = [1, self.player1, self.item11, self.item12, self.item13, self.stats1], [1, self.enemy1, self.enemyitem11, self.enemyitem12, self.enemyitem13, self.estats1]
 
+        self.round = 1
+
+        self.playerstatus, self.enemystatus = ['a', 'a', 'a'], ['a', 'a', 'a']
+
     def s(self, new):
+
         playerlistdata = ['p1', 'p2', 'p3']
         enemylistdata = ['e1', 'e2', 'e3']
 
@@ -894,6 +886,7 @@ class Combat:
         while running:
             BasicWorkings().basicheading('', size=30)
             Button(0, 470, 1000, 30, (0, 211, 222), '', 75, (0, 211, 222)).draw()
+            Button(450, 50, 100, 50, (0, 211, 222), 'Round ' + str(self.round), invisible = 'on').draw()
 
             # Button(499, 0, 2, 500, (255, 0, 0), '', 75, (255, 0, 0)).draw()
             global gridscreen
@@ -903,11 +896,13 @@ class Combat:
 
             Button(100, 100, 300, 300, (0, 211, 222), '', 75, (0, 211, 222), image = self.playerteam[1].icon).draw()  # player
             self.healthbar(FILE_1.ontheteam, 'player')
-            bplayer1 = Button(10, 110, 80, 80, (0, 211, 222), '', 75, image = self.player1.icon).draw()  # team 1
-            bplayer2 = Button(10, 210, 80, 80, (0, 211, 222), '', 75, image = self.player2.icon).draw()  # team 2
-            bplayer3 = Button(10, 310, 80, 80, (0, 211, 222), '', 75, image = self.player3.icon).draw()  # team 3
+
+            bplayer1 = Button(10, 110, 80, 80, (0, 211, 222), '', 75, image = self.player1.icon).draw() if self.playerstatus[0] == 'a' else Button(10, 110, 80, 80, (217, 15, 39), '', 75, (217, 15, 39), image = self.player1.icon).draw() # team 1
+            bplayer2 = Button(10, 210, 80, 80, (0, 211, 222), '', 75, image = self.player2.icon).draw() if self.playerstatus[1] == 'a' else Button(10, 210, 80, 80, (217, 15, 39), '', 75, (217, 15, 39), image = self.player2.icon).draw() # team 2
+            bplayer3 = Button(10, 310, 80, 80, (0, 211, 222), '', 75, image = self.player3.icon).draw() if self.playerstatus[2] == 'a' else Button(10, 310, 80, 80, (217, 15, 39), '', 75, (217, 15, 39), image = self.player3.icon).draw() # team 3
+
             bplayeritem1 = Button(110, 410, 80, 80, (0, 211, 222), '', 75, image = self.playerteam[2].icon).draw()  # weapon 1
-            bplayeritem2 = Button(210, 410, 80, 80, (0, 211, 222), '', 75, image = self.playerteam[3].icon).draw()  # weapon 2
+            bplayeritem2 = Button(210, 410, 80, 80, (0, 211, 222), '', 75, image = self.playerteam[3].icon).draw() # weapon 2
             bplayeritem3 = Button(310, 410, 80, 80, (0, 211, 222), '', 75, image = self.playerteam[4].icon).draw()  # weapon 3
 
             if self.playerteam[0] == 1:
@@ -924,9 +919,9 @@ class Combat:
 
             Button(600, 100, 300, 300, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemyteam[1].icon).draw()  # player
             self.healthbar(FILE_1.currentlevel, 'enemy')
-            benemy1 = Button(910, 110, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemy1.icon).draw()  # team 1
-            benemy2 = Button(910, 210, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemy2.icon).draw()  # team 2
-            benemy3 = Button(910, 310, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemy3.icon).draw()  # team 3
+            benemy1 = Button(910, 110, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemy1.icon).draw() if self.enemystatus[0] == 'a' else Button(910, 110, 80, 80, (217, 15, 39), '', 75, (217, 15, 39), image = self.enemy1.icon).draw() # team 1
+            benemy2 = Button(910, 210, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemy2.icon).draw() if self.enemystatus[1] == 'a' else Button(910, 210, 80, 80, (217, 15, 39), '', 75, (217, 15, 39), image = self.enemy2.icon).draw() # team 2
+            benemy3 = Button(910, 310, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemy3.icon).draw() if self.enemystatus[2] == 'a' else Button(910, 310, 80, 80, (217, 15, 39), '', 75, (217, 15, 39), image = self.enemy3.icon).draw() # team 3
             benemyitem1 = Button(610, 410, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemyteam[2].icon).draw()  # weapon 1
             benemyitem2 = Button(710, 410, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemyteam[3].icon).draw()  # weapon 2
             benemyitem3 = Button(810, 410, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemyteam[4].icon).draw()  # weapon 3
@@ -1002,18 +997,29 @@ class Combat:
             Button(600, 50, 300 * (currenthealth/Totalstats(team, self.enemyteam[0]).totalhealth()), 30, (100, 255, 0), '', 20, (100, 255, 0)).draw()
             Button(600, 50, 300, 30, (200, 200, 200), 'Health ' + str(currenthealth) + '/' + str(Totalstats(team, self.enemyteam[0]).totalhealth()), 20, (200, 200, 200), invisible='on').draw()
 
-    def speedfactor(self, who, weapon):
+    def speedfactor(self, who, weapon, forced = None):
 
         self.s('re')
 
-        if self.playerteam[5][5] > self.enemyteam[5][5]:
+        if self.playerteam[5][5] > self.enemyteam[5][5] or forced == 'playerfirst':
+            self.round += 1
             print('player first')
             self.dealdamage(who, weapon)
-            self.dealdamage('toplayer', random.randint(2, 5))
-        elif self.playerteam[5][5] < self.enemyteam[5][5]:
+
+            if self.enemystatus[(self.enemyteam[0] - 1)] == 'd':
+                print('can not attack enemy is dead')
+            else:
+                self.dealdamage('toplayer', random.randint(2, 4))
+
+        elif self.playerteam[5][5] < self.enemyteam[5][5] or forced == 'enemyfirst':
+            self.round += 1
             print('enemy first')
-            self.dealdamage('toplayer', random.randint(2, 5))
-            self.dealdamage(who, weapon)
+            self.dealdamage('toplayer', random.randint(2, 4))
+
+            if self.playerstatus[(self.playerteam[0] - 1)] == 'd':
+                print('can not attack player is dead')
+            else:
+                self.dealdamage(who, weapon)
 
         #if speed is the same do a coin flip'''
 
@@ -1023,23 +1029,23 @@ class Combat:
                 coin = random.randint(1, 2)
             if coin == 1:
                 print('coin flip, player first')
-                self.dealdamage(who, weapon)
-                self.dealdamage('toplayer', random.randint(2, 4))
+                self.speedfactor(who, weapon, 'playerfirst')
             elif coin == 2:
                 print('coin flip, enemy first')
-                self.dealdamage('toplayer', random.randint(2, 4))
-                self.dealdamage(who, weapon)
+                self.speedfactor(who, weapon, 'enemyfirst')
 
     def dealdamage(self, who, weapon):
+
         if who == 'toenemy':
             damagedeal = ((self.playerteam[5][0] * self.playerteam[5][0])/(self.playerteam[5][0] + self.enemyteam[5][1])) * self.playerteam[weapon].power
             for x in range(1):
-                t = random.randint(1, 100)
-                print(t)
-                if t <= self.playerteam[5][3]:
+                if random.randint(1, 100) <= self.playerteam[5][3]:
                     damagedeal *= (1+self.playerteam[5][4])
-            print(damagedeal)
             self.enemyteam[5][2] -= int(damagedeal)
+
+            if self.enemyteam[5][2] <= 0:
+                self.enemystatus[(self.enemyteam[0] - 1)] = 'd'
+                print("Enemy's " + self.enemyteam[1].name + ' died')
 
         elif who == 'toplayer':
             damagedeal = ((self.enemyteam[5][0] * self.enemyteam[5][0])/(self.enemyteam[5][0] + self.playerteam[5][1])) * self.enemyteam[weapon].power
@@ -1047,6 +1053,13 @@ class Combat:
                 if random.randint(1, 100) <= self.enemyteam[5][3]:
                     damagedeal *= (1+self.enemyteam[5][4])
             self.playerteam[5][2] -= int(damagedeal)
+
+            if self.playerteam[5][2] <= 0:
+                self.playerstatus[(self.playerteam[0] - 1)] = 'd'
+                print("PLayer's " + self.playerteam[1].name + ' died')
+
+        print(self.playerstatus)
+        print(self.enemystatus)
 
 '''Weapons for player, place holder stats'''
 
@@ -1251,20 +1264,20 @@ FILE_1.currentlevel = (PLAYER, SWORD, PICKAXE, SPEAR, SWAMP, SCYTHE, BLOWGUN, HE
 FILE_1.ontheteam = FILE_1.currentlevel
 # menu()
 
-print(Combat().player1.damage)
-
-totalpower = Totalstats(FILE_1.ontheteam, 1).totallsit()
-print(totalpower)
-
-print(Combat().stats1)
-print(Combat().stats2)
-print(Combat().stats3)
-
-deff = 900
-
-print((1000) * (((deff)/(deff + 100))))
-
-print((1000*1000)/(1000 + deff))
+# print(Combat().player1.damage)
+#
+# totalpower = Totalstats(FILE_1.ontheteam, 1).totallsit()
+# print(totalpower)
+#
+# print(Combat().stats1)
+# print(Combat().stats2)
+# print(Combat().stats3)
+#
+# deff = 900
+#
+# print((1000) * (((deff)/(deff + 100))))
+#
+# print((1000*1000)/(1000 + deff))
 
 if __name__ == '__main__':
     MainRun()
