@@ -995,18 +995,16 @@ class Combat:
             clock.tick(30)
 
     def healthbar(self, team, side):
+        # a = "neg" if b < 0 else "pos" if b > 0 else "zero"
+        whos_hp = [self.playerteam, 100] if side == 'player' else [self.enemyteam, 600]
+        current_health = whos_hp[0][5][2]
+        BAR = 300*(current_health/Totalstats(team, whos_hp[0][0]).totalhealth())
+        current_color = 0 if BAR > 250 else 1 if BAR > 200 else 2 if BAR > 150 else 3 if BAR > 100 else 4 if BAR > 50 else 5
+        health_color = [(0, 255, 0), (100, 255, 0), (200, 255, 0), (255, 200, 0), (255, 100, 0), (255, 0, 0)]
 
-        if side == 'player':
-            currenthealth = self.playerteam[5][2]
-            Button(100, 50, 300, 30, (200, 200, 200), '', 20, (200, 200, 200)).draw() # health
-            Button(100, 50, 300*(currenthealth/Totalstats(team, self.playerteam[0]).totalhealth()), 30, (100, 255, 0), '', 20, (100, 255, 0)).draw()
-            Button(100, 50, 300, 30, (200, 200, 200), 'Health ' + str(int(currenthealth)) + '/' + str(Totalstats(team, self.playerteam[0]).totalhealth()), 20, (200, 200, 200), invisible = 'on').draw()
-
-        elif side == 'enemy':
-            currenthealth = self.enemyteam[5][2]
-            Button(600, 50, 300, 30, (200, 200, 200), '', 20, (200, 200, 200)).draw()  # health
-            Button(600, 50, 300 * (currenthealth/Totalstats(team, self.enemyteam[0]).totalhealth()), 30, (100, 255, 0), '', 20, (100, 255, 0)).draw()
-            Button(600, 50, 300, 30, (200, 200, 200), 'Health ' + str(int(currenthealth)) + '/' + str(Totalstats(team, self.enemyteam[0]).totalhealth()), 20, (200, 200, 200), invisible='on').draw()
+        Button(whos_hp[1], 50, 300, 30, (200, 200, 200), '', 20, (200, 200, 200)).draw() # health
+        Button(whos_hp[1], 50, BAR, 30, health_color[current_color], '', 20, health_color[current_color]).draw()
+        Button(whos_hp[1], 50, 300, 30, (200, 200, 200), 'Health ' + str(int(current_health)) + '/' + str(Totalstats(team, whos_hp[0][0]).totalhealth()), 20, (200, 200, 200), invisible = 'on').draw()
 
     def speedfactor(self, who, weapon, forced = None):
 
