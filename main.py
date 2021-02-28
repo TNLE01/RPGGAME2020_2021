@@ -23,10 +23,15 @@ class BasicWorkings:
     def loadimages(self, w, x, y, z, image):
         screen.blit(pygame.transform.scale(pygame.image.load(image), (int(y) - 10, int(z) - 10)), (int(w) + 5, int(x) + 5))
 
-    def draw_text(self, text, font, color, surface, x, y):
+    def draw_text(self, text, font, color, surface, x, y, type = 'center'):
         textobj = font.render(text, 1, color)
         textrect = textobj.get_rect()
-        textrect.center = (x, y)
+        if type == 'center':
+            textrect.center = (x, y)
+        elif type == 'midleft':
+            textrect.midleft = (x, y)
+        elif type == 'midright':
+            textrect.midright = (x, y)
         surface.blit(textobj, textrect)
 
     def fontstuff(self, size):
@@ -825,7 +830,7 @@ class Totalstats:
             quickness += self.teamlist[stats].speed
         return quickness
 
-    def totallsit(self):
+    def totallist(self):
         alltotal = []
         statfunctions = [self.totaldamage(), self.totaldefense(), self.totalhealth(), self.totalcritrate(), self.totalcritdamage(), self.totalspeed()]
         for stats in statfunctions:
@@ -849,12 +854,12 @@ class Combat:
         self.enemyitem31, self.enemyitem32, self.enemyitem33= FILE_1.currentlevel[9], FILE_1.currentlevel[10], FILE_1.currentlevel[11]
 
         # damage 0 defense 1 health 2 critrate 3 critdamage 4 speed 5
-        self.stats1, self.stats2, self.stats3 = Totalstats(FILE_1.ontheteam, 1).totallsit(), Totalstats(FILE_1.ontheteam, 2).totallsit(), Totalstats(FILE_1.ontheteam, 3).totallsit()
-        self.estats1, self.estats2, self.estats3 = Totalstats(FILE_1.currentlevel, 1).totallsit(), Totalstats(FILE_1.currentlevel, 2).totallsit(), Totalstats(FILE_1.currentlevel, 3).totallsit()
+        self.stats1, self.stats2, self.stats3 = Totalstats(FILE_1.ontheteam, 1).totallist(), Totalstats(FILE_1.ontheteam, 2).totallist(), Totalstats(FILE_1.ontheteam, 3).totallist()
+        self.estats1, self.estats2, self.estats3 = Totalstats(FILE_1.currentlevel, 1).totallist(), Totalstats(FILE_1.currentlevel, 2).totallist(), Totalstats(FILE_1.currentlevel, 3).totallist()
 
         self.playerteam, self.enemyteam = [1, self.player1, self.item11, self.item12, self.item13, self.stats1, 'p1'], [1, self.enemy1, self.enemyitem11, self.enemyitem12, self.enemyitem13, self.estats1, 'e1']
 
-        self.round = 1
+        self.round, self.recentmessage = 1, ['Enemy ' + self.enemyteam[1].name + ' stands in your way', '', '', '', '']
 
         self.playerstatus, self.enemystatus, self.playerlistdata, self.enemylistdata = ['a'] * 3, ['a'] * 3, ['p1', 'p2', 'p3'], ['e1', 'e2', 'e3']
 
@@ -887,13 +892,13 @@ class Combat:
     def combatwindow(self):
         running = True
         while running:
-            BasicWorkings().basicheading('', size=30)
+            BasicWorkings().basicheading('', size = 30)
             Button(0, 470, 1000, 30, (0, 211, 222), '', 75, (0, 211, 222)).draw()
             Button(450, 50, 100, 50, (0, 211, 222), 'Round ' + str(self.round), invisible = 'on').draw()
 
             # Button(499, 0, 2, 500, (255, 0, 0), '', 75, (255, 0, 0)).draw()
-            global gridscreen
-            gridscreen = 'on'
+            # global gridscreen
+            # gridscreen = 'on'
 
             '''player side'''
 
@@ -922,13 +927,14 @@ class Combat:
 
             Button(600, 100, 300, 300, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemyteam[1].icon).draw()  # player
             self.healthbar(FILE_1.currentlevel, 'enemy')
+
             benemy1 = Button(910, 110, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemy1.icon).draw() if self.enemystatus[0] == 'a' else Button(910, 110, 80, 80, (217, 15, 39), '', 75, (217, 15, 39), image = self.enemy1.icon).draw() # team 1
             benemy2 = Button(910, 210, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemy2.icon).draw() if self.enemystatus[1] == 'a' else Button(910, 210, 80, 80, (217, 15, 39), '', 75, (217, 15, 39), image = self.enemy2.icon).draw() # team 2
             benemy3 = Button(910, 310, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemy3.icon).draw() if self.enemystatus[2] == 'a' else Button(910, 310, 80, 80, (217, 15, 39), '', 75, (217, 15, 39), image = self.enemy3.icon).draw() # team 3
-            benemyitem1 = Button(610, 410, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemyteam[2].icon).draw()  # weapon 1
-            benemyitem2 = Button(710, 410, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemyteam[3].icon).draw()  # weapon 2
-            benemyitem3 = Button(810, 410, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemyteam[4].icon).draw()  # weapon 3
 
+            # benemyitem1 = Button(610, 410, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemyteam[2].icon).draw()  # weapon 1
+            # benemyitem2 = Button(710, 410, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemyteam[3].icon).draw()  # weapon 2
+            # benemyitem3 = Button(810, 410, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemyteam[4].icon).draw()  # weapon 3
 
             if self.enemyteam[0] == 1:
                 Button(900, 140, 10, 20, (0, 211, 222), '', 75, (0, 211, 222)).draw()
@@ -937,19 +943,14 @@ class Combat:
             if self.enemyteam[0] == 3:
                 Button(900, 340, 10, 20, (0, 211, 222), '', 75, (0, 211, 222)).draw()
 
-            '''Mapping out Buttons'''
+            self.affects()
 
-            Button(430, 130, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 1
-            Button(430, 180, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 2
-            Button(430, 230, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 3
-            Button(430, 280, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 4
-            Button(430, 330, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 5
+            self.textwindow()
 
-            Button(530, 130, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 1
-            Button(530, 180, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 2
-            Button(530, 230, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 3
-            Button(530, 280, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 4
-            Button(530, 330, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 5
+            if self.playerstatus[self.playerteam[0] - 1] == 'd':
+                self.s('rp')
+            elif self.enemystatus[self.enemyteam[0] - 1] == 'd':
+                self.s('re')
 
             # BBACK = Button(25, 25, 150, 50, (200, 20, 20), 'Back').draw()
 
@@ -976,11 +977,6 @@ class Combat:
                     if bplayer2.is_clicked(event) and self.playerstatus[1] == 'a':
                         self.s('p2')
 
-                if self.playerstatus[self.playerteam[0] - 1] == 'd':
-                    self.s('rp')
-                elif self.enemystatus[self.enemyteam[0] - 1] == 'd':
-                    self.s('re')
-
                 bplayeritem1.clicked_action(event, self.speedfactor, 'toenemy', 2)
                 bplayeritem2.clicked_action(event, self.speedfactor, 'toenemy', 3)
                 bplayeritem3.clicked_action(event, self.speedfactor, 'toenemy', 4)
@@ -992,89 +988,142 @@ class Combat:
                     running = False
                     print('You win')
 
-                        # if BBACK.is_clicked(event):
+                # if BBACK.is_clicked(event):
                 #     running = False
 
             pygame.display.update()
             clock.tick(30)
 
     def healthbar(self, team, side):
+
         if side == 'player':
             currenthealth = self.playerteam[5][2]
             Button(100, 50, 300, 30, (200, 200, 200), '', 20, (200, 200, 200)).draw() # health
             Button(100, 50, 300*(currenthealth/Totalstats(team, self.playerteam[0]).totalhealth()), 30, (100, 255, 0), '', 20, (100, 255, 0)).draw()
-            Button(100, 50, 300, 30, (200, 200, 200), 'Health ' + str(currenthealth) + '/' + str(Totalstats(team, self.playerteam[0]).totalhealth()), 20, (200, 200, 200), invisible = 'on').draw()
+            Button(100, 50, 300, 30, (200, 200, 200), 'Health ' + str(int(currenthealth)) + '/' + str(Totalstats(team, self.playerteam[0]).totalhealth()), 20, (200, 200, 200), invisible = 'on').draw()
+
         elif side == 'enemy':
             currenthealth = self.enemyteam[5][2]
             Button(600, 50, 300, 30, (200, 200, 200), '', 20, (200, 200, 200)).draw()  # health
             Button(600, 50, 300 * (currenthealth/Totalstats(team, self.enemyteam[0]).totalhealth()), 30, (100, 255, 0), '', 20, (100, 255, 0)).draw()
-            Button(600, 50, 300, 30, (200, 200, 200), 'Health ' + str(currenthealth) + '/' + str(Totalstats(team, self.enemyteam[0]).totalhealth()), 20, (200, 200, 200), invisible='on').draw()
+            Button(600, 50, 300, 30, (200, 200, 200), 'Health ' + str(int(currenthealth)) + '/' + str(Totalstats(team, self.enemyteam[0]).totalhealth()), 20, (200, 200, 200), invisible='on').draw()
 
     def speedfactor(self, who, weapon, forced = None):
 
         self.s('re')
+        Button(600, 100, 300, 300, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemyteam[1].icon).draw()  # player
+        self.healthbar(FILE_1.currentlevel, 'enemy')
 
         if self.playerteam[5][5] > self.enemyteam[5][5] or forced == 'playerfirst':
             self.round += 1
-            print('player first')
+            self.textloop('Player goes first')
             self.dealdamage(who, weapon)
 
             if self.enemystatus[(self.enemyteam[0] - 1)] == 'd':
-                print('can not attack enemy is dead')
+                self.textloop('can not attack enemy is dead')
             else:
                 self.dealdamage('toplayer', random.randint(2, 4))
 
         elif self.playerteam[5][5] < self.enemyteam[5][5] or forced == 'enemyfirst':
             self.round += 1
-            print('enemy first')
+            self.textloop('Enemy goes first')
             self.dealdamage('toplayer', random.randint(2, 4))
 
             if self.playerstatus[(self.playerteam[0] - 1)] == 'd':
-                print('can not attack player is dead')
+                self.textloop('can not attack player is dead')
             else:
                 self.dealdamage(who, weapon)
 
         #if speed is the same do a coin flip'''
 
         else:
+            self.textloop('Player and Enemy has the same speed, a coin will be flipped')
             coin = 0
             for side in range(1):
                 coin = random.randint(1, 2)
             if coin == 1:
-                print('coin flip, player first')
                 self.speedfactor(who, weapon, 'playerfirst')
             elif coin == 2:
-                print('coin flip, enemy first')
                 self.speedfactor(who, weapon, 'enemyfirst')
 
     def dealdamage(self, who, weapon):
 
         if who == 'toenemy':
-            damagedeal = ((self.playerteam[5][0] * self.playerteam[5][0])/(self.playerteam[5][0] + self.enemyteam[5][1])) * self.playerteam[weapon].power
-            for x in range(1):
-                if random.randint(1, 100) <= self.playerteam[5][3]:
-                    damagedeal *= (1+self.playerteam[5][4])
-            self.enemyteam[5][2] -= int(damagedeal)
-
-            if self.enemyteam[5][2] <= 0:
-                self.enemystatus[(self.enemyteam[0] - 1)] = 'd'
-                self.enemylistdata.remove(self.enemyteam[6])
-                print("Enemy's " + self.enemyteam[1].name + ' died')
-
+            attacker, defender, status, listdata = [self.playerteam, 'Player'], [self.enemyteam, 'Enemy'], self.enemystatus, self.enemylistdata
         elif who == 'toplayer':
-            damagedeal = ((self.enemyteam[5][0] * self.enemyteam[5][0])/(self.enemyteam[5][0] + self.playerteam[5][1])) * self.enemyteam[weapon].power
-            for x in range(1):
-                if random.randint(1, 100) <= self.enemyteam[5][3]:
-                    damagedeal *= (1+self.enemyteam[5][4])
-            self.playerteam[5][2] -= int(damagedeal)
+            attacker, defender, status, listdata = [self.enemyteam, 'Enemy'], [self.playerteam, 'Player'], self.playerstatus, self.playerlistdata
 
-            if self.playerteam[5][2] <= 0:
-                self.playerstatus[(self.playerteam[0] - 1)] = 'd'
-                self.playerlistdata.remove(self.playerteam[6])
-                print("PLayer's " + self.playerteam[1].name + ' died')
+        for x in range(1):
+            if random.randint(1, 100) <= defender[0][5][5]:
+                self.textloop(defender[1] + "'s " + defender[0][1].name + ' dodge the attack')
+            else:
+                damagedeal = ((attacker[0][5][0]**2)/(attacker[0][5][0] + defender[0][5][1])) * attacker[0][weapon].power
+                extradamage = 0
+                for x in range(1):
+                    if random.randint(1, 100) <= attacker[0][5][3]:
+                        damagedeal *= (1 + (attacker[0][5][4] * 0.01))
+                        extradamage = 1
+                # defender[0][5][2] -= int(damagedeal)
+                self.smoothhpdrop(damagedeal / 100, who)
+                damagetext = attacker[1] +' deal ' + str(int(damagedeal)) + ' damage' if extradamage == 0 else 'Critical hit, ' + attacker[1] +' deal ' + str(int(damagedeal)) + ' damage!'
+                self.textloop(damagetext)
+                if defender[0][5][2] <= 0:
+                    status[(defender[0][0] - 1)] = 'd'
+                    listdata.remove(defender[0][6])
+                    self.textloop(defender[1] + "'s " + defender[0][1].name + ' died')
 
-        print(self.playerstatus)
-        print(self.enemystatus)
+    def smoothhpdrop(self, damagedeal, who):
+        theteam = FILE_1.currentlevel if who == 'toenemy' else FILE_1.ontheteam
+        healthbar = 'enemy' if who == 'toenemy' else 'player'
+        side = self.enemyteam if who == 'toenemy' else self.playerteam
+        damagetimer = 0
+        while damagetimer < 100:
+
+            side[5][2] -= damagedeal
+            damagetimer += 1
+
+            self.healthbar(theteam, healthbar)
+
+            if side[5][2] <= 0:
+                break
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    BasicWorkings().closing()
+
+            pygame.display.update()
+            clock.tick(30)
+
+    def affects(self):
+
+        '''Mapping out Buttons'''
+
+        Button(430, 130, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 1
+        Button(430, 180, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 2
+        Button(430, 230, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 3
+        Button(430, 280, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 4
+        Button(430, 330, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 5
+
+        Button(530, 130, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 1
+        Button(530, 180, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 2
+        Button(530, 230, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 3
+        Button(530, 280, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 4
+        Button(530, 330, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 5
+
+    def textloop(self, newmessage):
+        del self.recentmessage[-1]
+        self.recentmessage.insert(0, newmessage)
+        self.textwindow()
+
+    def textwindow(self):
+        Button(550, 400, 400, 100, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # player
+
+        # Button(555, 405, 390, 90, (255, 255, 255), message, 25, (255, 255, 255)).draw()
+
+        for num in range(0, 5):
+            Button(555, 405 + (18 * num), 390, 18, (255, 255, 255), self.recentmessage[num], 20, (255, 255, 255)).draw()
+
+        # BasicWorkings().draw_text(message + message, BasicWorkings().fontstuff(20), (50, 100, 150), screen, 555, 405 + (18/2), 'midleft')
 
 '''Weapons for player, place holder stats'''
 
@@ -1127,21 +1176,21 @@ class Weapon:
             self.teamcode = placeindex
             print(self.onteam, placeindex)
 
-SWORD = Weapon('Sword', 'Damage', 50, 250, 150, 100, 5, .1, 15, 1,.20, 'GAMEWEAPONS/game_sword_icon.png', requiredlevel = 1)
-BOWANDARROW = Weapon('Bow and Arrows', 'Damage', 0, 250, 150, 100, 5, .1, 15, 1, .20, 'GAMEWEAPONS/game_bow_icon.png')
-DUALBALDE = Weapon('Dual Blades', 'Damage', 0, 250, 150, 100, 5, .1, 15, 1, .20, 'GAMEWEAPONS/game_dualblade_icon.png')
-CHAINKUNAI = Weapon('Chained Kunai', 'Damage', 0, 250, 150, 100, 5, .1, 15, 1, .20, 'GAMEWEAPONS/game_chainkunai_icon.png')
-SPEAR = Weapon('Spear', 'Damage', 0, 250, 150, 100, 5, .1, 15, 1, .20, 'GAMEWEAPONS/game_spear_icon.png')
-AX = Weapon('Ax', 'Damage', 50, 250, 150, 100, 5, .1, 15, 1, .20, 'GAMEWEAPONS/game_ax_icon.png', requiredlevel = 9)
-MACE = Weapon('Mace', 'Breaker', 50, 250, 150, 100, 5, .1, 15, 1, .20, 'GAMEWEAPONS/game_mace_icon.png')
-HAMMER = Weapon('Hammer', 'Breaker', 50, 250, 150, 100, 5, .1, 15, 1, .20, 'GAMEWEAPONS/game_hammer_icon.png')
-NUNCHUCKS = Weapon('Nunchucks', 'Breaker', 50, 250, 150, 100, 5, .1, 15, 1, .20, 'GAMEWEAPONS/game_nunchucks_icon.png')
-PICKAXE = Weapon('Pickaxe', 'Breaker', 50, 250, 150, 100, 5, .1, 15, 1, .20, 'GAMEWEAPONS/game_pickaxe_icon.png')
-MAGIC = Weapon('Magic', 'Breaker', 50, 250, 150, 100, 5, .1, 15, 1, .20, 'GAMEWEAPONS/game_magic_icon.png', requiredlevel = 7)
-CLUB = Weapon('Club', 'Stack', 50, 250, 150, 100, 5, .1, 15, 1, .20, 'GAMEWEAPONS/game_club_icon.png')
-BLOWGUN = Weapon('Blowgun', 'Stack', 50, 250, 150, 100, 5, .1, 15, 1, .20, 'GAMEWEAPONS/game_blowgun_icon.png', requiredlevel = 3)
-SCYTHE = Weapon('Scythe', 'Stack', 50, 250, 150, 100, 5, .1, 15, 1, .20, 'GAMEWEAPONS/game_scythe_icon.png', requiredlevel = 5)
-HEAL = Weapon('Heal', 'Heal', 50, 250, 150, 100, 5, .1, 15, 1, .20, 'GAMEWEAPONS/game_heal_icon.png')
+SWORD = Weapon('Sword', 'Damage', 50, 250, 150, 100, 5, 10, 15, 1,.20, 'GAMEWEAPONS/game_sword_icon.png', requiredlevel = 1)
+BOWANDARROW = Weapon('Bow and Arrows', 'Damage', 0, 250, 150, 100, 5, 10, 15, 1, .20, 'GAMEWEAPONS/game_bow_icon.png')
+DUALBALDE = Weapon('Dual Blades', 'Damage', 0, 250, 150, 100, 5, 10, 15, 1, .20, 'GAMEWEAPONS/game_dualblade_icon.png')
+CHAINKUNAI = Weapon('Chained Kunai', 'Damage', 0, 250, 150, 100, 5, 10, 15, 1, .20, 'GAMEWEAPONS/game_chainkunai_icon.png')
+SPEAR = Weapon('Spear', 'Damage', 0, 250, 150, 100, 5, 10, 15, 1, .20, 'GAMEWEAPONS/game_spear_icon.png')
+AX = Weapon('Ax', 'Damage', 50, 250, 150, 100, 5, 10, 15, 1, .20, 'GAMEWEAPONS/game_ax_icon.png', requiredlevel = 9)
+MACE = Weapon('Mace', 'Breaker', 50, 250, 150, 100, 5, 10, 15, 1, .20, 'GAMEWEAPONS/game_mace_icon.png')
+HAMMER = Weapon('Hammer', 'Breaker', 50, 250, 150, 100, 5, 10, 15, 1, .20, 'GAMEWEAPONS/game_hammer_icon.png')
+NUNCHUCKS = Weapon('Nunchucks', 'Breaker', 50, 250, 150, 100, 5, 10, 15, 1, .20, 'GAMEWEAPONS/game_nunchucks_icon.png')
+PICKAXE = Weapon('Pickaxe', 'Breaker', 50, 250, 150, 100, 5, 10, 15, 1, .20, 'GAMEWEAPONS/game_pickaxe_icon.png')
+MAGIC = Weapon('Magic', 'Breaker', 50, 250, 150, 100, 5, 10, 15, 1, .20, 'GAMEWEAPONS/game_magic_icon.png', requiredlevel = 7)
+CLUB = Weapon('Club', 'Stack', 50, 250, 150, 100, 5, 10, 15, 1, .20, 'GAMEWEAPONS/game_club_icon.png')
+BLOWGUN = Weapon('Blowgun', 'Stack', 50, 250, 150, 100, 5, 10, 15, 1, .20, 'GAMEWEAPONS/game_blowgun_icon.png', requiredlevel = 3)
+SCYTHE = Weapon('Scythe', 'Stack', 50, 250, 150, 100, 5, 10, 15, 1, .20, 'GAMEWEAPONS/game_scythe_icon.png', requiredlevel = 5)
+HEAL = Weapon('Heal', 'Heal', 50, 250, 150, 100, 5, 10, 15, 1, .20, 'GAMEWEAPONS/game_heal_icon.png')
 
 '''Player and enemies, place holder stats'''
 
@@ -1194,21 +1243,21 @@ class Character:
             self.teamcode = placeindex
             print(self.onteam, placeindex)
 
-PLAYER = Character('Player', 'Common', 0, 250, 150, 100, 5, .1, 15, 3, 'GAMEHEROICONS/game_player_icon.png', None)
-ALPIN = Character('Alpin', 'Common', 0, 250, 150, 100, 5, .1, 15, 3, 'GAMEHEROICONS/game_alpin_icon.png', None)
-GAR = Character('Gar', 'Common', 0, 250, 150, 100, 5, .1, 15, 3, 'GAMEHEROICONS/game_gar_icon.png', None)
-MARKSON = Character('Markson', 'Common', 0, 250, 150, 100, 5, .1, 15, 3, 'GAMEHEROICONS/game_markson_icon.png', None)
-SWAMP = Character('Swamp', 'Rare', 50, 250, 150, 10000, 5, .1, 15, 3, 'GAMEHEROICONS/game_swamp_icon.png', None, requiredlevel = 2)
-SISTER = Character('Sister', 'Rare', 50, 250, 150, 100, 5, .1, 15, 3, 'GAMEHEROICONS/game_sister_icon.png', None)
-TORPEDO = Character('Torpedo', 'Rare', 50, 250, 150, 100, 5, .1, 15, 3, 'GAMEHEROICONS/game_torpedo_icon.png', None)
-REAPER = Character('Reaper', 'Rare', 50, 250, 150, 100, 5, .1, 15, 3, 'GAMEHEROICONS/game_reaper_icon.png', None, requiredlevel = 4)
-MINER = Character('Miner', 'Rare', 50, 250, 150, 100, 5, .1, 15, 3, 'GAMEHEROICONS/game_miner_icon.png', None)
-RAZOR = Character('Razor', 'Rare', 50, 250, 150, 100, 5, .1, 15, 3, 'GAMEHEROICONS/game_razor_icon.png', None)
-PHANTASM = Character('Phantasm', 'Rare', 50, 250, 150, 100, 5, .1, 15, 3, 'GAMEHEROICONS/game_phantasm_icon.png',None, requiredlevel = 6)
-STALKER = Character('Stalker', 'Rare', 50, 250, 150, 100, 5, .1, 15, 3, 'GAMEHEROICONS/game_stalker_icon.png', None, requiredlevel = 8)
-VIVI = Character('Vivi', 'Epic', 50, 250, 150, 100, 5, .1, 15, 3, 'GAMEHEROICONS/game_vivi_icon.png', None)
-CLYPEUS = Character('Clypeus', 'Epic', 50, 250, 150, 100, 5, .1, 15, 3, 'GAMEHEROICONS/game_clypeus_icon.png', None)
-EXECUTIONER = Character('Executioner', 'Epic', 50, 250, 150, 1, 5, .1, 15, 3, 'GAMEHEROICONS/game_executioner_icon.png', None, requiredlevel = 10)
+PLAYER = Character('Player', 'Common', 0, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_player_icon.png', None)
+ALPIN = Character('Alpin', 'Common', 0, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_alpin_icon.png', None)
+GAR = Character('Gar', 'Common', 0, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_gar_icon.png', None)
+MARKSON = Character('Markson', 'Common', 0, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_markson_icon.png', None)
+SWAMP = Character('Swamp', 'Rare', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_swamp_icon.png', None, requiredlevel = 2)
+SISTER = Character('Sister', 'Rare', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_sister_icon.png', None)
+TORPEDO = Character('Torpedo', 'Rare', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_torpedo_icon.png', None)
+REAPER = Character('Reaper', 'Rare', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_reaper_icon.png', None, requiredlevel = 4)
+MINER = Character('Miner', 'Rare', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_miner_icon.png', None)
+RAZOR = Character('Razor', 'Rare', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_razor_icon.png', None)
+PHANTASM = Character('Phantasm', 'Rare', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_phantasm_icon.png',None, requiredlevel = 6)
+STALKER = Character('Stalker', 'Rare', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_stalker_icon.png', None, requiredlevel = 8)
+VIVI = Character('Vivi', 'Epic', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_vivi_icon.png', None)
+CLYPEUS = Character('Clypeus', 'Epic', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_clypeus_icon.png', None)
+EXECUTIONER = Character('Executioner', 'Epic', 50, 250, 150, 1, 5, 10, 15, 3, 'GAMEHEROICONS/game_executioner_icon.png', None, requiredlevel = 10)
 
 def requirements(item):
     if item.requiredlevel == 0:
@@ -1275,13 +1324,13 @@ PHC = Character('', '', 0, 0, 0, 0, 0, 0, 0, 0, None, None)
 # print(bobbob)
 
 FILE_1.ontheteam = ([PHC] + [PHW] * 3) * 3
-FILE_1.currentlevel = (TORPEDO, SWORD, PICKAXE, SPEAR, PLAYER, SCYTHE, BLOWGUN, HEAL, EXECUTIONER, MAGIC, CLUB, AX)
-FILE_1.ontheteam = (TORPEDO, SWORD, PICKAXE, SPEAR, SWAMP, SCYTHE, BLOWGUN, HEAL, EXECUTIONER, MAGIC, CLUB, AX)
+FILE_1.currentlevel = (TORPEDO, SWORD, PICKAXE, SPEAR, SWAMP, SCYTHE, BLOWGUN, HEAL, EXECUTIONER, MAGIC, CLUB, AX)
+FILE_1.ontheteam = (ALPIN, SWORD, PICKAXE, SPEAR, SWAMP, SCYTHE, BLOWGUN, HEAL, EXECUTIONER, MAGIC, CLUB, AX)
 # menu()
 
 # print(Combat().player1.damage)
 #
-# totalpower = Totalstats(FILE_1.ontheteam, 1).totallsit()
+# totalpower = Totalstats(FILE_1.ontheteam, 1).totallist()
 # print(totalpower)
 #
 # print(Combat().stats1)
@@ -1293,6 +1342,9 @@ FILE_1.ontheteam = (TORPEDO, SWORD, PICKAXE, SPEAR, SWAMP, SCYTHE, BLOWGUN, HEAL
 # print((1000) * (((deff)/(deff + 100))))
 #
 # print((1000*1000)/(1000 + deff))
+
+newlinefirst = 'test \n'
+print(newlinefirst + 'test')
 
 if __name__ == '__main__':
     MainRun()
