@@ -863,6 +863,8 @@ class Combat:
 
         self.playerstatus, self.enemystatus, self.playerlistdata, self.enemylistdata = ['a'] * 3, ['a'] * 3, ['p1', 'p2', 'p3'], ['e1', 'e2', 'e3']
 
+        self.player_effects, self.enemy_effects = [[ALPIN.icon, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0]], [[TORPEDO.icon, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0]] #[[0]*5]*3
+
     def s(self, new):
 
         if new == 'p1':
@@ -1011,6 +1013,7 @@ class Combat:
         self.s('re')
         Button(600, 100, 300, 300, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemyteam[1].icon).draw()  # player
         self.healthbar(FILE_1.currentlevel, 'enemy')
+        self.affects()
 
         if self.playerteam[5][5] > self.enemyteam[5][5] or forced == 'playerfirst':
             self.round += 1
@@ -1055,7 +1058,15 @@ class Combat:
             if random.randint(1, 100) <= defender[0][5][5]:
                 self.textloop(defender[1] + "'s " + defender[0][1].name + ' dodge the attack')
             else:
-                damagedeal = ((attacker[0][5][0]**2)/(attacker[0][5][0] + defender[0][5][1])) * attacker[0][weapon].power
+
+                total_attack = attacker[0][5][0]*1.075 if attacker[0][weapon].type == 'Damage' else attacker[0][5][0]
+                total_defense = defender[0][5][1]*.75 if attacker[0][weapon].type == 'Breaker' else defender[0][5][1]
+
+                damagedeal = ((total_attack**2)/(total_attack + total_defense)) * attacker[0][weapon].power
+
+                if attacker[0][weapon].type == 'Stack':
+                    self.affects_symbols(attacker[0][weapon].icon, defender[0])
+
                 extradamage = 0
                 for x in range(1):
                     if random.randint(1, 100) <= attacker[0][5][3]:
@@ -1094,19 +1105,64 @@ class Combat:
 
     def affects(self):
 
-        '''Mapping out Buttons'''
+        Button(400, 100, 200, 300, (255, 255, 255), '', 75, (255, 255, 255)).draw()
 
-        Button(430, 130, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 1
-        Button(430, 180, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 2
-        Button(430, 230, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 3
-        Button(430, 280, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 4
-        Button(430, 330, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 5
+        for affect, x_num in zip(self.player_effects[self.playerteam[0] - 1], range(0, 5)):
+            if affect == 0:
+                pass
+            else:
+                Button(430, 130 + (50*x_num), 40, 40, (0, 211, 222), '', 75, (0, 211, 222), image = affect).draw()
 
-        Button(530, 130, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 1
-        Button(530, 180, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 2
-        Button(530, 230, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 3
-        Button(530, 280, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 4
-        Button(530, 330, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 5
+        # Button(430, 130, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 1
+        # Button(430, 180, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 2
+        # Button(430, 230, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 3
+        # Button(430, 280, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 4
+        # Button(430, 330, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 5
+
+        for affect, x_num in zip(self.enemy_effects[self.enemyteam[0] - 1], range(0, 5)):
+            if affect == 0:
+                pass
+            else:
+                Button(530, 130 + (50*x_num), 40, 40, (0, 211, 222), '', 75, (0, 211, 222), image = affect).draw()
+
+        # Button(530, 130, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 1
+        # Button(530, 180, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 2
+        # Button(530, 230, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 3
+        # Button(530, 280, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 4
+        # Button(530, 330, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 5
+
+    def affects_symbols(self, add, side):
+
+        current = False
+        current_counter = 0
+
+        if side == self.enemyteam:
+            for affect in self.enemy_effects[self.enemyteam[0] - 1]:
+                if affect == add:
+                    current = True
+            if current == False:
+                for affect in self.enemy_effects[self.enemyteam[0] - 1]:
+                    if affect == 0:
+                        current_counter += 1
+                if current_counter == 0:
+                    del self.enemy_effects[self.enemyteam[0] - 1][-1]
+                    self.enemy_effects[self.enemyteam[0] - 1].insert(0, add)
+                else:
+                    self.enemy_effects[self.enemyteam[0] - 1].insert(-current_counter, add)
+
+        if side == self.playerteam:
+            for affect in self.player_effects[self.playerteam[0] - 1]:
+                if affect == add:
+                    current = True
+            if current == False:
+                for affect in self.player_effects[self.playerteam[0] - 1]:
+                    if affect == 0:
+                        current_counter += 1
+                if current_counter == 0:
+                    del self.player_effects[self.playerteam[0] - 1][-1]
+                    self.player_effects[self.playerteam[0] - 1].insert(0, add)
+                else:
+                    self.player_effects[self.playerteam[0] - 1].insert(-current_counter, add)
 
     def textloop(self, newmessage):
         del self.recentmessage[-1]
@@ -1271,6 +1327,58 @@ fullheroslist = [PLAYER, ALPIN, GAR, MARKSON, SWAMP, SISTER, TORPEDO, REAPER, MI
 PHW = Weapon('', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, None)
 PHC = Character('', '', 0, 0, 0, 0, 0, 0, 0, 0, None, None)
 
+'''Abilities'''
+
+class Abilities:
+
+    def __init__(self):
+        pass
+
+    def for_honor(self): # PLAYER
+        pass
+
+    def freeze(self): # ALPIN
+        pass
+
+    def rage(self): # GAR
+        pass
+
+    def build_up(self): # MARKSON
+        pass
+
+    def plant_life(self): # SWAMP
+        pass
+
+    def blessing(self): # SISTER
+        pass
+
+    def quick_attack(self): # TORPEDO
+        pass
+
+    def soul_reap(self): # REAPER
+        pass
+
+    def explosives(self): # MINER
+        pass
+
+    def bleed(self): # RAZOR
+        pass
+
+    def nightmare(self): # PHANTASM
+        pass
+
+    def weak_spots(self): # STALKER
+        pass
+
+    def seduction(self): # VIVI
+        pass
+
+    def defense_boost(self): # CLYPEUS
+        pass
+
+    def instant_death(self): # EXECUTIONER
+        pass
+
 '''code testing'''
 
 # x = ['buffalo', 'hellp', 'me', 'please']
@@ -1322,8 +1430,8 @@ PHC = Character('', '', 0, 0, 0, 0, 0, 0, 0, 0, None, None)
 # print(bobbob)
 
 FILE_1.ontheteam = ([PHC] + [PHW] * 3) * 3
-FILE_1.currentlevel = (TORPEDO, SWORD, PICKAXE, SPEAR, SWAMP, SCYTHE, BLOWGUN, HEAL, EXECUTIONER, MAGIC, CLUB, AX)
-FILE_1.ontheteam = (ALPIN, SWORD, PICKAXE, SPEAR, SWAMP, SCYTHE, BLOWGUN, HEAL, EXECUTIONER, MAGIC, CLUB, AX)
+FILE_1.currentlevel = (TORPEDO, CLUB, BLOWGUN, SCYTHE, SWAMP, SPEAR, PICKAXE, HEAL, EXECUTIONER, MAGIC, SWORD, AX)
+FILE_1.ontheteam = (ALPIN, SWORD, PICKAXE, SCYTHE, SWAMP, SPEAR, BLOWGUN, HEAL, EXECUTIONER, MAGIC, CLUB, AX)
 # menu()
 
 # print(Combat().player1.damage)
@@ -1339,10 +1447,12 @@ FILE_1.ontheteam = (ALPIN, SWORD, PICKAXE, SPEAR, SWAMP, SCYTHE, BLOWGUN, HEAL, 
 #
 # print((1000) * (((deff)/(deff + 100))))
 #
-# print((1000*1000)/(1000 + deff))
+# print((1000**2)/(1000 + deff))
 
-newlinefirst = 'test \n'
-print(newlinefirst + 'test')
+# print(((1000**2)/(1000 + 600))*.2)
+# print(((1000**2)/(1000 + 300))*.2)
+# print(((1000**2)/(1000 + 560))*.2)
+# print(((1075**2)/(1075 + 700))*.2)
 
 if __name__ == '__main__':
     MainRun()
