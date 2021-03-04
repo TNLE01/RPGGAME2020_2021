@@ -108,7 +108,7 @@ class Button(object):
 
 class Profile:
 
-    def __init__(self, ShopLastOpen, TeamLastOpen, Gold, XP, CurrentLevel):
+    def __init__(self, ShopLastOpen, TeamLastOpen, Gold, XP, CurrentLevel, text_display, timer):
         self.ShopLastOpen = ShopLastOpen
         self.TeamLastOpen = TeamLastOpen
         self.Gold = Gold
@@ -116,6 +116,8 @@ class Profile:
         self.CurrentLevel = CurrentLevel
         self.ontheteam = None
         self.currentlevel = None
+        self.text_displayed = text_display
+        self.timer = timer
 
     def change(self, what, value):
         if what == 'XP':
@@ -132,9 +134,21 @@ class Profile:
             self.CurrentLevel = self.CurrentLevel + 1
         BasicWorkings().draw_text('Level ' + str(self.CurrentLevel), BasicWorkings().fontstuff(20), (50, 100, 150), screen, (650 + (200 / 2)), (5 + (20 / 2)))
 
-FILE_1 = Profile('Heroes', 'Team', 0, 0, 1)
+    def text_guild(self):
+        if self.timer <= 75:
+            Button(0, 490, 1000, 10, (219, 219, 219), self.text_displayed, 15,hovercolor = (219, 219, 219)).draw()
+
+FILE_1 = Profile('Heroes', 'Team', 0, 0, 1, 'Welcome to the Coliseum', 0)
 #FILE_2 = Profile()
 #FILE_3 = Profile()
+
+def helpful_text(newtext = None, reset = None):
+    if newtext != None:
+        FILE_1.text_displayed = newtext
+    if reset != None:
+        FILE_1.timer = 0
+    FILE_1.text_guild()
+    FILE_1.timer += 1
 
 '''Main game loop'''
 
@@ -157,6 +171,8 @@ class MainRun:
             BMONSTERS = Button(100, 500 / 2 + 150, 200, 50, (0, 242, 255), 'Monsters').draw()
             BCREDITS = Button(400, 500 / 2 + 150, 200, 50, (0, 242, 255), 'Credits').draw()
             BEXIT = Button(700, 500 / 2 + 150, 200, 50, (0, 242, 255), 'Exit').draw()
+
+            helpful_text()
 
             '''test code in a loop'''
             #img_path = os.path.join("Game Stuff - Python", "game_ax_icon.png")
@@ -206,6 +222,8 @@ class MainRun:
             BasicWorkings().basicheading('Map')
 
             BBACK = Button(25, 25, 150, 50, (200, 20, 20), 'Back').draw()
+
+            helpful_text()
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -260,6 +278,8 @@ class MainRun:
                             button_dict[buttonslist[buttonmark]] = Button(Xweaponslot, Yweaponslot, 80, 80, (0, 211, 222), '', image = FILE_1.ontheteam[buttonmark].icon).draw()
                             buttonmark += 1
 
+                    helpful_text()
+
                     for event in pygame.event.get():
                         if event.type == pygame.QUIT:
                             BasicWorkings().closing()
@@ -299,6 +319,8 @@ class MainRun:
                     for button, hero, x, y in zip(buttonslist, fullheroeslist, itertools.cycle(XVALUEFORBUTTON), YVALUEFORBUTTON):
                         button_dict[button] = Button(x, y, 80, 80, (0, 211, 222), requirements(hero), 25, image = hero.inventory('self')).draw()
 
+                    helpful_text()
+
                     for event in pygame.event.get():
                         if event.type == pygame.QUIT:
                             BasicWorkings().closing()
@@ -336,6 +358,8 @@ class MainRun:
                     buttonslist = ['BSWORD', 'BBOW', 'BDUALBLADE', 'BCHAINKUNAI', 'BSPEAR', 'BAX', 'BMACE', 'BHAMMER', 'BNUNCHUCKS', 'BPICKAXE', 'BMAGIC', 'BCLUB', 'BBLOWGUN', 'BSCYTHE', 'BHEAL']
                     for button, weapon, x, y in zip(buttonslist, fullweaponslist, itertools.cycle(XVALUEFORBUTTON), YVALUEFORBUTTON):
                         button_dict[button] = Button(x, y, 80, 80, (0, 211, 222), requirements(weapon), 25, image = weapon.inventory('self')).draw()
+
+                    helpful_text()
 
                     for event in pygame.event.get():
                         if event.type == pygame.QUIT:
@@ -376,6 +400,8 @@ class MainRun:
                     Button(415, 265, 170, 170, (0, 242, 255), '', image = 'GAMEUPGRADES/game_upgrades_health.png').draw()
                     Button(610, 265, 170, 170, (0, 242, 255), '', image = 'GAMEUPGRADES/game_upgrades_crit_rate.png').draw()
                     Button(805, 265, 170, 170, (0, 242, 255), '', image = 'GAMEUPGRADES/game_upgrades_crit_damage.png').draw()
+
+                    helpful_text()
 
                     for event in pygame.event.get():
                         if event.type == pygame.QUIT:
@@ -423,6 +449,8 @@ class MainRun:
                     for button, hero, x, y in zip(buttonslist, heroeslist, itertools.cycle(XVALUEFORBUTTON), YVALUEFORBUTTON):
                         button_dict[button] = Button(x, y, 135, 135, (0, 211, 222), 'Recruited', 35, image = hero.inventory('shop')).draw()
 
+                    helpful_text()
+
                     for event in pygame.event.get():
                         if event.type == pygame.QUIT:
                             BasicWorkings().closing()
@@ -457,6 +485,8 @@ class MainRun:
                     weaponslist = [BOWANDARROW, DUALBALDE, CHAINKUNAI, SPEAR, MACE, HAMMER, NUNCHUCKS, PICKAXE, CLUB, HEAL]
                     for button, weapon, x, y in zip(buttonslist, weaponslist, itertools.cycle(XVALUEFORBUTTON), YVALUEFORBUTTON):
                         button_dict[button] = Button(x, y, 135, 135, (0, 211, 222), 'Sold Out', 35, image = weapon.inventory('shop')).draw()
+
+                    helpful_text()
 
                     for event in pygame.event.get():
                         if event.type == pygame.QUIT:
@@ -494,6 +524,8 @@ class MainRun:
                     Button(610, 265, 170, 170, (0, 242, 255), '', image = 'GAMEUPGRADES/game_upgrades_crit_rate.png').draw()
                     Button(805, 265, 170, 170, (0, 242, 255), '', image = 'GAMEUPGRADES/game_upgrades_crit_damage.png').draw()
 
+                    helpful_text()
+
                     for event in pygame.event.get():
                         if event.type == pygame.QUIT:
                             BasicWorkings().closing()
@@ -522,6 +554,8 @@ class MainRun:
 
             BBACK = Button(25, 25, 150, 50, (200, 20, 20), 'Back').draw()
 
+            helpful_text()
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     BasicWorkings().closing()
@@ -542,6 +576,8 @@ class MainRun:
 
             BBACK = Button(25, 25, 150, 50, (200, 20, 20), 'Back').draw()
             BTESTSCREEN = Button(400, 500 / 2 + 150, 200, 50, (0, 242, 255), 'Testscreen').draw()
+
+            helpful_text()
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -569,6 +605,8 @@ class MainRun:
             BGRID = Button(700, 500 / 2 + 150, 200, 50, (0, 242, 255), 'Grid').draw()
 
             global gridscreen
+
+            helpful_text()
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -637,6 +675,8 @@ class Popup:
                     return
                 self.TEXT(size)
 
+            helpful_text()
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     BasicWorkings().closing()
@@ -676,15 +716,16 @@ class Popup:
             YVALUEFORSTATS = 0
             for num in range(0, 8):
                 Button(575, 100 + (YVALUEFORSTATS * (250 / 8)), 125, 250 / 8, (0, 0, 0),
-                       self.item.statslist[num] + str(self.item.DATALIST[num]), 20, invisible='on').draw()
+                       self.item.statslist[num] + str(self.item.DATALIST[num]), 20, invisible = 'on').draw()
                 YVALUEFORSTATS += 1
             return True
         if action != None:
             if FILE_1.Gold >= self.item.cost:
                 FILE_1.change('gold', -self.item.cost)
                 self.item.bought = 'yes'
+                helpful_text('Just recuited ' + self.item.name, 0) if self.type == 'hero' else helpful_text('Just bought ' + self.item.name, 0)
             else:
-                print('not enough gold')
+                helpful_text('Not enough gold', 0)
 
     def addtoloadout(self, action = None):
         if self.item.bought != None and action == None:
@@ -753,6 +794,8 @@ class Popup:
                         statindex -= 1
                         totalstat = 0
 
+            helpful_text()
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     BasicWorkings().closing()
@@ -804,11 +847,12 @@ class Popup:
                     if hero_with_weapon == [False, False, False]:
                         heroes_in_team = 1000
 
-            if heroes_in_team == 0 or heroes_in_team > 3:
-                print('Sorry')
+            if heroes_in_team == 0:
+                helpful_text('No teammates on team', 0)
+            elif heroes_in_team > 3:
+                helpful_text("Teammate doesn't have weapon", 0)
             else:
                 Combat().start()
-
 
 class Totalstats:
 
