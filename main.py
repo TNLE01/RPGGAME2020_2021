@@ -132,7 +132,7 @@ class Profile:
             self.CurrentLevel = self.CurrentLevel + 1
         BasicWorkings().draw_text('Level ' + str(self.CurrentLevel), BasicWorkings().fontstuff(20), (50, 100, 150), screen, (650 + (200 / 2)), (5 + (20 / 2)))
 
-FILE_1 = Profile('Heros', 'Team', 0, 0, 1)
+FILE_1 = Profile('Heroes', 'Team', 0, 0, 1)
 #FILE_2 = Profile()
 #FILE_3 = Profile()
 
@@ -180,7 +180,7 @@ class MainRun:
                     if event.key == pygame.K_ESCAPE:
                         BasicWorkings().closing()
 
-                BMAP.clicked_action(event, Combat().combatwindow) #self.map)
+                BMAP.clicked_action(event, Popup(PHW, 0, 'level', 'Complete previous Level').selectionbox, 50) #self.map)
                 BTEAM.clicked_action(event, self.team, FILE_1.TeamLastOpen)
                 BSHOP.clicked_action(event, self.shop, FILE_1.ShopLastOpen)
                 BMONSTERS.clicked_action(event, self.monsters)
@@ -233,7 +233,7 @@ class MainRun:
 
                     BBACK = Button(25, 25, 150, 50, (200, 20, 20), 'Back').draw()
                     Button(80, 125, 150, 50, (0, 211, 222), 'Team', 55, (0, 211, 222)).draw()
-                    BHEROS = Button(310, 125, 150, 50, (0, 242, 255), 'Heros', 30).draw()
+                    BHEROES = Button(310, 125, 150, 50, (0, 242, 255), 'Heroes', 30).draw()
                     BWEAPONS = Button(540, 125, 150, 50, (0, 242, 255), 'Weapons', 30).draw()
                     BUPGRADES = Button(770, 125, 150, 50, (0, 242, 255), 'Upgrades', 30).draw()
 
@@ -243,7 +243,7 @@ class MainRun:
                     YVALUEFORBUTTONWEAPONS = [215, 310, 405]
 
                     FILE_1.ontheteam = ([PHC] + [PHW] * 3) * 3
-                    for weapon, hero in zip(fullweaponslist, fullheroslist):
+                    for weapon, hero in zip(fullweaponslist, fullheroeslist):
                         if weapon.onteam != None:
                             FILE_1.ontheteam.pop(weapon.teamcode)
                             FILE_1.ontheteam.insert(weapon.teamcode, weapon)
@@ -270,8 +270,8 @@ class MainRun:
                         if BBACK.is_clicked(event):
                             openshop = False
                             running = False
-                        if BHEROS.is_clicked(event):
-                            slide = 'Heros'
+                        if BHEROES.is_clicked(event):
+                            slide = 'Heroes'
                             running = False
                         if BWEAPONS.is_clicked(event):
                             slide = 'Weapons'
@@ -284,19 +284,19 @@ class MainRun:
 
                     pygame.display.update()
                     clock.tick(30)
-            if slide == 'Heros':
+            if slide == 'Heroes':
                 while running:
                     BasicWorkings().basicheading('Team')
                     pygame.draw.rect(screen, (0, 211, 222), pygame.Rect(270, 100, 230, 500 / 5))
 
                     BBACK = Button(25, 25, 150, 50, (200, 20, 20), 'Back').draw()
                     BTEAM = Button(80, 125, 150, 50, (0, 242, 255), 'Team', 30).draw()
-                    Button(310, 125, 150, 50, (0, 211, 222), 'Heros', 55, (0, 211, 222)).draw()
+                    Button(310, 125, 150, 50, (0, 211, 222), 'Heroes', 55, (0, 211, 222)).draw()
                     BWEAPONS = Button(540, 125, 150, 50, (0, 242, 255), 'Weapons', 30).draw()
                     BUPGRADES = Button(770, 125, 150, 50, (0, 242, 255), 'Upgrades', 30).draw()
 
                     buttonslist = ['BPLAYER', 'BALPIN', 'BGAR', 'BMARKSON', 'BSWAMP', 'BSISTER', 'BTORPEDO', 'BREAPER', 'BMINER', 'BRAZOR', 'BPHANTASM', 'BSTALKER', 'BVIVI', 'BCLYPEUS', 'BEXECUTIONER']
-                    for button, hero, x, y in zip(buttonslist, fullheroslist, itertools.cycle(XVALUEFORBUTTON), YVALUEFORBUTTON):
+                    for button, hero, x, y in zip(buttonslist, fullheroeslist, itertools.cycle(XVALUEFORBUTTON), YVALUEFORBUTTON):
                         button_dict[button] = Button(x, y, 80, 80, (0, 211, 222), requirements(hero), 25, image = hero.inventory('self')).draw()
 
                     for event in pygame.event.get():
@@ -318,7 +318,7 @@ class MainRun:
                         if BUPGRADES.is_clicked(event):
                             slide = 'Upgrades'
                             running = False
-                        for button, hero in zip(button_dict, fullheroslist):
+                        for button, hero in zip(button_dict, fullheroeslist):
                             button_dict[button].clicked_action(event, Popup(hero, 'hero', 'team', requirements(hero)).selectionbox)
                     pygame.display.update()
                     clock.tick(30)
@@ -329,7 +329,7 @@ class MainRun:
 
                     BBACK = Button(25, 25, 150, 50, (200, 20, 20), 'Back').draw()
                     BTEAM = Button(80, 125, 150, 50, (0, 242, 255), 'Team', 30).draw()
-                    BHEROS = Button(310, 125, 150, 50, (0, 242, 255), 'Heros', 30).draw()
+                    BHEROES = Button(310, 125, 150, 50, (0, 242, 255), 'Heroes', 30).draw()
                     Button(540, 125, 150, 50, (0, 211, 222), 'Weapons', 55, (0, 211, 222)).draw()
                     BUPGRADES = Button(770, 125, 150, 50, (0, 242, 255), 'Upgrades', 30).draw()
 
@@ -350,8 +350,8 @@ class MainRun:
                         if BTEAM.is_clicked(event):
                             slide = 'Team'
                             running = False
-                        if BHEROS.is_clicked(event):
-                            slide = 'Heros'
+                        if BHEROES.is_clicked(event):
+                            slide = 'Heroes'
                             running = False
                         if BUPGRADES.is_clicked(event):
                             slide = 'Upgrades'
@@ -367,7 +367,7 @@ class MainRun:
 
                     BBACK = Button(25, 25, 150, 50, (200, 20, 20), 'Back').draw()
                     BTEAM = Button(80, 125, 150, 50, (0, 242, 255), 'Team', 30).draw()
-                    BHEROS = Button(310, 125, 150, 50, (0, 242, 255), 'Heros', 30).draw()
+                    BHEROES = Button(310, 125, 150, 50, (0, 242, 255), 'Heroes', 30).draw()
                     BWEAPONS = Button(540, 125, 150, 50, (0, 242, 255), 'Weapons', 30).draw()
                     Button(770, 125, 150, 50, (0, 211, 222), 'Upgrades', 55, (0, 211, 222)).draw()
 
@@ -390,8 +390,8 @@ class MainRun:
                         if BTEAM.is_clicked(event):
                             slide = 'Team'
                             running = False
-                        if BHEROS.is_clicked(event):
-                            slide = 'Heros'
+                        if BHEROES.is_clicked(event):
+                            slide = 'Heroes'
                             running = False
                         if BWEAPONS.is_clicked(event):
                             slide = 'Weapons'
@@ -408,19 +408,19 @@ class MainRun:
             button_dict = {}
             XVALUEFORBUTTON = [325 / 6, (325 / 6) * 2 + 135, (325 / 6) * 3 + (135) * 2, (325 / 6) * 4 + (135) * 3, (325 / 6) * 5 + (135) * 4]
             YVALUEFORBUTTON = [210] * 5 + [220 + 135] * 5
-            if slide == 'Heros':
+            if slide == 'Heroes':
                 while running:
                     BasicWorkings().basicheading('Shop')
                     pygame.draw.rect(screen, (0, 211, 222), pygame.Rect(50, 100, 300, 500 / 5))
 
                     BBACK = Button(25, 25, 150, 50, (200, 20, 20), 'Back').draw()
-                    Button(100, 125, 200, 50, (0, 211, 222), 'Heros', 75, (0, 211, 222)).draw()
+                    Button(100, 125, 200, 50, (0, 211, 222), 'Heroes', 75, (0, 211, 222)).draw()
                     BWEAPONS = Button(400, 125, 200, 50, (0, 242, 255), 'Weapons').draw()
                     BUPGRADES = Button(700, 125, 200, 50, (0, 242, 255), 'Upgrades').draw()
 
                     buttonslist = ['BPLAYER', 'BALPIN', 'BGAR', 'BMARKSON', 'BSISTER', 'BTORPEDO', 'BMINER', 'BRAZOR', 'BVIVI', 'BCLYPEUS']
-                    heroslist = [PLAYER, ALPIN, GAR, MARKSON, SISTER, TORPEDO, MINER, RAZOR, VIVI, CLYPEUS]
-                    for button, hero, x, y in zip(buttonslist, heroslist, itertools.cycle(XVALUEFORBUTTON), YVALUEFORBUTTON):
+                    heroeslist = [PLAYER, ALPIN, GAR, MARKSON, SISTER, TORPEDO, MINER, RAZOR, VIVI, CLYPEUS]
+                    for button, hero, x, y in zip(buttonslist, heroeslist, itertools.cycle(XVALUEFORBUTTON), YVALUEFORBUTTON):
                         button_dict[button] = Button(x, y, 135, 135, (0, 211, 222), 'Recruited', 35, image = hero.inventory('shop')).draw()
 
                     for event in pygame.event.get():
@@ -439,7 +439,7 @@ class MainRun:
                         if BUPGRADES.is_clicked(event):
                             slide = 'Upgrades'
                             running = False
-                        for button, hero in zip(button_dict, heroslist):
+                        for button, hero in zip(button_dict, heroeslist):
                             button_dict[button].clicked_action(event, Popup(hero, 'hero', 'buy', 'Recruited').selectionbox)
                     pygame.display.update()
                     clock.tick(30)
@@ -449,7 +449,7 @@ class MainRun:
                     pygame.draw.rect(screen, (0, 211, 222), pygame.Rect(350, 100, 300, 500 / 5))
 
                     BBACK = Button(25, 25, 150, 50, (200, 20, 20), 'Back').draw()
-                    BHEROS = Button(100, 125, 200, 50, (0, 242, 255), 'Heros').draw()
+                    BHEROES = Button(100, 125, 200, 50, (0, 242, 255), 'Heroes').draw()
                     Button(400, 125, 200, 50, (0, 211, 222), 'Weapons', 75, (0, 211, 222)).draw()
                     BUPGRADES = Button(700, 125, 200, 50, (0, 242, 255), 'Upgrades').draw()
 
@@ -468,8 +468,8 @@ class MainRun:
                         if BBACK.is_clicked(event):
                             openshop = False
                             running = False
-                        if BHEROS.is_clicked(event):
-                            slide = 'Heros'
+                        if BHEROES.is_clicked(event):
+                            slide = 'Heroes'
                             running = False
                         if BUPGRADES.is_clicked(event):
                             slide = 'Upgrades'
@@ -484,7 +484,7 @@ class MainRun:
                     pygame.draw.rect(screen, (0, 211, 222), pygame.Rect(650, 100, 300, 500 / 5))
 
                     BBACK = Button(25, 25, 150, 50, (200, 20, 20), 'Back').draw()
-                    BHEROS = Button(100, 125, 200, 50, (0, 242, 255), 'Heros').draw()
+                    BHEROES = Button(100, 125, 200, 50, (0, 242, 255), 'Heroes').draw()
                     BWEAPONS = Button(400, 125, 200, 50, (0, 242, 255), 'Weapons').draw()
                     Button(700, 125, 200, 50, (0, 211, 222), 'Upgrades', 75, (0, 211, 222)).draw()
 
@@ -504,8 +504,8 @@ class MainRun:
                         if BBACK.is_clicked(event):
                             openshop = False
                             running = False
-                        if BHEROS.is_clicked(event):
-                            slide = 'Heros'
+                        if BHEROES.is_clicked(event):
+                            slide = 'Heroes'
                             running = False
                         if BWEAPONS.is_clicked(event):
                             slide = 'Weapons'
@@ -625,6 +625,8 @@ class Popup:
                 key = self.addtoloadout()
             if self.use == 'remove':
                 key = self.removefromteam()
+            if self.use == 'level':
+                key = self.levels()
 
             if key == True:
                 BCANCEL = Button(275 + 50 / 3, 400, 200, 50, (200, 20, 20), 'Cancel').draw()
@@ -663,6 +665,8 @@ class Popup:
             self.addtoloadout(action = 'on')
         if self.use == 'remove':
             self.removefromteam(action = 'on')
+        if self.use == 'level':
+            self.levels(action = 'on')
 
     def buying(self, action = None):
         if self.item.bought == None and action == None:
@@ -723,7 +727,7 @@ class Popup:
 
             FILE_1.ontheteam = ([PHC] + [PHW] * 3) * 3
 
-            for weapon, hero in zip(fullweaponslist, fullheroslist):
+            for weapon, hero in zip(fullweaponslist, fullheroeslist):
                 if weapon.onteam != None:
                     FILE_1.ontheteam.pop(weapon.teamcode)
                     FILE_1.ontheteam.insert(weapon.teamcode, weapon)
@@ -781,6 +785,30 @@ class Popup:
         if action != None:
             if self.item in FILE_1.ontheteam:
                 self.item.onteam = None
+
+    def levels(self, action = None):
+        if FILE_1.CurrentLevel >= self.type and action == None:
+            Button(275, 25, 450, 450, (0, 211, 222), '', 75, (0, 211, 222)).draw()
+            Button(275, 25, 450, 50, (0, 211, 222), 'Enter Level ' + str(self.type) + '?', 30, (0, 211, 222)).draw()
+            return True
+        if action != None:
+            hero_indexes, weapon_indexes, heroes_in_team = [0, 4, 8], [1, 2, 3], 3
+            for hindex in hero_indexes:
+                if FILE_1.ontheteam[hindex] == PHC:
+                    heroes_in_team -= 1
+                else:
+                    hero_with_weapon = [True, True, True]
+                    for windex in weapon_indexes:
+                        if FILE_1.ontheteam[hindex + windex] == PHW:
+                            hero_with_weapon[windex - 1] = False
+                    if hero_with_weapon == [False, False, False]:
+                        heroes_in_team = 1000
+
+            if heroes_in_team == 0 or heroes_in_team > 3:
+                print('Sorry')
+            else:
+                Combat().start()
+
 
 class Totalstats:
 
@@ -863,7 +891,37 @@ class Combat:
 
         self.playerstatus, self.enemystatus, self.playerlistdata, self.enemylistdata = ['a'] * 3, ['a'] * 3, ['p1', 'p2', 'p3'], ['e1', 'e2', 'e3']
 
-        self.player_effects, self.enemy_effects = [[ALPIN.icon, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0]], [[TORPEDO.icon, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0]] #[[0]*5]*3
+        self.player_effects, self.enemy_effects = [[0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0]], [[0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0]] # [[0]*5]*3
+
+        self.damagedeal, self.attack_style = 0, ''
+
+    def start(self):
+
+        if self.player1 == PHC:
+            self.playerstatus[0] = 'd'
+            self.playerlistdata.remove('p1')
+
+        if self.enemy1 == PHC:
+            self.enemystatus[0] = 'd'
+            self.enemylistdata.remove('e1')
+
+        if self.player2 == PHC:
+            self.playerstatus[1] = 'd'
+            self.playerlistdata.remove('p2')
+
+        if self.enemy2 == PHC:
+            self.enemystatus[1] = 'd'
+            self.enemylistdata.remove('e2')
+
+        if self.player3 == PHC:
+            self.playerstatus[2] = 'd'
+            self.playerlistdata.remove('p3')
+
+        if self.enemy3 == PHC:
+            self.enemystatus[2] = 'd'
+            self.enemylistdata.remove('e3')
+
+        self.combatwindow()
 
     def s(self, new):
 
@@ -902,6 +960,11 @@ class Combat:
             # global gridscreen
             # gridscreen = 'on'
 
+            if self.playerstatus[self.playerteam[0] - 1] == 'd':
+                self.s('rp')
+            elif self.enemystatus[self.enemyteam[0] - 1] == 'd':
+                self.s('re')
+
             '''player side'''
 
             Button(100, 100, 300, 300, (0, 211, 222), '', 75, (0, 211, 222), image = self.playerteam[1].icon).draw()  # player
@@ -911,9 +974,9 @@ class Combat:
             bplayer2 = Button(10, 210, 80, 80, (0, 211, 222), '', 75, image = self.player2.icon).draw() if self.playerstatus[1] == 'a' else Button(10, 210, 80, 80, (217, 15, 39), '', 75, (217, 15, 39), image = self.player2.icon).draw() # team 2
             bplayer3 = Button(10, 310, 80, 80, (0, 211, 222), '', 75, image = self.player3.icon).draw() if self.playerstatus[2] == 'a' else Button(10, 310, 80, 80, (217, 15, 39), '', 75, (217, 15, 39), image = self.player3.icon).draw() # team 3
 
-            bplayeritem1 = Button(110, 410, 80, 80, (0, 211, 222), '', 75, image = self.playerteam[2].icon).draw()  # weapon 1
-            bplayeritem2 = Button(210, 410, 80, 80, (0, 211, 222), '', 75, image = self.playerteam[3].icon).draw() # weapon 2
-            bplayeritem3 = Button(310, 410, 80, 80, (0, 211, 222), '', 75, image = self.playerteam[4].icon).draw()  # weapon 3
+            bplayeritem1 = Button(110, 410, 80, 80, (0, 211, 222), '', 75, image = self.playerteam[2].icon).draw() if self.playerteam[2] != PHW else Button(0, 0, 0, 0, (0, 0, 0), '', invisible = 'on') # weapon 1
+            bplayeritem2 = Button(210, 410, 80, 80, (0, 211, 222), '', 75, image = self.playerteam[3].icon).draw() if self.playerteam[3] != PHW else Button(0, 0, 0, 0, (0, 0, 0), '', invisible = 'on') # weapon 2
+            bplayeritem3 = Button(310, 410, 80, 80, (0, 211, 222), '', 75, image = self.playerteam[4].icon).draw() if self.playerteam[4] != PHW else Button(0, 0, 0, 0, (0, 0, 0), '', invisible = 'on') # weapon 3
 
             if self.playerteam[0] == 1:
                 Button(90, 140, 10, 20, (0, 211, 222), '', 75, (0, 211, 222)).draw()
@@ -949,11 +1012,6 @@ class Combat:
 
             self.textwindow()
 
-            if self.playerstatus[self.playerteam[0] - 1] == 'd':
-                self.s('rp')
-            elif self.enemystatus[self.enemyteam[0] - 1] == 'd':
-                self.s('re')
-
             # BBACK = Button(25, 25, 150, 50, (200, 20, 20), 'Back').draw()
 
             for event in pygame.event.get():
@@ -979,9 +1037,14 @@ class Combat:
                     if bplayer2.is_clicked(event) and self.playerstatus[1] == 'a':
                         self.s('p2')
 
-                bplayeritem1.clicked_action(event, self.speedfactor, 'toenemy', 2)
-                bplayeritem2.clicked_action(event, self.speedfactor, 'toenemy', 3)
-                bplayeritem3.clicked_action(event, self.speedfactor, 'toenemy', 4)
+                enemy_weapon_choice = random.randint(2, 4) if self.enemyteam[4] != PHW else random.randint(2, 3) if self.enemyteam[3] != PHW else random.randint(2, 2)
+
+                if self.playerteam[2] != PHW:
+                    bplayeritem1.clicked_action(event, self.speedfactor, 'toenemy', 2, enemy_weapon_choice)
+                if self.playerteam[3] != PHW:
+                    bplayeritem2.clicked_action(event, self.speedfactor, 'toenemy', 3, enemy_weapon_choice)
+                if self.playerteam[4] != PHW:
+                    bplayeritem3.clicked_action(event, self.speedfactor, 'toenemy', 4, enemy_weapon_choice)
 
                 if self.playerstatus == ['d'] * 3:
                     running = False
@@ -1008,32 +1071,42 @@ class Combat:
         Button(whos_hp[1], 50, BAR, 30, health_color[current_color], '', 20, health_color[current_color]).draw()
         Button(whos_hp[1], 50, 300, 30, (200, 200, 200), 'Health ' + str(int(current_health)) + '/' + str(Totalstats(team, whos_hp[0][0]).totalhealth()), 20, (200, 200, 200), invisible = 'on').draw()
 
-    def speedfactor(self, who, weapon, forced = None):
+    def speedfactor(self, who, weapon, enemy_weapon, forced = None):
 
-        self.s('re')
-        Button(600, 100, 300, 300, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemyteam[1].icon).draw()  # player
-        self.healthbar(FILE_1.currentlevel, 'enemy')
-        self.affects()
+        if forced == None:
+
+            self.s('re')
+            Button(600, 100, 300, 300, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemyteam[1].icon).draw()  # player
+            self.healthbar(FILE_1.currentlevel, 'enemy')
+
+            self.assign_abilities('before', [self.playerteam, 'Player'], [self.enemyteam, 'Enemy'], weapon)
+            self.assign_abilities('before', [self.enemyteam, 'Enemy'], [self.playerteam, 'Player'], enemy_weapon)
+
+            self.affects()
 
         if self.playerteam[5][5] > self.enemyteam[5][5] or forced == 'playerfirst':
-            self.round += 1
             self.textloop('Player goes first')
             self.dealdamage(who, weapon)
 
             if self.enemystatus[(self.enemyteam[0] - 1)] == 'd':
                 self.textloop('can not attack enemy is dead')
             else:
-                self.dealdamage('toplayer', random.randint(2, 4))
+
+                self.dealdamage('toplayer', enemy_weapon)
+
+            self.round += 1
 
         elif self.playerteam[5][5] < self.enemyteam[5][5] or forced == 'enemyfirst':
-            self.round += 1
             self.textloop('Enemy goes first')
-            self.dealdamage('toplayer', random.randint(2, 4))
+            self.dealdamage('toplayer', enemy_weapon)
 
             if self.playerstatus[(self.playerteam[0] - 1)] == 'd':
                 self.textloop('can not attack player is dead')
             else:
+
                 self.dealdamage(who, weapon)
+
+            self.round += 1
 
         #if speed is the same do a coin flip'''
 
@@ -1043,9 +1116,9 @@ class Combat:
             for side in range(1):
                 coin = random.randint(1, 2)
             if coin == 1:
-                self.speedfactor(who, weapon, 'playerfirst')
+                self.speedfactor(who, weapon, enemy_weapon, 'playerfirst')
             elif coin == 2:
-                self.speedfactor(who, weapon, 'enemyfirst')
+                self.speedfactor(who, weapon, enemy_weapon, 'enemyfirst')
 
     def dealdamage(self, who, weapon):
 
@@ -1053,6 +1126,8 @@ class Combat:
             attacker, defender, status, listdata = [self.playerteam, 'Player'], [self.enemyteam, 'Enemy'], self.enemystatus, self.enemylistdata
         elif who == 'toplayer':
             attacker, defender, status, listdata = [self.enemyteam, 'Enemy'], [self.playerteam, 'Player'], self.playerstatus, self.playerlistdata
+
+        self.attack_style = attacker[1] + ' deal '
 
         for x in range(1):
             if random.randint(1, 100) <= defender[0][5][5]:
@@ -1062,19 +1137,23 @@ class Combat:
                 total_attack = attacker[0][5][0]*1.075 if attacker[0][weapon].type == 'Damage' else attacker[0][5][0]
                 total_defense = defender[0][5][1]*.75 if attacker[0][weapon].type == 'Breaker' else defender[0][5][1]
 
-                damagedeal = ((total_attack**2)/(total_attack + total_defense)) * attacker[0][weapon].power
+                self.damagedeal = ((total_attack**2)/(total_attack + total_defense)) * attacker[0][weapon].power
 
-                if attacker[0][weapon].type == 'Stack':
-                    self.affects_symbols(attacker[0][weapon].icon, defender[0])
+                self.assign_abilities('attack', attacker, defender, weapon, total_attack, total_defense)
 
                 extradamage = 0
                 for x in range(1):
                     if random.randint(1, 100) <= attacker[0][5][3]:
-                        damagedeal *= (1 + (attacker[0][5][4] * 0.01))
+                        self.damagedeal *= (1 + (attacker[0][5][4] * 0.01))
                         extradamage = 1
                 # defender[0][5][2] -= int(damagedeal)
-                self.smoothhpdrop(damagedeal / 100, who)
-                damagetext = attacker[1] +' deal ' + str(int(damagedeal)) + ' damage' if extradamage == 0 else 'Critical hit, ' + attacker[1] +' deal ' + str(int(damagedeal)) + ' damage!'
+                self.smoothhpdrop(self.damagedeal / 100, who)
+                damagetext = self.attack_style + str(int(self.damagedeal)) + ' damage' if extradamage == 0 else 'Critical hit, ' + self.attack_style + str(int(self.damagedeal)) + ' damage!'
+
+                self.assign_abilities('after', attacker, defender, weapon, total_attack, total_defense)
+
+                self.affects()
+
                 self.textloop(damagetext)
                 if defender[0][5][2] <= 0:
                     status[(defender[0][0] - 1)] = 'd'
@@ -1131,38 +1210,101 @@ class Combat:
         # Button(530, 280, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 4
         # Button(530, 330, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 5
 
-    def affects_symbols(self, add, side):
+    def assign_abilities(self, phrase, attacker_side, defender_side, current_weapon, attacking_power = 0, defending_power = 0):
+
+        team = [FILE_1.ontheteam, FILE_1.currentlevel] if attacker_side[1] == 'Player' else [FILE_1.currentlevel, FILE_1.ontheteam]
+        team_status = self.playerstatus if attacker_side[1] == 'Player' else self.enemystatus
+
+        if phrase == 'before':
+
+            if attacker_side[0][1] == ALPIN and defender_side[0][5][2] > (Totalstats(team[1], defender_side[0][0]).totalhealth()*0.5): # ALPIN
+                self.affects_symbols(ALPIN.icon, defender_side[0])
+
+
+
+                self.textloop(defender_side[0][1].name + ' has been slowed')
+
+
+            if attacker_side[0][1] == SISTER: # SISTER
+                self.affects_symbols(attacker_side[0][1].icon, attacker_side[0])
+
+            if attacker_side[0][1] == TORPEDO: # TORPEDO
+                self.affects_symbols(attacker_side[0][1].icon, attacker_side[0])
+
+            if attacker_side[0][1] == REAPER: # REAPER
+                self.affects_symbols(attacker_side[0][1].icon, attacker_side[0])
+
+            if attacker_side[0][1] == MINER: # MINER
+                self.affects_symbols(attacker_side[0][1].icon, attacker_side[0])
+
+            if attacker_side[0][1] == PHANTASM: # PHANTASM
+                for status in team_status:
+                    if status == 'd':
+                        self.affects_symbols(attacker_side[0][1].icon, attacker_side[0])
+                        break
+
+            if self.round >= 5 and attacker_side[0][1] == STALKER: # STALKER
+                self.affects_symbols(attacker_side[0][1].icon, attacker_side[0])
+
+            if attacker_side[0][1] == EXECUTIONER: # EXECUTIONER
+                self.affects_symbols(attacker_side[0][1].icon, attacker_side[0])
+
+        elif phrase == 'attack':
+
+            if attacker_side[0][current_weapon].type == 'Stack':
+                self.affects_symbols(attacker_side[0][current_weapon].icon, defender_side[0])
+                self.attack_style = attacker_side[1] + ' poisoned ' + defender_side[1] + ' with '
+
+            if attacker_side[0][current_weapon].type == 'Damage' and attacker_side[0][1] == RAZOR: # RAZOR
+                self.affects_symbols(attacker_side[0][1].icon, defender_side[0])
+
+        elif phrase == 'after':
+
+            if attacker_side[0][1] == PLAYER and defender_side[0][5][2] <= 0:  # PLAYER
+                self.affects_symbols(PLAYER.icon, attacker_side[0])
+
+            if defender_side[0][5][2] <= (Totalstats(team[1], defender_side[0][0]).totalhealth()*0.5): # ALPIN
+                self.affects_symbols(ALPIN.icon, defender_side[0], 'remove')
+
+            if defender_side[0][1] == GAR and defender_side[0][5][2] <= (Totalstats(team[1], defender_side[0][0]).totalhealth()*0.3): # GAR
+                self.affects_symbols(defender_side[0][1].icon, defender_side[0])
+
+            if defender_side[0][1] == SWAMP:
+                self.affects_symbols(SWAMP.icon, attacker_side[0])
+
+            if defender_side[0][1] == CLYPEUS and defender_side[0][5][2] <= (Totalstats(team[1], defender_side[0][0]).totalhealth()*0.4): # CLYPEUS
+                self.affects_symbols(defender_side[0][1].icon, defender_side[0])
+
+            if defender_side[0][1] == VIVI and defender_side[0][5][2] <= (Totalstats(team[1], defender_side[0][0]).totalhealth()*0.4): # VIVI
+                self.affects_symbols(defender_side[0][1].icon, defender_side[0])
+
+        elif phrase == 'death':
+            pass
+
+    def affects_symbols(self, add, side, to_do = 'add'):
 
         current = False
         current_counter = 0
+        team = [self.playerteam, self.player_effects] if side == self.playerteam else [self.enemyteam, self.enemy_effects]
 
-        if side == self.enemyteam:
-            for affect in self.enemy_effects[self.enemyteam[0] - 1]:
+        if to_do == 'add':
+            for affect in team[1][team[0][0] - 1]:
                 if affect == add:
                     current = True
             if current == False:
-                for affect in self.enemy_effects[self.enemyteam[0] - 1]:
+                for affect in team[1][team[0][0] - 1]:
                     if affect == 0:
                         current_counter += 1
                 if current_counter == 0:
-                    del self.enemy_effects[self.enemyteam[0] - 1][-1]
-                    self.enemy_effects[self.enemyteam[0] - 1].insert(0, add)
+                    del team[1][team[0][0] - 1][-1]
+                    team[1][team[0][0] - 1].insert(0, add)
                 else:
-                    self.enemy_effects[self.enemyteam[0] - 1].insert(-current_counter, add)
+                    team[1][team[0][0] - 1].insert(-current_counter, add)
 
-        if side == self.playerteam:
-            for affect in self.player_effects[self.playerteam[0] - 1]:
+        elif to_do == 'remove':
+            for affect in team[1][team[0][0] - 1]:
                 if affect == add:
-                    current = True
-            if current == False:
-                for affect in self.player_effects[self.playerteam[0] - 1]:
-                    if affect == 0:
-                        current_counter += 1
-                if current_counter == 0:
-                    del self.player_effects[self.playerteam[0] - 1][-1]
-                    self.player_effects[self.playerteam[0] - 1].insert(0, add)
-                else:
-                    self.player_effects[self.playerteam[0] - 1].insert(-current_counter, add)
+                    team[1][team[0][0] - 1].remove(add)
 
     def textloop(self, newmessage):
         del self.recentmessage[-1]
@@ -1178,6 +1320,62 @@ class Combat:
             Button(555, 405 + (18 * num), 390, 18, (255, 255, 255), self.recentmessage[num], 20, (255, 255, 255)).draw()
 
         # BasicWorkings().draw_text(message + message, BasicWorkings().fontstuff(20), (50, 100, 150), screen, 555, 405 + (18/2), 'midleft')
+
+'''Abilities'''
+
+class Abilities:
+
+    def __init__(self, attacker_side, defender_side, attacking_power, defending_power, current_weapon):
+        self.attacker_side = attacker_side
+        self.defender_side = defender_side
+        self.attacking_power = attacking_power
+        self.defending_power = defending_power
+        self.current_weapon = current_weapon
+
+    def for_honor(self): # PLAYER # Killing an enemy will boost attack
+        pass
+
+    def freeze(self): # ALPIN # reduce the speed of enemies when they are above 50% health
+        pass
+
+    def rage(self): # GAR # Gain attack boost below 30% health
+        pass
+
+    def incraese_scope(self): # MARKSON # Enemies marked by Markson will take increase damage
+        pass
+
+    def poisonous(self): # SWAMP # Attacking Swamp will cause poison effect
+        pass
+
+    def blessing(self): # SISTER # Heal after each attack
+        pass
+
+    def quick_attack(self): # TORPEDO # More power to attack if Torpedo has higher speed
+        pass
+
+    def soul_reap(self): # REAPER # Gain health when enemy dies
+        pass
+
+    def explosives(self): # MINER # Damages enemy upon death
+        pass
+
+    def bleed(self): # RAZOR # Weapons with damage type will cause bleeding
+        pass
+
+    def nightmare(self): # PHANTASM # Boost attack if team has dead teammates
+        pass
+
+    def weak_spots(self): # STALKER # Enemies after round five will have their defenses lowered
+        pass
+
+    def seduction(self): # VIVI # Increase crit when below 40% health
+        pass
+
+    def defense_boost(self): # CLYPEUS # Gain shield below 40% health
+        pass
+
+    def instant_death(self): # EXECUTIONER # Low chance to instantly kill enemies
+        pass
 
 '''Weapons for player, place holder stats'''
 
@@ -1289,7 +1487,7 @@ class Character:
         if place[-1] != '0':
             print('zero')
         else:
-            for hero in fullheroslist:
+            for hero in fullheroeslist:
                 if hero.onteam == place:
                     hero.onteam = None
                     hero.teamcode = None
@@ -1297,7 +1495,7 @@ class Character:
             self.teamcode = placeindex
             print(self.onteam, placeindex)
 
-PLAYER = Character('Player', 'Common', 0, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_player_icon.png', None)
+PLAYER = Character('Player', 'Common', 0, 250, 150, 1000, 5, 10, 15, 3, 'GAMEHEROICONS/game_player_icon.png', None)
 ALPIN = Character('Alpin', 'Common', 0, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_alpin_icon.png', None)
 GAR = Character('Gar', 'Common', 0, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_gar_icon.png', None)
 MARKSON = Character('Markson', 'Common', 0, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_markson_icon.png', None)
@@ -1310,8 +1508,8 @@ RAZOR = Character('Razor', 'Rare', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICO
 PHANTASM = Character('Phantasm', 'Rare', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_phantasm_icon.png',None, requiredlevel = 6)
 STALKER = Character('Stalker', 'Rare', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_stalker_icon.png', None, requiredlevel = 8)
 VIVI = Character('Vivi', 'Epic', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_vivi_icon.png', None)
-CLYPEUS = Character('Clypeus', 'Epic', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_clypeus_icon.png', None)
-EXECUTIONER = Character('Executioner', 'Epic', 50, 250, 150, 1, 5, 10, 15, 3, 'GAMEHEROICONS/game_executioner_icon.png', None, requiredlevel = 10)
+CLYPEUS = Character('Clypeus', 'Epic', 50, 250, 150, 700, 5, 10, 15, 3, 'GAMEHEROICONS/game_clypeus_icon.png', None)
+EXECUTIONER = Character('Executioner', 'Epic', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_executioner_icon.png', None, requiredlevel = 10)
 
 def requirements(item):
     if item.requiredlevel == 0:
@@ -1320,64 +1518,13 @@ def requirements(item):
         return 'Level ' + str(item.requiredlevel)
 
 fullweaponslist = [SWORD, BOWANDARROW, DUALBALDE, CHAINKUNAI, SPEAR, AX, MACE, HAMMER, NUNCHUCKS, PICKAXE, MAGIC, CLUB, BLOWGUN, SCYTHE, HEAL]
-fullheroslist = [PLAYER, ALPIN, GAR, MARKSON, SWAMP, SISTER, TORPEDO, REAPER, MINER, RAZOR, PHANTASM, STALKER, VIVI, CLYPEUS, EXECUTIONER]
+fullheroeslist = [PLAYER, ALPIN, GAR, MARKSON, SWAMP, SISTER, TORPEDO, REAPER, MINER, RAZOR, PHANTASM, STALKER, VIVI, CLYPEUS, EXECUTIONER]
 
 '''PLace Holders for Weapons and Characters'''
 
 PHW = Weapon('', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, None)
 PHC = Character('', '', 0, 0, 0, 0, 0, 0, 0, 0, None, None)
 
-'''Abilities'''
-
-class Abilities:
-
-    def __init__(self):
-        pass
-
-    def for_honor(self): # PLAYER
-        pass
-
-    def freeze(self): # ALPIN
-        pass
-
-    def rage(self): # GAR
-        pass
-
-    def build_up(self): # MARKSON
-        pass
-
-    def plant_life(self): # SWAMP
-        pass
-
-    def blessing(self): # SISTER
-        pass
-
-    def quick_attack(self): # TORPEDO
-        pass
-
-    def soul_reap(self): # REAPER
-        pass
-
-    def explosives(self): # MINER
-        pass
-
-    def bleed(self): # RAZOR
-        pass
-
-    def nightmare(self): # PHANTASM
-        pass
-
-    def weak_spots(self): # STALKER
-        pass
-
-    def seduction(self): # VIVI
-        pass
-
-    def defense_boost(self): # CLYPEUS
-        pass
-
-    def instant_death(self): # EXECUTIONER
-        pass
 
 '''code testing'''
 
@@ -1430,8 +1577,8 @@ class Abilities:
 # print(bobbob)
 
 FILE_1.ontheteam = ([PHC] + [PHW] * 3) * 3
-FILE_1.currentlevel = (TORPEDO, CLUB, BLOWGUN, SCYTHE, SWAMP, SPEAR, PICKAXE, HEAL, EXECUTIONER, MAGIC, SWORD, AX)
-FILE_1.ontheteam = (ALPIN, SWORD, PICKAXE, SCYTHE, SWAMP, SPEAR, BLOWGUN, HEAL, EXECUTIONER, MAGIC, CLUB, AX)
+FILE_1.currentlevel = (ALPIN, CLUB, BLOWGUN, SCYTHE, SWAMP, SPEAR, PICKAXE, HEAL, CLYPEUS, MAGIC, SWORD, AX)
+FILE_1.ontheteam = (CLYPEUS, SWORD, PICKAXE, PHW, PHC, SPEAR, BLOWGUN, HEAL, ALPIN, MAGIC, CLUB, AX)
 # menu()
 
 # print(Combat().player1.damage)
