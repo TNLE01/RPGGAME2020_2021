@@ -196,7 +196,7 @@ class MainRun:
                     if event.key == pygame.K_ESCAPE:
                         BasicWorkings().closing()
 
-                BMAP.clicked_action(event, Popup(PHW, 0, 'level', 'Complete previous Level').selectionbox, 50) #self.map)
+                BMAP.clicked_action(event, self.map)
                 BTEAM.clicked_action(event, self.team, FILE_1.TeamLastOpen)
                 BSHOP.clicked_action(event, self.shop, FILE_1.ShopLastOpen)
                 BMONSTERS.clicked_action(event, self.monsters)
@@ -219,9 +219,27 @@ class MainRun:
     def map(self):
         running = True
         while running:
+            button_dict = {}
             BasicWorkings().basicheading('Map')
 
             BBACK = Button(25, 25, 150, 50, (200, 20, 20), 'Back').draw()
+
+            buttonslist = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+            XVFB, YVFB = [1, 0], [112, 0]
+            for button in buttonslist:
+                button_dict[button] = Button(XVFB[0]*(575/6) + (XVFB[1]*85), YVFB[0], 85, 85, (0, 242, 255), str(button)).draw()
+                XVFB[0], XVFB[1], YVFB[1] = (XVFB[0] + 1), (XVFB[1] + 1), (YVFB[1] + 1)
+                if YVFB[1] == 5:
+                    XVFB, YVFB = [1, 0], [YVFB[0] + 97, 0]
+
+            # XVALUEFORLINE = 0
+            # YVALUEFORLINE = 100
+            # for x in range(21):
+            #     pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(XVALUEFORLINE, 100, 1, 500))
+            #     XVALUEFORLINE += 200
+            # for y in range(11):
+            #     pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(0, YVALUEFORLINE, 1000, 1))
+            #     YVALUEFORLINE += 100
 
             helpful_text()
 
@@ -233,6 +251,8 @@ class MainRun:
                         running = False
                 if BBACK.is_clicked(event):
                     running = False
+                for button in button_dict:
+                    button_dict[button].clicked_action(event, Popup(PHW, button, 'level', 'Complete previous Level').selectionbox, 50)
 
             pygame.display.update()
             clock.tick(30)
@@ -1092,10 +1112,10 @@ class Combat:
 
                 if self.playerstatus == ['d'] * 3:
                     running = False
-                    print('You lose')
+                    helpful_text('You lose', 0)
                 elif self.enemystatus == ['d'] * 3:
                     running = False
-                    print('You win')
+                    helpful_text('You win', 0)
 
                 # if BBACK.is_clicked(event):
                 #     running = False
@@ -1167,9 +1187,9 @@ class Combat:
     def dealdamage(self, who, weapon):
 
         if who == 'toenemy':
-            attacker, defender, status, listdata = [self.playerteam, 'Player'], [self.enemyteam, 'Enemy'], self.enemystatus, self.enemylistdata
+            attacker, defender, status, listdata, effects = [self.playerteam, 'Player'], [self.enemyteam, 'Enemy'], self.enemystatus, self.enemylistdata, [self.player_effects, self.enemy_effects]
         elif who == 'toplayer':
-            attacker, defender, status, listdata = [self.enemyteam, 'Enemy'], [self.playerteam, 'Player'], self.playerstatus, self.playerlistdata
+            attacker, defender, status, listdata, effects = [self.enemyteam, 'Enemy'], [self.playerteam, 'Player'], self.playerstatus, self.playerlistdata, [self.enemy_effects, self.player_effects]
 
         self.attack_style = attacker[1] + ' deal '
 
@@ -1180,6 +1200,8 @@ class Combat:
 
                 total_attack = attacker[0][5][0]*1.075 if attacker[0][weapon].type == 'Damage' else attacker[0][5][0]
                 total_defense = defender[0][5][1]*.75 if attacker[0][weapon].type == 'Breaker' else defender[0][5][1]
+
+                ####Abilities(attacker[0], defender[0], total_attack, total_defense, effects[0], effects[1], weapon).damage_cal()
 
                 self.damagedeal = ((total_attack**2)/(total_attack + total_defense)) * attacker[0][weapon].power
 
@@ -1369,12 +1391,33 @@ class Combat:
 
 class Abilities:
 
-    def __init__(self, attacker_side, defender_side, attacking_power, defending_power, current_weapon):
+    def __init__(self, attacker_side, defender_side, attacking_power, defending_power, attacker_effects, defender_effects, current_weapon):
         self.attacker_side = attacker_side
         self.defender_side = defender_side
         self.attacking_power = attacking_power
         self.defending_power = defending_power
+        self.attacker_effects = attacker_effects
+        self.defender_effects = defender_effects
         self.current_weapon = current_weapon
+
+    def damage_cal(self):
+
+        if PLAYER.icon in self.attacker_effects:
+            print('bob')
+        # if
+        # if
+        # if
+        # if
+        # if
+        # if
+        # if
+        # if
+        # if
+        # if
+        # if
+        # if
+        # if
+        # if
 
     def for_honor(self): # PLAYER # Killing an enemy will boost attack
         pass
@@ -1539,7 +1582,7 @@ class Character:
             self.teamcode = placeindex
             print(self.onteam, placeindex)
 
-PLAYER = Character('Player', 'Common', 0, 250, 150, 1000, 5, 10, 15, 3, 'GAMEHEROICONS/game_player_icon.png', None)
+PLAYER = Character('Player', 'Common', 0, 250, 1500, 1000, 5, 10, 15, 3, 'GAMEHEROICONS/game_player_icon.png', None)
 ALPIN = Character('Alpin', 'Common', 0, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_alpin_icon.png', None)
 GAR = Character('Gar', 'Common', 0, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_gar_icon.png', None)
 MARKSON = Character('Markson', 'Common', 0, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_markson_icon.png', None)
@@ -1622,7 +1665,7 @@ PHC = Character('', '', 0, 0, 0, 0, 0, 0, 0, 0, None, None)
 
 FILE_1.ontheteam = ([PHC] + [PHW] * 3) * 3
 FILE_1.currentlevel = (ALPIN, CLUB, BLOWGUN, SCYTHE, SWAMP, SPEAR, PICKAXE, HEAL, CLYPEUS, MAGIC, SWORD, AX)
-FILE_1.ontheteam = (CLYPEUS, SWORD, PICKAXE, PHW, PHC, SPEAR, BLOWGUN, HEAL, ALPIN, MAGIC, CLUB, AX)
+FILE_1.ontheteam = (CLYPEUS, SWORD, PICKAXE, SCYTHE, PLAYER, SPEAR, BLOWGUN, HEAL, ALPIN, MAGIC, CLUB, AX)
 # menu()
 
 # print(Combat().player1.damage)
