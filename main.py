@@ -108,16 +108,17 @@ class Button(object):
 
 class Profile:
 
-    def __init__(self, ShopLastOpen, TeamLastOpen, Gold, XP, CurrentLevel, text_display, timer):
+    def __init__(self, ShopLastOpen, TeamLastOpen, Gold, XP, CurrentLevel, text_display, timer, MapLevel):
         self.ShopLastOpen = ShopLastOpen
         self.TeamLastOpen = TeamLastOpen
         self.Gold = Gold
         self.XP = XP
         self.CurrentLevel = CurrentLevel
         self.ontheteam = None
-        self.currentlevel = None
+        self.currentenemy = None
         self.text_displayed = text_display
         self.timer = timer
+        self.MapLevel = MapLevel
 
     def change(self, what, value):
         if what == 'XP':
@@ -138,7 +139,7 @@ class Profile:
         if self.timer <= 75:
             Button(0, 490, 1000, 10, (219, 219, 219), self.text_displayed, 15,hovercolor = (219, 219, 219)).draw()
 
-FILE_1 = Profile('Heroes', 'Team', 0, 0, 1, 'Welcome to the Coliseum', 0)
+FILE_1 = Profile('Heroes', 'Team', 0, 0, 1, 'Welcome to the Coliseum', 0, 1)
 #FILE_2 = Profile()
 #FILE_3 = Profile()
 
@@ -218,29 +219,26 @@ class MainRun:
 
     def map(self):
         running = True
+        timer = 5
         while running:
             button_dict = {}
             BasicWorkings().basicheading('Map')
 
             BBACK = Button(25, 25, 150, 50, (200, 20, 20), 'Back').draw()
 
-            buttonslist = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
             XVFB, YVFB = [1, 0], [112, 0]
-            for button in buttonslist:
-                button_dict[button] = Button(XVFB[0]*(575/6) + (XVFB[1]*85), YVFB[0], 85, 85, (0, 242, 255), str(button)).draw()
+            for button in range(1, 21):
+                unlocked = [(0, 242, 255), str(button)] if button <= FILE_1.MapLevel else [(0, 211, 222), '']
+                if button == FILE_1.MapLevel:
+                    Button(XVFB[0] * (575 / 6) + (XVFB[1] * 85) - 5, YVFB[0] - 5, 95, 95, (255, 255, 0), '').draw() if timer <= 10 else Button(0, 0, 0, 0, (0, 0, 0), '', invisible = 'on').draw()
+                    if timer == 20:
+                        timer = 0
+                button_dict[button] = Button(XVFB[0]*(575/6) + (XVFB[1]*85), YVFB[0], 85, 85, unlocked[0], unlocked[1]).draw()
                 XVFB[0], XVFB[1], YVFB[1] = (XVFB[0] + 1), (XVFB[1] + 1), (YVFB[1] + 1)
                 if YVFB[1] == 5:
                     XVFB, YVFB = [1, 0], [YVFB[0] + 97, 0]
 
-            # XVALUEFORLINE = 0
-            # YVALUEFORLINE = 100
-            # for x in range(21):
-            #     pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(XVALUEFORLINE, 100, 1, 500))
-            #     XVALUEFORLINE += 200
-            # for y in range(11):
-            #     pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(0, YVALUEFORLINE, 1000, 1))
-            #     YVALUEFORLINE += 100
-
+            timer += 1
             helpful_text()
 
             for event in pygame.event.get():
@@ -292,7 +290,7 @@ class MainRun:
                     buttonmark = 0
                     for teamslot, Xweaponslot in zip(XVALUEFORBUTTONTEAM, XVALUEFORBUTTONWEAPONS):
                         button_dict[buttonslist[buttonmark]] = Button(teamslot, 215, 175, 270, (0, 211, 222), '').draw()
-                        characteronteam(teamslot + 5, 220, FILE_1.ontheteam[buttonmark].icon)
+                        characteronteam(teamslot + 5, 220, FILE_1.ontheteam[buttonmark].profile)
                         buttonmark += 1
                         for Yweaponslot in YVALUEFORBUTTONWEAPONS:
                             button_dict[buttonslist[buttonmark]] = Button(Xweaponslot, Yweaponslot, 80, 80, (0, 211, 222), '', image = FILE_1.ontheteam[buttonmark].icon).draw()
@@ -617,12 +615,14 @@ class MainRun:
             BasicWorkings().basicheading('Testscreen')
 
             BBACK = Button(25, 25, 150, 50, (200, 20, 20), 'Back').draw()
+
             BGIVEGOLD = Button(100, 500 / 2 + 50, 200, 50, (0, 242, 255), 'Add Gold').draw()
             BGIVEXP = Button(400, 500 / 2 + 50, 200, 50, (0, 242, 255), 'Add XP').draw()
             BTAKEGOLD = Button(100, 500 / 2 + 150, 200, 50, (0, 242, 255), 'Minus Gold').draw()
             BTAKEXP = Button(400, 500 / 2 + 150, 200, 50, (0, 242, 255), 'Minus XP').draw()
             BTEST = Button(700, 500 / 2 + 50, 200, 50, (0, 242, 255), 'TEST BUTTON').draw()
             BGRID = Button(700, 500 / 2 + 150, 200, 50, (0, 242, 255), 'Grid').draw()
+            BLEVEL = Button(100, 500 / 2 - 50, 200, 50, (0, 242, 255), 'Add Level').draw()
 
             global gridscreen
 
@@ -655,6 +655,9 @@ class MainRun:
                     else:
                         gridscreen = 'off'
                     BasicWorkings().makegrid()
+                if BLEVEL.is_clicked(event):
+                    FILE_1.MapLevel += 20
+                    print('Current Level ' + str(FILE_1.MapLevel))
             pygame.display.update()
             clock.tick(30)
 
@@ -732,7 +735,7 @@ class Popup:
         if self.item.bought == None and action == None:
             Button(275, 25, 450, 450, (0, 211, 222), '', 75, (0, 211, 222)).draw()
             Button(275, 25, 450, 50, (0, 211, 222), 'Do you wish to buy: ' + str(self.item.name) + '?', 30, (0, 211, 222)).draw()
-            Button(300, 100, 250, 250, (0, 0, 0), '', 0, (0, 0, 0), image = self.item.icon).draw()
+            Button(300, 100, 250, 250, (0, 0, 0), '', 0, (0, 0, 0), image = self.item.icon if self.type == 'weapon' else self.item.profile).draw()
             YVALUEFORSTATS = 0
             for num in range(0, 8):
                 Button(575, 100 + (YVALUEFORSTATS * (250 / 8)), 125, 250 / 8, (0, 0, 0),
@@ -751,7 +754,7 @@ class Popup:
         if self.item.bought != None and action == None:
             Button(275, 25, 450, 450, (0, 211, 222), '', 75, (0, 211, 222)).draw()
             Button(275, 25, 450, 50, (0, 211, 222), 'Add ' + str(self.item.name) + ' to your team?', 30, (0, 211, 222)).draw()
-            Button(300, 100, 250, 250, (0, 0, 0), '', 0, (0, 0, 0), image = self.item.icon).draw()
+            Button(300, 100, 250, 250, (0, 0, 0), '', 0, (0, 0, 0), image = self.item.icon if self.type == 'weapon' else self.item.profile).draw()
             YVALUEFORSTATS = 0
             for num in range(1, 8):
                 Button(575, 100 + (YVALUEFORSTATS * (250 / 8)), 125, 250 / 8, (0, 0, 0), self.item.statslist[num] + str(self.item.DATALIST[num]), 20, invisible = 'on').draw()
@@ -850,9 +853,29 @@ class Popup:
                 self.item.onteam = None
 
     def levels(self, action = None):
-        if FILE_1.CurrentLevel >= self.type and action == None:
-            Button(275, 25, 450, 450, (0, 211, 222), '', 75, (0, 211, 222)).draw()
+        if FILE_1.MapLevel >= self.type and action == None:
+            FILE_1.currentenemy, playeronteam, enemyonteam, team_index = Levels[self.type - 1], 0, 0, [[0, 4, 8], [0, 4, 8], [0, 4, 8]]
+            X_VALUE = 275
+
+            Button(250, 25, 500, 450, (0, 211, 222), '', 75, (0, 211, 222)).draw()
             Button(275, 25, 450, 50, (0, 211, 222), 'Enter Level ' + str(self.type) + '?', 30, (0, 211, 222)).draw()
+
+            for index in team_index[0]:
+                if FILE_1.ontheteam[index] == PHC:
+                    team_index[1].remove(index)
+                if FILE_1.currentenemy[index] == PHC:
+                    team_index[2].remove(index)
+
+            for icon in team_index[1]:
+                Button(X_VALUE, 75, 150, 150, (0, 211, 222), '', 30, (0, 211, 222), image = FILE_1.ontheteam[icon].icon).draw() if len(team_index[1]) == 3 else Button(X_VALUE + 75, 75, 150, 150, (0, 211, 222), '', 30, (0, 211, 222), image = FILE_1.ontheteam[icon].icon).draw() if len(team_index[1]) == 2 else Button(425, 75, 150, 150, (0, 211, 222), '', 30, (0, 211, 222), image = FILE_1.ontheteam[icon].icon).draw()
+                X_VALUE += 150
+            X_VALUE = 275
+            for icon in team_index[2]:
+                Button(X_VALUE, 225, 150, 150, (0, 211, 222), '', 30, (0, 211, 222), image = FILE_1.currentenemy[icon].icon).draw() if len(team_index[2]) == 3 else Button(X_VALUE + 75, 225, 150, 150, (0, 211, 222), '', 30, (0, 211, 222), image = FILE_1.currentenemy[icon].icon).draw() if len(team_index[2]) == 2 else Button(425, 225, 150, 150, (0, 211, 222), '', 30, (0, 211, 222), image = FILE_1.currentenemy[icon].icon).draw()
+                X_VALUE += 150
+
+            Button(275, 75, 450, 300, (0, 0, 0), 'VS', 100, (0, 211, 222), invisible = 'on').draw()
+
             return True
         if action != None:
             hero_indexes, weapon_indexes, heroes_in_team = [0, 4, 8], [1, 2, 3], 3
@@ -872,7 +895,7 @@ class Popup:
             elif heroes_in_team > 3:
                 helpful_text("Teammate doesn't have weapon", 0)
             else:
-                Combat().start()
+                Combat(self.type).start()
 
 class Totalstats:
 
@@ -931,23 +954,25 @@ class Totalstats:
 
 class Combat:
 
-    def __init__(self):
+    def __init__(self, level_being_played):
 
-        self.player1, self.enemy1 = FILE_1.ontheteam[0], FILE_1.currentlevel[0]
+        self.level_being_played = level_being_played
+
+        self.player1, self.enemy1 = FILE_1.ontheteam[0], FILE_1.currentenemy[0]
         self.item11, self.item12, self.item13 = FILE_1.ontheteam[1], FILE_1.ontheteam[2], FILE_1.ontheteam[3]
-        self.enemyitem11, self.enemyitem12, self.enemyitem13 = FILE_1.currentlevel[1], FILE_1.currentlevel[2], FILE_1.currentlevel[3]
+        self.enemyitem11, self.enemyitem12, self.enemyitem13 = FILE_1.currentenemy[1], FILE_1.currentenemy[2], FILE_1.currentenemy[3]
 
-        self.player2, self.enemy2 = FILE_1.ontheteam[4], FILE_1.currentlevel[4]
+        self.player2, self.enemy2 = FILE_1.ontheteam[4], FILE_1.currentenemy[4]
         self.item21, self.item22, self.item23 = FILE_1.ontheteam[5], FILE_1.ontheteam[6], FILE_1.ontheteam[7]
-        self.enemyitem21, self.enemyitem22, self.enemyitem23 = FILE_1.currentlevel[5], FILE_1.currentlevel[6], FILE_1.currentlevel[7]
+        self.enemyitem21, self.enemyitem22, self.enemyitem23 = FILE_1.currentenemy[5], FILE_1.currentenemy[6], FILE_1.currentenemy[7]
 
-        self.player3, self.enemy3 = FILE_1.ontheteam[8], FILE_1.currentlevel[8]
+        self.player3, self.enemy3 = FILE_1.ontheteam[8], FILE_1.currentenemy[8]
         self.item31, self.item32, self.item33 = FILE_1.ontheteam[9], FILE_1.ontheteam[10], FILE_1.ontheteam[11]
-        self.enemyitem31, self.enemyitem32, self.enemyitem33= FILE_1.currentlevel[9], FILE_1.currentlevel[10], FILE_1.currentlevel[11]
+        self.enemyitem31, self.enemyitem32, self.enemyitem33= FILE_1.currentenemy[9], FILE_1.currentenemy[10], FILE_1.currentenemy[11]
 
         # damage 0 defense 1 health 2 critrate 3 critdamage 4 speed 5
         self.stats1, self.stats2, self.stats3 = Totalstats(FILE_1.ontheteam, 1).totallist(), Totalstats(FILE_1.ontheteam, 2).totallist(), Totalstats(FILE_1.ontheteam, 3).totallist()
-        self.estats1, self.estats2, self.estats3 = Totalstats(FILE_1.currentlevel, 1).totallist(), Totalstats(FILE_1.currentlevel, 2).totallist(), Totalstats(FILE_1.currentlevel, 3).totallist()
+        self.estats1, self.estats2, self.estats3 = Totalstats(FILE_1.currentenemy, 1).totallist(), Totalstats(FILE_1.currentenemy, 2).totallist(), Totalstats(FILE_1.currentenemy, 3).totallist()
 
         self.playerteam, self.enemyteam = [1, self.player1, self.item11, self.item12, self.item13, self.stats1, 'p1'], [1, self.enemy1, self.enemyitem11, self.enemyitem12, self.enemyitem13, self.estats1, 'e1']
 
@@ -1013,6 +1038,17 @@ class Combat:
             else:
                 pass
 
+    def LOCD(self, who): # List of combat data
+
+        LISTPLAYER = ['Player', self.playerteam, FILE_1.ontheteam, self.player_effects, self.playerstatus, self.playerlistdata]
+        LISTENEMY = ['Enemy', self.enemyteam, FILE_1.currentenemy, self.enemy_effects, self.enemystatus, self.enemylistdata]
+
+        if who == 'player':
+            return LISTPLAYER
+
+        elif who == 'enemy':
+            return LISTENEMY
+
     def combatwindow(self):
         running = True
         while running:
@@ -1031,7 +1067,7 @@ class Combat:
 
             '''player side'''
 
-            Button(100, 100, 300, 300, (0, 211, 222), '', 75, (0, 211, 222), image = self.playerteam[1].icon).draw()  # player
+            Button(100, 100, 300, 300, (0, 211, 222), '', 75, (0, 211, 222), image = self.playerteam[1].profile).draw()  # player
             self.healthbar(FILE_1.ontheteam, 'player')
 
             bplayer1 = Button(10, 110, 80, 80, (0, 211, 222), '', 75, image = self.player1.icon).draw() if self.playerstatus[0] == 'a' else Button(10, 110, 80, 80, (217, 15, 39), '', 75, (217, 15, 39), image = self.player1.icon).draw() # team 1
@@ -1054,8 +1090,8 @@ class Combat:
 
             '''enemy side'''
 
-            Button(600, 100, 300, 300, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemyteam[1].icon).draw()  # player
-            self.healthbar(FILE_1.currentlevel, 'enemy')
+            Button(600, 100, 300, 300, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemyteam[1].profile).draw()  # player
+            self.healthbar(FILE_1.currentenemy, 'enemy')
 
             benemy1 = Button(910, 110, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemy1.icon).draw() if self.enemystatus[0] == 'a' else Button(910, 110, 80, 80, (217, 15, 39), '', 75, (217, 15, 39), image = self.enemy1.icon).draw() # team 1
             benemy2 = Button(910, 210, 80, 80, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemy2.icon).draw() if self.enemystatus[1] == 'a' else Button(910, 210, 80, 80, (217, 15, 39), '', 75, (217, 15, 39), image = self.enemy2.icon).draw() # team 2
@@ -1116,6 +1152,7 @@ class Combat:
                 elif self.enemystatus == ['d'] * 3:
                     running = False
                     helpful_text('You win', 0)
+                    FILE_1.MapLevel += 1 if self.level_being_played == FILE_1.MapLevel else 0
 
                 # if BBACK.is_clicked(event):
                 #     running = False
@@ -1140,11 +1177,14 @@ class Combat:
         if forced == None:
 
             self.s('re')
-            Button(600, 100, 300, 300, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemyteam[1].icon).draw()  # player
-            self.healthbar(FILE_1.currentlevel, 'enemy')
+            Button(600, 100, 300, 300, (0, 211, 222), '', 75, (0, 211, 222), image = self.enemyteam[1].profile).draw()  # player
+            self.healthbar(FILE_1.currentenemy, 'enemy')
 
-            self.assign_abilities('before', [self.playerteam, 'Player'], [self.enemyteam, 'Enemy'], weapon)
-            self.assign_abilities('before', [self.enemyteam, 'Enemy'], [self.playerteam, 'Player'], enemy_weapon)
+            self.assign_abilities('before', self.LOCD('player'), self.LOCD('enemy'), weapon)
+            self.assign_abilities('before', self.LOCD('enemy'), self.LOCD('player'), enemy_weapon)
+
+            self.activating_abilities('before', self.LOCD('player'), self.LOCD('enemy'), weapon)
+            self.activating_abilities('before', self.LOCD('enemy'), self.LOCD('player'), enemy_weapon)
 
             self.affects()
 
@@ -1187,47 +1227,61 @@ class Combat:
     def dealdamage(self, who, weapon):
 
         if who == 'toenemy':
-            attacker, defender, status, listdata, effects = [self.playerteam, 'Player'], [self.enemyteam, 'Enemy'], self.enemystatus, self.enemylistdata, [self.player_effects, self.enemy_effects]
+            # attacker, defender, status, listdata, effects = [self.playerteam, 'Player', FILE_1.ontheteam], [self.enemyteam, 'Enemy', FILE_1.currentenemy], self.enemystatus, self.enemylistdata, [self.player_effects, self.enemy_effects]
+            attacker, defender = self.LOCD('player'), self.LOCD('enemy')
         elif who == 'toplayer':
-            attacker, defender, status, listdata, effects = [self.enemyteam, 'Enemy'], [self.playerteam, 'Player'], self.playerstatus, self.playerlistdata, [self.enemy_effects, self.player_effects]
+            # attacker, defender, status, listdata, effects = [self.enemyteam, 'Enemy', FILE_1.currentenemy], [self.playerteam, 'Player', FILE_1.ontheteam], self.playerstatus, self.playerlistdata, [self.enemy_effects, self.player_effects]
+            attacker, defender = self.LOCD('enemy'), self.LOCD('player')
 
-        self.attack_style = attacker[1] + ' deal '
+        print(attacker[1][1].name, defender[1][1].name)
+
+        self.attack_style = attacker[0] + ' deal '
 
         for x in range(1):
-            if random.randint(1, 100) <= defender[0][5][5]:
-                self.textloop(defender[1] + "'s " + defender[0][1].name + ' dodge the attack')
+            if random.randint(1, 100) <= defender[1][5][5]:
+                self.textloop(defender[0] + "'s " + defender[1][1].name + ' dodge the attack')
             else:
 
-                total_attack = attacker[0][5][0]*1.075 if attacker[0][weapon].type == 'Damage' else attacker[0][5][0]
-                total_defense = defender[0][5][1]*.75 if attacker[0][weapon].type == 'Breaker' else defender[0][5][1]
+                total_attack = attacker[1][5][0]*1.075 if attacker[1][weapon].type == 'Damage' else attacker[1][5][0]
+                total_defense = defender[1][5][1]*.75 if attacker[1][weapon].type == 'Breaker' else defender[1][5][1]
 
-                ####Abilities(attacker[0], defender[0], total_attack, total_defense, effects[0], effects[1], weapon).damage_cal()
+                self.damagedeal = self.activating_abilities('attack', attacker, defender, weapon, total_attack, total_defense)
 
-                self.damagedeal = ((total_attack**2)/(total_attack + total_defense)) * attacker[0][weapon].power
+                # # # self.damagedeal = ((total_attack**2)/(total_attack + total_defense)) * attacker[0][weapon].power
 
                 self.assign_abilities('attack', attacker, defender, weapon, total_attack, total_defense)
 
                 extradamage = 0
                 for x in range(1):
-                    if random.randint(1, 100) <= attacker[0][5][3]:
-                        self.damagedeal *= (1 + (attacker[0][5][4] * 0.01))
+                    if random.randint(1, 100) <= attacker[1][5][3]:
+                        self.damagedeal *= (1 + (attacker[1][5][4] * 0.01))
                         extradamage = 1
                 # defender[0][5][2] -= int(damagedeal)
                 self.smoothhpdrop(self.damagedeal / 100, who)
                 damagetext = self.attack_style + str(int(self.damagedeal)) + ' damage' if extradamage == 0 else 'Critical hit, ' + self.attack_style + str(int(self.damagedeal)) + ' damage!'
 
+                self.activating_abilities('after', attacker, defender, weapon, total_attack, total_defense)
                 self.assign_abilities('after', attacker, defender, weapon, total_attack, total_defense)
 
                 self.affects()
 
                 self.textloop(damagetext)
-                if defender[0][5][2] <= 0:
-                    status[(defender[0][0] - 1)] = 'd'
-                    listdata.remove(defender[0][6])
-                    self.textloop(defender[1] + "'s " + defender[0][1].name + ' died')
+
+                if defender[1][5][2] <= 0:
+                    defender[4][(defender[1][0] - 1)] = 'd'
+                    defender[5].remove(defender[1][6])
+                    self.textloop(defender[0] + "'s " + defender[1][1].name + ' died')
+
+                self.activating_abilities('death', attacker, defender, weapon, total_attack, total_defense)
+                self.assign_abilities('death', attacker, defender, weapon, total_attack, total_defense)
+
+                if attacker[1][5][2] <= 0:
+                    attacker[4][(attacker[1][0] - 1)] = 'd'
+                    attacker[5].remove(attacker[1][6])
+                    self.textloop(attacker[0] + "'s " + attacker[1][1].name + ' died')
 
     def smoothhpdrop(self, damagedeal, who):
-        theteam = FILE_1.currentlevel if who == 'toenemy' else FILE_1.ontheteam
+        theteam = FILE_1.currentenemy if who == 'toenemy' else FILE_1.ontheteam
         healthbar = 'enemy' if who == 'toenemy' else 'player'
         side = self.enemyteam if who == 'toenemy' else self.playerteam
         damagetimer = 0
@@ -1276,76 +1330,169 @@ class Combat:
         # Button(530, 280, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 4
         # Button(530, 330, 40, 40, (0, 211, 222), '', 75, (0, 211, 222)).draw()  # affect 5
 
-    def assign_abilities(self, phrase, attacker_side, defender_side, current_weapon, attacking_power = 0, defending_power = 0):
-
-        team = [FILE_1.ontheteam, FILE_1.currentlevel] if attacker_side[1] == 'Player' else [FILE_1.currentlevel, FILE_1.ontheteam]
-        team_status = self.playerstatus if attacker_side[1] == 'Player' else self.enemystatus
+    def assign_abilities(self, phrase, attacking_side, defending_side, current_weapon, attacking_power = 0, defending_power = 0):
 
         if phrase == 'before':
+            '''Alpin'''
+            if attacking_side[1][1] == ALPIN and defending_side[1][5][2] > (Totalstats(defending_side[2], defending_side[1][0]).totalhealth()*0.5): # ALPIN
+                self.affects_symbols(ALPIN.icon, defending_side[1])
 
-            if attacker_side[0][1] == ALPIN and defender_side[0][5][2] > (Totalstats(team[1], defender_side[0][0]).totalhealth()*0.5): # ALPIN
-                self.affects_symbols(ALPIN.icon, defender_side[0])
-
-
-
-                self.textloop(defender_side[0][1].name + ' has been slowed')
-
-
-            if attacker_side[0][1] == SISTER: # SISTER
-                self.affects_symbols(attacker_side[0][1].icon, attacker_side[0])
-
-            if attacker_side[0][1] == TORPEDO: # TORPEDO
-                self.affects_symbols(attacker_side[0][1].icon, attacker_side[0])
-
-            if attacker_side[0][1] == REAPER: # REAPER
-                self.affects_symbols(attacker_side[0][1].icon, attacker_side[0])
-
-            if attacker_side[0][1] == MINER: # MINER
-                self.affects_symbols(attacker_side[0][1].icon, attacker_side[0])
-
-            if attacker_side[0][1] == PHANTASM: # PHANTASM
-                for status in team_status:
+                self.textloop(defending_side[1][1].name + ' has been slowed')
+            '''Sister'''
+            if attacking_side[1][1] == SISTER: # SISTER
+                self.affects_symbols(attacking_side[1][1].icon, attacking_side[1])
+            '''Torpedo'''
+            if attacking_side[1][1] == TORPEDO: # TORPEDO
+                self.affects_symbols(attacking_side[1][1].icon, attacking_side[1])
+            '''Reaper'''
+            if attacking_side[1][1] == REAPER: # REAPER
+                self.affects_symbols(attacking_side[1][1].icon, attacking_side[1])
+            '''Miner'''
+            if attacking_side[1][1] == MINER: # MINER
+                self.affects_symbols(attacking_side[1][1].icon, attacking_side[1])
+            '''Razor'''
+            if attacking_side[1][1] == RAZOR: # RAZOR
+                self.affects_symbols(RAZOR.icon, attacking_side[1])
+            '''Phantasm'''
+            if attacking_side[1][1] == PHANTASM: # PHANTASM
+                for status in attacking_side[4]:
                     if status == 'd':
-                        self.affects_symbols(attacker_side[0][1].icon, attacker_side[0])
+                        self.affects_symbols(attacking_side[1][1].icon, attacking_side[1])
                         break
-
-            if self.round >= 5 and attacker_side[0][1] == STALKER: # STALKER
-                self.affects_symbols(attacker_side[0][1].icon, attacker_side[0])
-
-            if attacker_side[0][1] == EXECUTIONER: # EXECUTIONER
-                self.affects_symbols(attacker_side[0][1].icon, attacker_side[0])
+            '''Stalker'''
+            if self.round >= 5 and STALKER in attacking_side[2]: # STALKER
+                self.affects_symbols(STALKER.icon, defending_side[1])
+            '''Excutioner'''
+            if attacking_side[1][1] == EXECUTIONER: # EXECUTIONER
+                self.affects_symbols(attacking_side[1][1].icon, attacking_side[1])
 
         elif phrase == 'attack':
-
-            if attacker_side[0][current_weapon].type == 'Stack':
-                self.affects_symbols(attacker_side[0][current_weapon].icon, defender_side[0])
-                self.attack_style = attacker_side[1] + ' poisoned ' + defender_side[1] + ' with '
-
-            if attacker_side[0][current_weapon].type == 'Damage' and attacker_side[0][1] == RAZOR: # RAZOR
-                self.affects_symbols(attacker_side[0][1].icon, defender_side[0])
+            '''Weapons'''
+            if attacking_side[1][current_weapon].type == 'Stack': #WEAPONS
+                self.affects_symbols(attacking_side[1][current_weapon].icon, defending_side[1])
+                self.attack_style = attacking_side[0] + ' poisoned ' + defending_side[0] + ' with '
+            '''Markson'''
+            if attacking_side[1][1] == MARKSON:
+                if random.randint(1, 3) == 1:
+                    self.affects_symbols(MARKSON.icon, defending_side[1])
+            # '''Razor'''
+            # if attacking_side[1][current_weapon].type == 'Damage' and attacking_side[1][1] == RAZOR: # RAZOR
+            #     self.affects_symbols(RAZOR.icon, defending_side[1])
 
         elif phrase == 'after':
-
-            if attacker_side[0][1] == PLAYER and defender_side[0][5][2] <= 0:  # PLAYER
-                self.affects_symbols(PLAYER.icon, attacker_side[0])
-
-            if defender_side[0][5][2] <= (Totalstats(team[1], defender_side[0][0]).totalhealth()*0.5): # ALPIN
-                self.affects_symbols(ALPIN.icon, defender_side[0], 'remove')
-
-            if defender_side[0][1] == GAR and defender_side[0][5][2] <= (Totalstats(team[1], defender_side[0][0]).totalhealth()*0.3): # GAR
-                self.affects_symbols(defender_side[0][1].icon, defender_side[0])
-
-            if defender_side[0][1] == SWAMP:
-                self.affects_symbols(SWAMP.icon, attacker_side[0])
-
-            if defender_side[0][1] == CLYPEUS and defender_side[0][5][2] <= (Totalstats(team[1], defender_side[0][0]).totalhealth()*0.4): # CLYPEUS
-                self.affects_symbols(defender_side[0][1].icon, defender_side[0])
-
-            if defender_side[0][1] == VIVI and defender_side[0][5][2] <= (Totalstats(team[1], defender_side[0][0]).totalhealth()*0.4): # VIVI
-                self.affects_symbols(defender_side[0][1].icon, defender_side[0])
+            '''Player'''
+            if attacking_side[1][1] == PLAYER and defending_side[1][5][2] <= 0:  # PLAYER
+                self.affects_symbols(PLAYER.icon, attacking_side[1])
+            '''Alpin'''
+            if defending_side[1][5][2] <= (Totalstats(defending_side[2], defending_side[1][0]).totalhealth()*0.5): # ALPIN
+                self.affects_symbols(ALPIN.icon, defending_side[1], 'remove')
+            '''Gar'''
+            if defending_side[1][1] == GAR and defending_side[1][5][2] <= (Totalstats(defending_side[2], defending_side[1][0]).totalhealth()*0.3): # GAR
+                self.affects_symbols(defending_side[1][1].icon, defending_side[1])
+            '''Swamp'''
+            if defending_side[1][1] == SWAMP: # SWAMP
+                self.affects_symbols(SWAMP.icon, attacking_side[1])
+            '''Clypeus'''
+            if defending_side[1][1] == CLYPEUS and defending_side[1][5][2] <= (Totalstats(defending_side[2], defending_side[1][0]).totalhealth()*0.4): # CLYPEUS
+                self.affects_symbols(defending_side[1][1].icon, defending_side[1])
+            '''Vivi'''
+            if defending_side[1][1] == VIVI and defending_side[1][5][2] <= (Totalstats(defending_side[2], defending_side[1][0]).totalhealth()*0.4): # VIVI
+                self.affects_symbols(defending_side[1][1].icon, defending_side[1])
 
         elif phrase == 'death':
             pass
+
+    def activating_abilities(self, phrase, attacking_side, defending_side, current_weapon, attacking_power = 0, defending_power = 0):
+
+        if phrase == 'before':
+            '''Freeze # ALPIN # Reduce the speed of enemies when they are above 50% health'''
+            if ALPIN.icon in attacking_side[3][attacking_side[1][0] - 1]:
+
+                attacking_side[1][5][5] = Totalstats(attacking_side[2], attacking_side[1][0]).totalspeed()
+                attacking_side[1][5][5] -= 10
+
+        elif phrase == 'attack':
+
+            '''For Honor # PLAYER # Killing an enemy will boost attack'''
+            if PLAYER.icon in attacking_side[3][attacking_side[1][0] - 1]:
+                print('Player power, attack')
+                attacking_power *= 1.15
+
+            '''Rage # GAR # Gain # attack boost below 30% health'''
+            if GAR.icon in attacking_side[3][attacking_side[1][0] - 1]:
+                print('Gar power, attack')
+                attacking_power *= 1.20
+
+            '''Increase Scope # MARKSON # Enemies marked by Markson will take increase damage'''
+            if MARKSON.icon in defending_side[3][defending_side[1][0] - 1]:
+                print('Markson power, attack')
+                if attacking_side[1][1] == MARKSON:
+                    attacking_power *= 1.15
+                else:
+                    attacking_power *= 1.05
+
+            '''Poisonous # SWAMP # Attacking Swamp will cause poison effect'''
+            # if
+
+            '''Quick Attack # TORPEDO # More power to attack if Torpedo has higher speed'''
+            if TORPEDO.icon in attacking_side[3][attacking_side[1][0] - 1]:
+                print('Torpedo power, attack')
+                print('attacker speed ' + str(attacking_side[1][1].speed) + ' vs defender speed ' + str(defending_side[1][1].speed))
+                if Totalstats(attacking_side[2], attacking_side[1][0]).totalspeed() > Totalstats(defending_side[2], defending_side[1][0]).totalspeed():
+                    print('working')
+                    attacking_power *= 1.10
+                else:
+                    print('fail')
+
+            '''Nightmare # PHANTASM # Boost attack if team has dead teammates'''
+            if PHANTASM.icon in attacking_side[3][attacking_side[1][0] - 1]:
+                print('Phantasm power, attack')
+                attacking_power *= 1.10
+
+            '''Weak Spots # STALKER # Enemies after round five will have their defenses lowered'''
+            if STALKER.icon in defending_side[3][defending_side[1][0] - 1]:
+                print('Stalker power, attack')
+                defending_power *= 0.85
+
+            '''Seduction # VIVI # Increase crit when below 40% health'''
+            if VIVI.icon in attacking_side[3][attacking_side[1][0] - 1]:
+                print('Vivi power, attack')
+
+            '''Defense Boost # CLYPEUS # Gain shield below 40% health'''
+            if CLYPEUS.icon in defending_side[3][defending_side[1][0] - 1]:
+                print('Clypeus block, defense')
+                defending_power *= 1.50
+
+            '''Instant Death # EXECUTIONER # Low chance to instantly kill enemies'''
+            if EXECUTIONER.icon in attacking_side[3][attacking_side[1][0] - 1]:
+                print('Excutioner power, attack')
+                if random.randint(1, 25) == 1:
+                    attacking_power *= 1000
+
+            return ((attacking_power ** 2) / (attacking_power + defending_power)) * attacking_side[1][current_weapon].power
+
+        elif phrase == 'after':
+            '''Blessing # SISTER # Heal after each attack'''
+            if SISTER.icon in attacking_side[3][attacking_side[1][0] - 1]:
+                attacking_side[1][5][2] += attacking_power * attacking_side[1][current_weapon].power
+                if attacking_side[1][5][2] > Totalstats(attacking_side[2], attacking_side[1][0]).totalhealth():
+                    attacking_side[1][5][2] = Totalstats(attacking_side[2], attacking_side[1][0]).totalhealth()
+
+            '''Reflection # RAZOR # Reflect some damage back to the attacker'''
+            if RAZOR.icon in defending_side[3][defending_side[1][0] - 1]:
+                print(attacking_power * attacking_side[1][current_weapon].power)
+                attacking_side[1][5][2] -= attacking_power * attacking_side[1][current_weapon].power
+
+        elif phrase == 'death':
+            '''Soul Reap # REAPER # Gain health when enemy dies'''
+            if REAPER.icon in attacking_side[3][attacking_side[1][0] - 1] and defending_side[4][(defending_side[1][0] - 1)] == 'd':
+                attacking_side[1][5][2] += Totalstats(defending_side[2], defending_side[1][0]).totalhealth()*.25
+                if attacking_side[1][5][2] > Totalstats(attacking_side[2], attacking_side[1][0]).totalhealth():
+                    attacking_side[1][5][2] = Totalstats(attacking_side[2], attacking_side[1][0]).totalhealth()
+
+            '''Explosives # MINER # Damages enemy upon death'''
+            if MINER.icon in defending_side[3][defending_side[1][0] - 1] and defending_side[4][(defending_side[1][0] - 1)] == 'd':
+                attacking_side[1][5][2] -= Totalstats(defending_side[2], defending_side[1][0]).totaldamage()*.5
 
     def affects_symbols(self, add, side, to_do = 'add'):
 
@@ -1386,83 +1533,6 @@ class Combat:
             Button(555, 405 + (18 * num), 390, 18, (255, 255, 255), self.recentmessage[num], 20, (255, 255, 255)).draw()
 
         # BasicWorkings().draw_text(message + message, BasicWorkings().fontstuff(20), (50, 100, 150), screen, 555, 405 + (18/2), 'midleft')
-
-'''Abilities'''
-
-class Abilities:
-
-    def __init__(self, attacker_side, defender_side, attacking_power, defending_power, attacker_effects, defender_effects, current_weapon):
-        self.attacker_side = attacker_side
-        self.defender_side = defender_side
-        self.attacking_power = attacking_power
-        self.defending_power = defending_power
-        self.attacker_effects = attacker_effects
-        self.defender_effects = defender_effects
-        self.current_weapon = current_weapon
-
-    def damage_cal(self):
-
-        if PLAYER.icon in self.attacker_effects:
-            print('bob')
-        # if
-        # if
-        # if
-        # if
-        # if
-        # if
-        # if
-        # if
-        # if
-        # if
-        # if
-        # if
-        # if
-        # if
-
-    def for_honor(self): # PLAYER # Killing an enemy will boost attack
-        pass
-
-    def freeze(self): # ALPIN # reduce the speed of enemies when they are above 50% health
-        pass
-
-    def rage(self): # GAR # Gain attack boost below 30% health
-        pass
-
-    def incraese_scope(self): # MARKSON # Enemies marked by Markson will take increase damage
-        pass
-
-    def poisonous(self): # SWAMP # Attacking Swamp will cause poison effect
-        pass
-
-    def blessing(self): # SISTER # Heal after each attack
-        pass
-
-    def quick_attack(self): # TORPEDO # More power to attack if Torpedo has higher speed
-        pass
-
-    def soul_reap(self): # REAPER # Gain health when enemy dies
-        pass
-
-    def explosives(self): # MINER # Damages enemy upon death
-        pass
-
-    def bleed(self): # RAZOR # Weapons with damage type will cause bleeding
-        pass
-
-    def nightmare(self): # PHANTASM # Boost attack if team has dead teammates
-        pass
-
-    def weak_spots(self): # STALKER # Enemies after round five will have their defenses lowered
-        pass
-
-    def seduction(self): # VIVI # Increase crit when below 40% health
-        pass
-
-    def defense_boost(self): # CLYPEUS # Gain shield below 40% health
-        pass
-
-    def instant_death(self): # EXECUTIONER # Low chance to instantly kill enemies
-        pass
 
 '''Weapons for player, place holder stats'''
 
@@ -1582,21 +1652,26 @@ class Character:
             self.teamcode = placeindex
             print(self.onteam, placeindex)
 
-PLAYER = Character('Player', 'Common', 0, 250, 1500, 1000, 5, 10, 15, 3, 'GAMEHEROICONS/game_player_icon.png', None)
-ALPIN = Character('Alpin', 'Common', 0, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_alpin_icon.png', None)
-GAR = Character('Gar', 'Common', 0, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_gar_icon.png', None)
-MARKSON = Character('Markson', 'Common', 0, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_markson_icon.png', None)
-SWAMP = Character('Swamp', 'Rare', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_swamp_icon.png', None, requiredlevel = 2)
-SISTER = Character('Sister', 'Rare', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_sister_icon.png', None)
-TORPEDO = Character('Torpedo', 'Rare', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_torpedo_icon.png', None)
-REAPER = Character('Reaper', 'Rare', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_reaper_icon.png', None, requiredlevel = 4)
-MINER = Character('Miner', 'Rare', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_miner_icon.png', None)
-RAZOR = Character('Razor', 'Rare', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_razor_icon.png', None)
-PHANTASM = Character('Phantasm', 'Rare', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_phantasm_icon.png',None, requiredlevel = 6)
-STALKER = Character('Stalker', 'Rare', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_stalker_icon.png', None, requiredlevel = 8)
-VIVI = Character('Vivi', 'Epic', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_vivi_icon.png', None)
-CLYPEUS = Character('Clypeus', 'Epic', 50, 250, 150, 700, 5, 10, 15, 3, 'GAMEHEROICONS/game_clypeus_icon.png', None)
-EXECUTIONER = Character('Executioner', 'Epic', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_executioner_icon.png', None, requiredlevel = 10)
+PLAYER = Character('Player', 'Common', 0, 2500, 1500, 1000, 5, 10, 15, 3, 'GAMEHEROICONS/game_player_icon.png', 'GAMEHEROES/game_player_player.png')
+ALPIN = Character('Alpin', 'Common', 0, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_alpin_icon.png', 'GAMEHEROES/game_alpin_player.png')
+GAR = Character('Gar', 'Common', 0, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_gar_icon.png', 'GAMEHEROES/game_gar_player.png')
+MARKSON = Character('Markson', 'Common', 0, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_markson_icon.png', 'GAMEHEROES/game_markson_player.png')
+SWAMP = Character('Swamp', 'Rare', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_swamp_icon.png', 'GAMEHEROES/game_swamp_player.png', requiredlevel = 2)
+SISTER = Character('Sister', 'Rare', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_sister_icon.png', 'GAMEHEROES/game_sister_player.png')
+TORPEDO = Character('Torpedo', 'Rare', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_torpedo_icon.png', 'GAMEHEROES/game_torpedo_player.png')
+REAPER = Character('Reaper', 'Rare', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_reaper_icon.png', 'GAMEHEROES/game_reaper_player.png', requiredlevel = 4)
+MINER = Character('Miner', 'Rare', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_miner_icon.png', 'GAMEHEROES/game_miner_player.png')
+RAZOR = Character('Razor', 'Rare', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_razor_icon.png', 'GAMEHEROES/game_razor_player.png')
+PHANTASM = Character('Phantasm', 'Rare', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_phantasm_icon.png','GAMEHEROES/game_phantasm_player.png', requiredlevel = 6)
+STALKER = Character('Stalker', 'Rare', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_stalker_icon.png', 'GAMEHEROES/game_stalker_player.png', requiredlevel = 8)
+VIVI = Character('Vivi', 'Epic', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_vivi_icon.png', 'GAMEHEROES/game_vivi_player.png')
+CLYPEUS = Character('Clypeus', 'Epic', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_clypeus_icon.png', 'GAMEHEROES/game_clypeus_player.png')
+EXECUTIONER = Character('Executioner', 'Epic', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_executioner_icon.png', 'GAMEHEROES/game_executioner_player.png', requiredlevel = 10)
+
+SLIME = Character('Slime', 'Common', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_mon_slime_icon.png', 'GAMEHEROES/game_mon_slime_mon.png')
+GHOST = Character('Ghost', 'Rare', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_mon_ghost_icon.png', 'GAMEHEROES/game_mon_ghost_mon.png')
+GOLEM = Character('Golem', 'Epic', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_mon_golem_icon.png', 'GAMEHEROES/game_mon_golem_mon.png')
+DEMON = Character('Demon', 'Legendary', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_mon_demon_icon.png', 'GAMEHEROES/game_mon_demon_mon.png')
 
 def requirements(item):
     if item.requiredlevel == 0:
@@ -1612,6 +1687,16 @@ fullheroeslist = [PLAYER, ALPIN, GAR, MARKSON, SWAMP, SISTER, TORPEDO, REAPER, M
 PHW = Weapon('', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, None)
 PHC = Character('', '', 0, 0, 0, 0, 0, 0, 0, 0, None, None)
 
+'''Levels'''
+
+FILE_1.ontheteam = ([PHC] + [PHW] * 3) * 3
+FILE_1.currentenemy = (ALPIN, CLUB, BLOWGUN, SCYTHE, SWAMP, SPEAR, PICKAXE, HEAL, CLYPEUS, MAGIC, SWORD, AX)
+FILE_1.ontheteam = (CLYPEUS, SWORD, PICKAXE, SCYTHE, ALPIN, SPEAR, BLOWGUN, HEAL, SISTER, MAGIC, CLUB, AX)
+
+Levels = [(PLAYER, CLUB, PHW, PHW, PHC, PHW, PHW, PHW, PHC, PHW, PHW, PHW), (ALPIN, CLUB, BLOWGUN, PHW, PHC, PHW, PHW, PHW, PHC, PHW, PHW, PHW), (GAR, CLUB, BLOWGUN, HEAL, PHC, PHW, PHW, PHW, PHC, PHW, PHW, PHW), (MARKSON, CLUB, PHW, PHW, PHC, PHW, PHW, PHW, PHC, PHW, PHW, PHW), (SWAMP, CLUB, SWORD, HEAL, PHC, PHW, PHW, PHW, PHC, PHW, PHW, PHW),
+          (SISTER, CLUB, SWORD, PHW, PHC, PHW, PHW, PHW, PHC, PHW, PHW, PHW), (TORPEDO, CLUB, PHW, PHW, PHC, PHW, PHW, PHW, PHC, PHW, PHW, PHW), (REAPER, CLUB, PHW, PHW, PHC, PHW, PHW, PHW, PHC, PHW, PHW, PHW), (MINER, CLUB, PHW, PHW, PHC, PHW, PHW, PHW, PHC, PHW, PHW, PHW), (RAZOR, SWORD, BLOWGUN, HAMMER, PHC, PHW, PHW, PHW, PHC, PHW, PHW, PHW),
+          (PHANTASM, CLUB, PHW, PHW, PHC, PHW, PHW, PHW, PHC, PHW, PHW, PHW), (STALKER, CLUB, PHW, PHW, PHC, PHW, PHW, PHW, PHC, PHW, PHW, PHW), (VIVI, CLUB, PHW, PHW, PHC, PHW, PHW, PHW, PHC, PHW, PHW, PHW), (CLYPEUS, CLUB, PHW, PHW, PHC, PHW, PHW, PHW, PHC, PHW, PHW, PHW), (EXECUTIONER, SPEAR, AX, HAMMER, PHC, PHW, PHW, PHW, PHC, PHW, PHW, PHW),
+          (SLIME, CLUB, BLOWGUN, SCYTHE, PHC, PHW, PHW, PHW, CLYPEUS, MAGIC, SWORD, AX), (PHC, PHW, PHW, PHW, GHOST, SPEAR, PICKAXE, HEAL, CLYPEUS, MAGIC, SWORD, AX), (GOLEM, CLUB, BLOWGUN, SCYTHE, SWAMP, SPEAR, PICKAXE, HEAL, PHC, PHW, PHW, PHW), (ALPIN, CLUB, BLOWGUN, SCYTHE, SWAMP, SPEAR, PICKAXE, HEAL, CLYPEUS, MAGIC, SWORD, AX),(DEMON, CLUB, BLOWGUN, SCYTHE, SWAMP, SPEAR, PICKAXE, HEAL, CLYPEUS, MAGIC, SWORD, AX)]
 
 '''code testing'''
 
@@ -1663,9 +1748,6 @@ PHC = Character('', '', 0, 0, 0, 0, 0, 0, 0, 0, None, None)
 # print(bobbob[1])
 # print(bobbob)
 
-FILE_1.ontheteam = ([PHC] + [PHW] * 3) * 3
-FILE_1.currentlevel = (ALPIN, CLUB, BLOWGUN, SCYTHE, SWAMP, SPEAR, PICKAXE, HEAL, CLYPEUS, MAGIC, SWORD, AX)
-FILE_1.ontheteam = (CLYPEUS, SWORD, PICKAXE, SCYTHE, PLAYER, SPEAR, BLOWGUN, HEAL, ALPIN, MAGIC, CLUB, AX)
 # menu()
 
 # print(Combat().player1.damage)
