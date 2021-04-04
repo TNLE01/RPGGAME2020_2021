@@ -1386,6 +1386,7 @@ class Combat:
             '''Alpin'''
             if defending_side[1][5][2] <= (Totalstats(defending_side[2], defending_side[1][0]).totalhealth()*0.5): # ALPIN
                 self.affects_symbols(ALPIN.icon, defending_side[1], 'remove')
+                defending_side[1][5][5] = Totalstats(defending_side[2], defending_side[1][0]).totalspeed()
             '''Gar'''
             if defending_side[1][1] == GAR and defending_side[1][5][2] <= (Totalstats(defending_side[2], defending_side[1][0]).totalhealth()*0.3): # GAR
                 self.affects_symbols(defending_side[1][1].icon, defending_side[1])
@@ -1463,7 +1464,7 @@ class Combat:
                 print('Clypeus block, defense')
                 defending_power *= 1.50
 
-            '''Instant Death # EXECUTIONER # Low chance to instantly kill enemies'''
+            '''Execution # EXECUTIONER # Low chance to instantly kill enemies'''
             if EXECUTIONER.icon in attacking_side[3][attacking_side[1][0] - 1]:
                 print('Excutioner power, attack')
                 if random.randint(1, 25) == 1:
@@ -1653,20 +1654,35 @@ class Character:
             print(self.onteam, placeindex)
 
 PLAYER = Character('Player', 'Common', 0, 2500, 1500, 1000, 5, 10, 15, 3, 'GAMEHEROICONS/game_player_icon.png', 'GAMEHEROES/game_player_player.png')
+FOR_HONOR = None
 ALPIN = Character('Alpin', 'Common', 0, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_alpin_icon.png', 'GAMEHEROES/game_alpin_player.png')
+FREEZE = None
 GAR = Character('Gar', 'Common', 0, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_gar_icon.png', 'GAMEHEROES/game_gar_player.png')
+RAGE = None
 MARKSON = Character('Markson', 'Common', 0, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_markson_icon.png', 'GAMEHEROES/game_markson_player.png')
+INCREASE_SCOPE = None
 SWAMP = Character('Swamp', 'Rare', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_swamp_icon.png', 'GAMEHEROES/game_swamp_player.png', requiredlevel = 2)
+POISONOUS = None
 SISTER = Character('Sister', 'Rare', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_sister_icon.png', 'GAMEHEROES/game_sister_player.png')
+BLESSING = None
 TORPEDO = Character('Torpedo', 'Rare', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_torpedo_icon.png', 'GAMEHEROES/game_torpedo_player.png')
+QUICK_ATTACK = None
 REAPER = Character('Reaper', 'Rare', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_reaper_icon.png', 'GAMEHEROES/game_reaper_player.png', requiredlevel = 4)
+SOUL_REAP = None
 MINER = Character('Miner', 'Rare', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_miner_icon.png', 'GAMEHEROES/game_miner_player.png')
+EXPLOSIVES = None
 RAZOR = Character('Razor', 'Rare', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_razor_icon.png', 'GAMEHEROES/game_razor_player.png')
+REFLECTION = None
 PHANTASM = Character('Phantasm', 'Rare', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_phantasm_icon.png','GAMEHEROES/game_phantasm_player.png', requiredlevel = 6)
+NIGHTMARE = None
 STALKER = Character('Stalker', 'Rare', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_stalker_icon.png', 'GAMEHEROES/game_stalker_player.png', requiredlevel = 8)
+WEAK_SPOTS = None
 VIVI = Character('Vivi', 'Epic', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_vivi_icon.png', 'GAMEHEROES/game_vivi_player.png')
+SEDUCTIIN = None
 CLYPEUS = Character('Clypeus', 'Epic', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_clypeus_icon.png', 'GAMEHEROES/game_clypeus_player.png')
+DEFENSE_BOOST = None
 EXECUTIONER = Character('Executioner', 'Epic', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_executioner_icon.png', 'GAMEHEROES/game_executioner_player.png', requiredlevel = 10)
+EXECUTION = None
 
 SLIME = Character('Slime', 'Common', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_mon_slime_icon.png', 'GAMEHEROES/game_mon_slime_mon.png')
 GHOST = Character('Ghost', 'Rare', 50, 250, 150, 100, 5, 10, 15, 3, 'GAMEHEROICONS/game_mon_ghost_icon.png', 'GAMEHEROES/game_mon_ghost_mon.png')
