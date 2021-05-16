@@ -757,7 +757,8 @@ class INFORMATION:
                         progress += 1
 
                 Button(100, 100 + (115 / 3), 800, (115 / 3), (200, 200, 200), str(progress) + '/15 unlocked', 20, (200, 200, 200)).draw()
-                Button(100, 100 + (115 / 3), (800 / 15) * progress, (115 / 3), (55, 200, 55), '', 20, (55, 200, 55)).draw()
+                Button(100, 100 + (115 / 3), (800 / 15) * progress, (115 / 3), (55, 200, 55), str(progress) + '/15 unlocked', 20, (55, 200, 55)).draw()
+                Button(100, 100 + (115 / 3), 800, (115 / 3), (200, 200, 200), str(progress) + '/15 unlocked', 20, (200, 200, 200), invisible = 'on').draw()
 
             for button, character, x, y in zip(buttonslist, list, itertools.cycle(self.XVALUEFORBUTTON), self.YVALUEFORBUTTON):
                 self.button_dict[button] = Button(x, y, 80, 80, (0, 211, 222), '', 25, image = character.icon).draw()
@@ -838,6 +839,7 @@ class INFORMATION:
 
             Button(100, 100 + (115 / 3), 800, (115 / 3), (200, 200, 200), str(progress) + '/15 unlocked', 20, (200, 200, 200)).draw()
             Button(100, 100 + (115 / 3), (800 / 15) * progress, (115 / 3), (55, 200, 55), '', 20, (55, 200, 55)).draw()
+            Button(100, 100 + (115 / 3), 800, (115 / 3), (200, 200, 200), str(progress) + '/15 unlocked', 20, (200, 200, 200), invisible = 'on').draw()
 
             buttonslist = ['BSWORD', 'BBOW', 'BDUALBLADE', 'BCHAINKUNAI', 'BSPEAR', 'BAX', 'BMACE', 'BHAMMER',
                            'BNUNCHUCKS', 'BPICKAXE', 'BMAGIC', 'BCLUB', 'BBLOWGUN', 'BSCYTHE', 'BHEAL']
@@ -1773,7 +1775,7 @@ class Combat:
             '''Reflection # RAZOR # Reflect some damage back to the attacker'''
             if ED.REFLECTION[0] in defending_side[3][defending_side[1][0] - 1]:
                 print(attacking_power * attacking_side[1][current_weapon].power)
-                attacking_side[1][5][2] -= attacking_power * attacking_side[1][current_weapon].power
+                attacking_side[1][5][2] -= (attacking_power*attacking_side[1][current_weapon].power)*0.1
 
         elif phrase == 'death':
             '''Soul Reap # REAPER # Gain health when enemy dies'''
@@ -1946,21 +1948,21 @@ class Character:
             self.teamcode = placeindex
             print(self.onteam, placeindex)
 
-PLAYER = Character('Player', 'Common', 0, 2500, 1500, 1000, 5, 10, 15, 3, ED.PLAYER_IMG[0], ED.PLAYER_IMG[1], ED.PEACOCK_CLAN, ED.FOR_HONOR)
-ALPIN = Character('Alpin', 'Common', 0, 250, 150, 100, 5, 10, 15, 3, ED.ALPIN_IMG[0], ED.ALPIN_IMG[1], ED.SNAKE_CLAN, ED.FREEZE)
-GAR = Character('Gar', 'Common', 0, 250, 150, 100, 5, 10, 15, 3, ED.GAR_IMG[0], ED.GAR_IMG[1], ED.OWL_CLAN, ED.RAGE)
-MARKSON = Character('Markson', 'Common', 0, 250, 150, 100, 5, 10, 15, 3, ED.MARKSON_IMG[0], ED.MARKSON_IMG[1], ED.OX_CLAN, ED.INCREASE_SCOPE)
-SWAMP = Character('Swamp', 'Rare', 50, 250, 150, 100, 5, 10, 15, 3, ED.SWAMP_IMG[0], ED.SWAMP_IMG[1], ED.OX_CLAN, ED.POISONOUS , requiredlevel = 2)
-SISTER = Character('Sister', 'Rare', 50, 250, 150, 100, 5, 10, 15, 3, ED.SISTER_IMG[0], ED.SISTER_IMG[1], ED.WOLF_CLAN, ED.BLESSING)
-TORPEDO = Character('Torpedo', 'Rare', 50, 250, 150, 100, 5, 10, 15, 3, ED.TORPEDO_IMG[0], ED.TORPEDO_IMG[1], ED.CHEETAH_CLAN, ED.QUICK_ATTACK)
-REAPER = Character('Reaper', 'Rare', 50, 250, 150, 100, 5, 10, 15, 3, ED.REAPER_IMG[0], ED.REAPER_IMG[1], ED.PIG_CLAN, ED.SOUL_REAP, requiredlevel = 4)
-MINER = Character('Miner', 'Rare', 50, 250, 150, 100, 5, 10, 15, 3, ED.MINER_IMG[0], ED.MINER_IMG[1], ED.EAGLE_CLAN, ED.EXPLOSIVES)
-RAZOR = Character('Razor', 'Rare', 50, 250, 150, 100, 5, 10, 15, 3, ED.RAZOR_IMG[0], ED.RAZOR_IMG[1], ED.EAGLE_CLAN, ED.REFLECTION)
-PHANTASM = Character('Phantasm', 'Rare', 50, 250, 150, 100, 5, 10, 15, 3, ED.PHANTASM_IMG[0], ED.PHANTASM_IMG[1], ED.LION_CLAN, ED.NIGHTMARE, requiredlevel = 6)
-STALKER = Character('Stalker', 'Rare', 50, 250, 150, 100, 5, 10, 15, 3, ED.STALKER_IMG[0], ED.STALKER_IMG[1], ED.SNAKE_CLAN, ED.WEAK_SPOTS, requiredlevel = 8)
-VIVI = Character('Vivi', 'Epic', 50, 250, 150, 100, 5, 10, 15, 3, ED.VIVI_IMG[0], ED.VIVI_IMG[1], ED.GOAT_CLAN, ED.SEDUCTION)
-CLYPEUS = Character('Clypeus', 'Epic', 50, 250, 150, 100, 5, 10, 15, 3, ED.CLYPEUS_IMG[0], ED.CLYPEUS_IMG[1], ED.TURTLE_CLAN, ED.DEFENSE_BOOST)
-EXECUTIONER = Character('Executioner', 'Epic', 50, 250, 150, 100, 5, 10, 15, 3, ED.EXECUTIONER_IMG[0], ED.EXECUTIONER_IMG[1], ED.LION_CLAN, ED.EXECUTION, requiredlevel = 10)
+PLAYER = Character('Player', 'Common', 0, 250, 150, 100, 5, 10, 50, 3, ED.PLAYER_IMG[0], ED.PLAYER_IMG[1], ED.PEACOCK_CLAN, ED.FOR_HONOR)
+ALPIN = Character('Alpin', 'Common', 0, 250, 150, 100, 5, 10, 50, 3, ED.ALPIN_IMG[0], ED.ALPIN_IMG[1], ED.SNAKE_CLAN, ED.FREEZE)
+GAR = Character('Gar', 'Common', 0, 250, 150, 100, 5, 10, 50, 3, ED.GAR_IMG[0], ED.GAR_IMG[1], ED.OWL_CLAN, ED.RAGE)
+MARKSON = Character('Markson', 'Common', 0, 250, 150, 100, 5, 10, 50, 3, ED.MARKSON_IMG[0], ED.MARKSON_IMG[1], ED.OX_CLAN, ED.INCREASE_SCOPE)
+SWAMP = Character('Swamp', 'Rare', 50, 250, 150, 100, 5, 10, 50, 3, ED.SWAMP_IMG[0], ED.SWAMP_IMG[1], ED.OX_CLAN, ED.POISONOUS , requiredlevel = 2)
+SISTER = Character('Sister', 'Rare', 50, 250, 150, 100, 5, 10, 50, 3, ED.SISTER_IMG[0], ED.SISTER_IMG[1], ED.WOLF_CLAN, ED.BLESSING)
+TORPEDO = Character('Torpedo', 'Rare', 50, 250, 150, 100, 5, 10, 50, 3, ED.TORPEDO_IMG[0], ED.TORPEDO_IMG[1], ED.CHEETAH_CLAN, ED.QUICK_ATTACK)
+REAPER = Character('Reaper', 'Rare', 50, 250, 150, 100, 5, 10, 50, 3, ED.REAPER_IMG[0], ED.REAPER_IMG[1], ED.PIG_CLAN, ED.SOUL_REAP, requiredlevel = 4)
+MINER = Character('Miner', 'Rare', 50, 250, 150, 100, 5, 10, 50, 3, ED.MINER_IMG[0], ED.MINER_IMG[1], ED.EAGLE_CLAN, ED.EXPLOSIVES)
+RAZOR = Character('Razor', 'Rare', 50, 250, 150, 100, 5, 10, 50, 3, ED.RAZOR_IMG[0], ED.RAZOR_IMG[1], ED.EAGLE_CLAN, ED.REFLECTION)
+PHANTASM = Character('Phantasm', 'Rare', 50, 250, 150, 100, 5, 10, 50, 3, ED.PHANTASM_IMG[0], ED.PHANTASM_IMG[1], ED.LION_CLAN, ED.NIGHTMARE, requiredlevel = 6)
+STALKER = Character('Stalker', 'Rare', 50, 250, 150, 100, 5, 10, 50, 3, ED.STALKER_IMG[0], ED.STALKER_IMG[1], ED.SNAKE_CLAN, ED.WEAK_SPOTS, requiredlevel = 8)
+VIVI = Character('Vivi', 'Epic', 50, 250, 150, 100, 5, 10, 50, 3, ED.VIVI_IMG[0], ED.VIVI_IMG[1], ED.GOAT_CLAN, ED.SEDUCTION)
+CLYPEUS = Character('Clypeus', 'Epic', 50, 250, 150, 100, 5, 10, 50, 3, ED.CLYPEUS_IMG[0], ED.CLYPEUS_IMG[1], ED.TURTLE_CLAN, ED.DEFENSE_BOOST)
+EXECUTIONER = Character('Executioner', 'Epic', 50, 250, 150, 100, 5, 10, 50, 3, ED.EXECUTIONER_IMG[0], ED.EXECUTIONER_IMG[1], ED.LION_CLAN, ED.EXECUTION, requiredlevel = 10)
 
 SLIME = Character('Slime', 'Common', 9999, 250, 150, 100, 5, 10, 15, 3, ED.SLIME_IMG[0], ED.SLIME_IMG[1], ED.CHEETAH_CLAN, ED.EXTRA_LIFE)
 GHOST = Character('Ghost', 'Rare', 9999, 250, 150, 100, 5, 10, 15, 3, ED.GHOST_IMG[0], ED.GHOST_IMG[1], ED.SNAKE_CLAN, ED.CHAINED)
@@ -1991,7 +1993,7 @@ current_FILE.ontheteam = (CLYPEUS, SWORD, PICKAXE, SCYTHE, ALPIN, SPEAR, BLOWGUN
 Levels = [(PLAYER, CLUB, PHW, PHW, PHC, PHW, PHW, PHW, PHC, PHW, PHW, PHW), (ALPIN, CLUB, BLOWGUN, PHW, PHC, PHW, PHW, PHW, PHC, PHW, PHW, PHW), (GAR, CLUB, BLOWGUN, HEAL, PHC, PHW, PHW, PHW, PHC, PHW, PHW, PHW), (MARKSON, CLUB, PHW, PHW, PHC, PHW, PHW, PHW, PHC, PHW, PHW, PHW), (SWAMP, CLUB, SWORD, HEAL, PHC, PHW, PHW, PHW, PHC, PHW, PHW, PHW),
           (SISTER, CLUB, SWORD, PHW, PHC, PHW, PHW, PHW, PHC, PHW, PHW, PHW), (TORPEDO, CLUB, PHW, PHW, PHC, PHW, PHW, PHW, PHC, PHW, PHW, PHW), (REAPER, CLUB, PHW, PHW, PHC, PHW, PHW, PHW, PHC, PHW, PHW, PHW), (MINER, CLUB, PHW, PHW, PHC, PHW, PHW, PHW, PHC, PHW, PHW, PHW), (RAZOR, SWORD, BLOWGUN, HAMMER, PHC, PHW, PHW, PHW, PHC, PHW, PHW, PHW),
           (PHANTASM, CLUB, PHW, PHW, PHC, PHW, PHW, PHW, PHC, PHW, PHW, PHW), (STALKER, CLUB, PHW, PHW, PHC, PHW, PHW, PHW, PHC, PHW, PHW, PHW), (VIVI, CLUB, PHW, PHW, PHC, PHW, PHW, PHW, PHC, PHW, PHW, PHW), (CLYPEUS, CLUB, PHW, PHW, PHC, PHW, PHW, PHW, PHC, PHW, PHW, PHW), (EXECUTIONER, SPEAR, AX, HAMMER, PHC, PHW, PHW, PHW, PHC, PHW, PHW, PHW),
-          (SLIME, CLUB, BLOWGUN, SCYTHE, PHC, PHW, PHW, PHW, CLYPEUS, MAGIC, SWORD, AX), (PHC, PHW, PHW, PHW, GHOST, SPEAR, PICKAXE, HEAL, CLYPEUS, MAGIC, SWORD, AX), (GOLEM, CLUB, BLOWGUN, SCYTHE, SWAMP, SPEAR, PICKAXE, HEAL, PHC, PHW, PHW, PHW), (ALPIN, CLUB, BLOWGUN, SCYTHE, SWAMP, SPEAR, PICKAXE, HEAL, CLYPEUS, MAGIC, SWORD, AX),(DEMON, CLUB, BLOWGUN, SCYTHE, SWAMP, SPEAR, PICKAXE, HEAL, CLYPEUS, MAGIC, SWORD, AX)]
+          (SLIME, CLUB, BLOWGUN, SCYTHE, PHC, PHW, PHW, PHW, CLYPEUS, MAGIC, SWORD, AX), (PHC, PHW, PHW, PHW, GHOST, SPEAR, PICKAXE, HEAL, CLYPEUS, MAGIC, SWORD, AX), (GOLEM, CLUB, BLOWGUN, SCYTHE, SWAMP, SPEAR, PICKAXE, HEAL, PHC, PHW, PHW, PHW), (ALPIN, CLUB, BLOWGUN, SCYTHE, SWAMP, SPEAR, PICKAXE, HEAL, CLYPEUS, MAGIC, SWORD, AX),(DEMON, CLUB, BLOWGUN, SCYTHE, SWAMP, SPEAR, PICKAXE, HEAL, PHANTASM, MAGIC, SWORD, AX)]
 
 if __name__ == '__main__':
     MainRun()
